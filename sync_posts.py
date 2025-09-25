@@ -103,7 +103,6 @@ def main():
             content = f"""---
 title: "{title}"
 metadate: "{post.get('metadate', '')}"
-layout: "{post.get('layout', '')}"
 categories: {categories_formatted}
 image: "{image_path}"
 visit: "{post.get('visit', '')}"
