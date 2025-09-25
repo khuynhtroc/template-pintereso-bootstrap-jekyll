@@ -1,7 +1,6 @@
 ---
 title: "Một Tiêu Đề Hấp Dẫn Khác"
 metadate: "hide"
-layout: ""
 categories: ["Graphic"]
 image: "/assets/images/iso.jpg"
 visit: "#"
