@@ -6,23 +6,23 @@ import requests
 from oauth2client.service_account import ServiceAccountCredentials
 from datetime import datetime
 
-# Lấy thông tin credentials từ GitHub Secrets
+# Get credentials from GitHub Secrets
 creds_json_str = os.environ['GCP_SA_KEY']
 sheet_id = os.environ['SHEET_ID']
 
-# Cấu hình thư mục
+# Directory configurations
 POSTS_DIR = "_posts"
 ASSETS_DIR = "assets/images"
 
 def slugify(text):
-    """Chuyển đổi văn bản sang slug chuẩn."""
+    """Converts text to a standard slug."""
     text = text.lower().strip()
     text = re.sub(r'[^\w\s-]', '', text)
     text = re.sub(r'\s+', '-', text)
     return text
 
-def download_image(url, posts_dir):
-    """Tải hình ảnh từ URL và lưu vào thư mục assets."""
+def download_image(url):
+    """Downloads an image from a URL and saves it to the assets directory."""
     try:
         if not url:
             return None
@@ -30,6 +30,7 @@ def download_image(url, posts_dir):
         if not os.path.exists(ASSETS_DIR):
             os.makedirs(ASSETS_DIR)
 
+        # Get the filename from the URL, removing query parameters
         filename = os.path.basename(url.split('?')[0])
         filepath = os.path.join(ASSETS_DIR, filename)
 
@@ -50,41 +51,39 @@ def download_image(url, posts_dir):
         return None
 
 def main():
-    """Tải dữ liệu từ Google Sheet và tạo các bài đăng Jekyll."""
+    """Fetches data from Google Sheet and creates Jekyll posts."""
     try:
-        # Xác thực với Google Sheets API
+        # Authenticate with Google Sheets API
         creds_dict = json.loads(creds_json_str)
         scope = ['https://spreadsheets.google.com/feeds', 'https://www.googleapis.com/auth/drive']
         creds = ServiceAccountCredentials.from_json_keyfile_dict(creds_dict, scope)
         client = gspread.authorize(creds)
 
-        # Mở spreadsheet và worksheet
+        # Open the spreadsheet and worksheet
         sheet = client.open_by_key(sheet_id).sheet1
 
-        # Lấy tất cả dữ liệu dưới dạng danh sách các dictionary
+        # Fetch all records as a list of dictionaries
         posts_data = sheet.get_all_records()
         all_cells = sheet.get_all_cells()
         header_row = [cell.value for cell in all_cells if cell.row == 1]
         
-        # Tìm chỉ số cột 'synced'
+        # Find the index of the 'synced' column
         try:
-            synced_col_index = header_row.index('synced') + 1 # gspread sử dụng chỉ số 1
+            synced_col_index = header_row.index('synced') + 1 # gspread uses 1-based indexing
         except ValueError:
             print("Cột 'synced' không tồn tại. Vui lòng thêm cột này vào Google Sheet của bạn.")
             return
 
-        # Tạo thư mục _posts nếu chưa tồn tại
+        # Create the _posts directory if it doesn't exist
         if not os.path.exists(POSTS_DIR):
             os.makedirs(POSTS_DIR)
 
         print(f"Tìm thấy {len(posts_data)} hàng trong Google Sheet.")
 
         for index, post in enumerate(posts_data):
-            # gspread.get_all_records() trả về dict, không có index
-            # Chúng ta cần tìm hàng dựa trên index của for loop
-            row_index = index + 2 # Hàng 1 là header
+            row_index = index + 2 # row 1 is the header
 
-            # Kiểm tra trạng thái đồng bộ
+            # Check sync status
             if post.get('synced') == 'DONE':
                 print(f"Hàng '{post.get('title')}' đã được đồng bộ, bỏ qua.")
                 continue
@@ -107,7 +106,7 @@ def main():
             filepath = os.path.join(POSTS_DIR, filename)
 
             image_url = post.get('image', '')
-            image_path = download_image(image_url, POSTS_DIR)
+            image_path = download_image(image_url)
 
             categories_str = post.get('categories', '')
             categories_list = [f'"{c.strip()}"' for c in categories_str.split(',') if c.strip()]
@@ -129,9 +128,14 @@ date: {post_date.strftime('%Y-%m-%d %H:%M:%S +0700')}
 
             print(f"Đã tạo/cập nhật file: {filename}")
 
-            # Cập nhật trạng thái đồng bộ trong Google Sheet
-            sheet.update_cell(row_index, synced_col_index, 'DONE')
-            print(f"Đã cập nhật trạng thái đồng bộ cho hàng {row_index}.")
+            # Update sync status in Google Sheet
+            try:
+                sheet.update_cell(row_index, synced_col_index, 'DONE')
+                print(f"Đã cập nhật trạng thái đồng bộ cho hàng {row_index}.")
+            except gspread.exceptions.APIError as api_e:
+                print(f"Lỗi khi cập nhật Google Sheet: {api_e.response.text}")
+            except Exception as e:
+                print(f"Lỗi không xác định khi cập nhật Google Sheet: {e}")
             
     except Exception as e:
         print(f"Đã xảy ra lỗi: {e}")
