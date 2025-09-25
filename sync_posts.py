@@ -139,6 +139,7 @@ def main():
             content = f"""---
 title: "{title}"
 metadate: "{post.get('metadate', '')}"
+layout: "{post.get('layout', '')}"
 categories: {categories_formatted}
 image: "{image_path}"
 visit: "{post.get('visit', '')}"
@@ -149,8 +150,8 @@ download_url: "{download_link}"
 {post.get('content', '')}
 
 <div style="text-align: center; margin-top: 2rem;">
-    {% if page.download_url %}
-    <a href="{{ page.download_url }}" class="btn" style="
+    {{% if page.download_url %}}
+    <a href="{{{{ page.download_url }}}}" class="btn" style="
         background-color: #3B82F6; /* Blue-500 */
         color: white;
         padding: 0.75rem 1.5rem;
@@ -162,7 +163,7 @@ download_url: "{download_link}"
     ">
         <i class="fas fa-download"></i> Tải về
     </a>
-    {% endif %}
+    {{% endif %}}
 </div>
 """
             with open(filepath, 'w', encoding='utf-8') as f:
