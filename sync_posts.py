@@ -17,8 +17,8 @@ ASSETS_DIR = "assets/images"
 def slugify(text):
     """Chuyển đổi văn bản sang slug chuẩn."""
     text = text.lower().strip()
-    text = re.sub(r'[^\w\s-]', '', text)  # Loại bỏ ký tự đặc biệt
-    text = re.sub(r'\s+', '-', text)      # Thay thế khoảng trắng bằng dấu gạch ngang
+    text = re.sub(r'[^\w\s-]', '', text)
+    text = re.sub(r'\s+', '-', text)
     return text
 
 def download_image(url, posts_dir):
@@ -30,7 +30,6 @@ def download_image(url, posts_dir):
         if not os.path.exists(ASSETS_DIR):
             os.makedirs(ASSETS_DIR)
 
-        # Lấy tên file từ URL
         filename = os.path.basename(url.split('?')[0])
         filepath = os.path.join(ASSETS_DIR, filename)
 
@@ -63,20 +62,38 @@ def main():
         sheet = client.open_by_key(sheet_id).sheet1
 
         # Lấy tất cả dữ liệu dưới dạng danh sách các dictionary
-        posts = sheet.get_all_records()
+        posts_data = sheet.get_all_records()
+        all_cells = sheet.get_all_cells()
+        header_row = [cell.value for cell in all_cells if cell.row == 1]
+        
+        # Tìm chỉ số cột 'synced'
+        try:
+            synced_col_index = header_row.index('synced') + 1 # gspread sử dụng chỉ số 1
+        except ValueError:
+            print("Cột 'synced' không tồn tại. Vui lòng thêm cột này vào Google Sheet của bạn.")
+            return
 
         # Tạo thư mục _posts nếu chưa tồn tại
         if not os.path.exists(POSTS_DIR):
             os.makedirs(POSTS_DIR)
 
-        print(f"Tìm thấy {len(posts)} bài viết trong Google Sheet.")
+        print(f"Tìm thấy {len(posts_data)} hàng trong Google Sheet.")
 
-        for post in posts:
-            title = post.get('title')
-            if not title:
+        for index, post in enumerate(posts_data):
+            # gspread.get_all_records() trả về dict, không có index
+            # Chúng ta cần tìm hàng dựa trên index của for loop
+            row_index = index + 2 # Hàng 1 là header
+
+            # Kiểm tra trạng thái đồng bộ
+            if post.get('synced') == 'DONE':
+                print(f"Hàng '{post.get('title')}' đã được đồng bộ, bỏ qua.")
                 continue
 
-            # Lấy ngày tháng và định dạng lại
+            title = post.get('title')
+            if not title:
+                print(f"Bỏ qua hàng {row_index} vì không có tiêu đề.")
+                continue
+
             post_date_str = str(post.get('date', ''))
             try:
                 post_date = datetime.strptime(post_date_str, '%Y-%m-%d')
@@ -85,21 +102,17 @@ def main():
                 print(f"Bỏ qua bài viết '{title}' do định dạng ngày không hợp lệ: {post_date_str}")
                 continue
 
-            # Tạo tên file chuẩn Jekyll
             title_slug = slugify(title)
             filename = f"{date_prefix}-{title_slug}.md"
             filepath = os.path.join(POSTS_DIR, filename)
-            
-            # Tải ảnh và lấy đường dẫn mới
+
             image_url = post.get('image', '')
             image_path = download_image(image_url, POSTS_DIR)
-            
-            # Xử lý categories: chuyển từ chuỗi sang danh sách chuỗi
+
             categories_str = post.get('categories', '')
             categories_list = [f'"{c.strip()}"' for c in categories_str.split(',') if c.strip()]
             categories_formatted = f"[{', '.join(categories_list)}]"
             
-            # Tạo nội dung file markdown với Front Matter
             content = f"""---
 title: "{title}"
 metadate: "{post.get('metadate', '')}"
@@ -111,12 +124,14 @@ date: {post_date.strftime('%Y-%m-%d %H:%M:%S +0700')}
 
 {post.get('content', '')}
 """
-
-            # Ghi file
             with open(filepath, 'w', encoding='utf-8') as f:
                 f.write(content)
 
             print(f"Đã tạo/cập nhật file: {filename}")
+
+            # Cập nhật trạng thái đồng bộ trong Google Sheet
+            sheet.update_cell(row_index, synced_col_index, 'DONE')
+            print(f"Đã cập nhật trạng thái đồng bộ cho hàng {row_index}.")
             
     except Exception as e:
         print(f"Đã xảy ra lỗi: {e}")
