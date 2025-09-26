@@ -41,4 +41,4 @@ jobs:
         with:
           commit_message: "chore: ✨ Tự động cập nhật bài viết từ Google Sheet"
           branch: master
-          file_pattern: "_posts/*.md redirects/*.md"
+          file_pattern: "_posts/*.md 
