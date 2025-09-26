@@ -81,11 +81,9 @@ def main():
             print("Cột 'synced' không tồn tại. Vui lòng thêm cột này vào Google Sheet của bạn.")
             return
 
-        # Tạo thư mục _posts và redirects nếu chưa tồn tại
+        # Tạo thư mục _posts nếu chưa tồn tại
         if not os.path.exists(POSTS_DIR):
             os.makedirs(POSTS_DIR)
-        if not os.path.exists(REDIRECTS_DIR):
-            os.makedirs(REDIRECTS_DIR)
 
         print(f"Tìm thấy {len(posts_data)} hàng trong Google Sheet.")
 
@@ -112,16 +110,12 @@ def main():
             title_slug = slugify(title)
             filename = f"{date_prefix}-{title_slug}.md"
             filepath = os.path.join(POSTS_DIR, filename)
-            
-            # --- Cấu hình đường dẫn redirect ---
-            download_url = post.get('download_link', '')
-            # Đường dẫn redirect nội bộ sẽ trỏ đến tệp HTML được Jekyll tạo ra
-            redirect_path = f"/redirects/{title_slug}.html" 
 
-            # --- Tạo file markdown cho bài viết ---
             image_url = post.get('image', '')
             image_path = download_image(image_url)
 
+            download_url = post.get('download_link', '')
+            
             categories_str = post.get('categories', '')
             categories_list = [f'"{c.strip()}"' for c in categories_str.split(',') if c.strip()]
             categories_formatted = f"[{', '.join(categories_list)}]"
@@ -133,27 +127,15 @@ categories: {categories_formatted}
 image: "{image_path}"
 visit: "{post.get('visit', '')}"
 date: {post_date.strftime('%Y-%m-%d %H:%M:%S +0700')}
-download_url: "{redirect_path}"
+download_url: "{download_url}"
+redirect_from: "/redirects/{title_slug}"
 ---
 {post.get('content', '')}
 """
             with open(filepath, 'w', encoding='utf-8') as f:
                 f.write(content)
-            
-            # --- Tạo file redirect markdown ---
-            redirect_content = f"""---
-layout: "redirect"
-download_url: "{download_url}"
-permalink: "{redirect_path}"
----
-"""
-            # Tên file markdown trong thư mục redirects
-            redirect_filepath = os.path.join(REDIRECTS_DIR, f"{title_slug}.md") 
-            with open(redirect_filepath, 'w', encoding='utf-8') as f:
-                f.write(redirect_content)
 
             print(f"Đã tạo/cập nhật file: {filename}")
-            print(f"Đã tạo file redirect: {redirect_filepath}")
 
             try:
                 sheet.update_cell(row_index, synced_col_index, 'DONE')
