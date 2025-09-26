@@ -1,58 +1,38 @@
-name: Fetch Facebook public posts (scraper)
+name: Fetch Facebook posts
 
 on:
   schedule:
-    - cron: '0 * * * *'  # mỗi giờ (UTC)
-  workflow_dispatch:     # run manually
-
-permissions:
-  contents: write
+    - cron: "0 * * * *"   # chạy mỗi giờ
+  workflow_dispatch:       # cho phép chạy thủ công
 
 jobs:
-  fetch:
+  fetch-posts:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - name: Checkout repo
+        uses: actions/checkout@v3
 
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: '3.x'
 
       - name: Install dependencies
         run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
+          pip install requests beautifulsoup4 python-slugify
 
       - name: Run scraper
-        env:
-          PAGE_USERNAME: ${{ secrets.PAGE_USERNAME }}
-          S3_BUCKET: ${{ secrets.S3_BUCKET }}
-          S3_PREFIX: ${{ secrets.S3_PREFIX }}
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
-          COMMIT_IMAGES: ${{ secrets.COMMIT_IMAGES }} # set "true" if you want to commit local images
         run: |
-          # If you want to run without S3, omit --upload-s3 and ensure COMMIT_IMAGES=true to have images committed
-          if [ -n "$S3_BUCKET" ]; then
-            python scrape_fb_public.py --page "${PAGE_USERNAME}" --out _posts --assets assets/images --limit 50 --upload-s3 --s3-bucket "${S3_BUCKET}" --s3-prefix "${S3_PREFIX}"
-          else
-            python scrape_fb_public.py --page "${PAGE_USERNAME}" --out _posts --assets assets/images --limit 50
-          fi
+          python scrape_fb_public.py \
+            --page ${{ secrets.FB_PAGE_SLUG }} \
+            --out _posts \
+            --assets assets/images \
+            --limit 20
 
-      - name: Commit & push changes
+      - name: Commit & Push changes
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add _posts processed.json || true
-          if [ "${{ secrets.COMMIT_IMAGES }}" = "true" ]; then
-            git add assets/images || true
-          fi
-          if git diff --cached --quiet; then
-            echo "No changes to commit"
-          else
-            git commit -m "Auto update posts (scraper)"
-            git push
-          fi
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add _posts assets/images processed.json || true
+          git commit -m "Auto update posts from Facebook" || echo "No changes to commit"
+          git push
