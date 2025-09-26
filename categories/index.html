@@ -1,0 +1,21 @@
+---
+layout: page
+title: Categories
+permalink: /categories/
+---
+
+<div class="container mx-auto px-4 py-8">
+    <h1 class="text-3xl font-bold mb-6">Tất cả danh mục</h1>
+    {% assign all_categories = site.categories | sort %}
+    {% for category in all_categories %}
+        {% assign category_name = category | first %}
+        {% assign category_count = category | last | size %}
+        <div class="mb-4">
+            <h2 class="text-xl font-semibold">
+                <a href="{{ site.baseurl }}/category/{{ category_name | slugify }}">
+                    {{ category_name }} ({{ category_count }})
+                </a>
+            </h2>
+        </div>
+    {% endfor %}
+</div>

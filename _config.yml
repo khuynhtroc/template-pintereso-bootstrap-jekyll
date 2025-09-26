@@ -18,7 +18,15 @@ plugins:
   - jekyll-paginate
   - jekyll-seo-tag
   - jekyll-redirect-from
- 
+  - jekyll-archives
+
+jekyll-archives:
+  enabled:
+    - categories
+  layout: 'category-page'
+  permalinks:
+    category: '/category/:name/'
+     
 # Defaults
 defaults:
 
