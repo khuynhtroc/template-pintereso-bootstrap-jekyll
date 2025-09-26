@@ -1,5 +1,12 @@
----
----
-<meta http-equiv="refresh" content="0; url={{ page.download_url | absolute_url }}">
-<link rel="canonical" href="{{ page.download_url | absolute_url }}">
-<script>window.location.replace("{{ page.download_url | absolute_url }}");</script>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Đang chuyển hướng...</title>
+<link rel="canonical" href="{{ page.download_url }}">
+<meta http-equiv="refresh" content="0; url={{ page.download_url }}">
+</head>
+<body>
+<p>Nếu bạn không được tự động chuyển hướng, vui lòng bấm vào <a href="{{ page.download_url }}">đây</a>.</p>
+</body>
+</html>
