@@ -1,12 +1,10 @@
 ---
 title: "Một Tiêu Đề Hấp Dẫn Khác"
 metadate: "hide"
-categories: ["Graphic"]
+categories: Graphic
 image: "/assets/images/iso.jpg"
 visit: "#"
 date: 2025-09-25 00:00:00 +0700
-download_url: "#"
+download_url: "/redirects/mot-tieu-de-hap-dan-khac"
 ---
-
 Graphic Elements
-
