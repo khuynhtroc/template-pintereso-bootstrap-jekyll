@@ -40,5 +40,5 @@ jobs:
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "chore: ✨ Tự động cập nhật bài viết từ Google Sheet"
-          branch: master # Kiểm tra nhánh chính của bạn, thường là 'main' hoặc 'master'
-          file_pattern: "_posts/*.md redirects/*.md" # Đã sửa để bao gồm cả thư mục redirects
+          branch: master
+          file_pattern: "_posts/*.md"
