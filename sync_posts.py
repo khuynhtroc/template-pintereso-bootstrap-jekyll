@@ -113,12 +113,14 @@ def main():
             filename = f"{date_prefix}-{title_slug}.md"
             filepath = os.path.join(POSTS_DIR, filename)
             
+            # --- Cấu hình đường dẫn redirect ---
+            download_url = post.get('download_link', '')
+            # Đường dẫn redirect nội bộ sẽ trỏ đến tệp HTML được Jekyll tạo ra
+            redirect_path = f"/redirects/{title_slug}.html" 
+
             # --- Tạo file markdown cho bài viết ---
             image_url = post.get('image', '')
             image_path = download_image(image_url)
-
-            download_url = post.get('download_link', '')
-            redirect_path = f"/redirects/{title_slug}.html"
 
             categories_str = post.get('categories', '')
             categories_list = [f'"{c.strip()}"' for c in categories_str.split(',') if c.strip()]
@@ -145,7 +147,8 @@ download_url: "{download_url}"
 permalink: "{redirect_path}"
 ---
 """
-            redirect_filepath = os.path.join(REDIRECTS_DIR, f"{title_slug}.md")
+            # Tên file markdown trong thư mục redirects
+            redirect_filepath = os.path.join(REDIRECTS_DIR, f"{title_slug}.md") 
             with open(redirect_filepath, 'w', encoding='utf-8') as f:
                 f.write(redirect_content)
 

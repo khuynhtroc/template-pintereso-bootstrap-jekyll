@@ -9,7 +9,6 @@ disqus: 'demowebsite'
 email: 'wowthemesnet@gmail.com'
 
 include: ["_pages"]
-include: [ "redirects" ]
 permalink: /:title/
 
 # Plugins
@@ -46,3 +45,6 @@ paginate: 20
 
 # Exclude metadata and development time dependencies (like Grunt plugins)
 exclude: [README.markdown, package.json, grunt.js, Gruntfile.js, Gruntfile.coffee, node_modules]
+
+# Thêm thư mục redirects để Jekyll xử lý
+include: [ "redirects" ]
