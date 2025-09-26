@@ -1,12 +1,12 @@
 ---
 layout: default
 ---
-<section class="bg-gray200 pt-5 pb-5">    
+<section class="bg-gray200 pt-5 pb-5">
     <div class="container">
-    	<div class="row justify-content-center">
-    		<div class="col-md-8">
+        <div class="row justify-content-center">
+            <div class="col-md-10">
                 
-    			<article class="card">
+                <article class="card">
                     
                  {% if page.image %} 
                     <span class="pinme">
@@ -15,40 +15,79 @@ layout: default
                     <img class="card-img-top mb-2" src="{% if page.image contains "://" %}{{ page.image }}{% else %}{{ page.image | absolute_url }}{% endif %}" alt="{{ page.title }}"> 
                 {% endif %}
                     
-    			<div class="card-body">
-                    
-    				<h1 class="display-4">
-    				    {{page.title}} 
-                    </h1>                    
-                     
-                    <small class="text-muted d-block mb-3">
-                        {% unless page.metadate == "hide" %} 
-                            {{ page.date | date: '%B %d, %Y' }} 
-                        {% endunless %}
-                        {% if page.author %}
-                            , by {{page.author | capitalize}} 
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <h1 class="display-4">{{page.title}}</h1>
+                            <small class="text-muted d-block mb-3">
+                                {% unless page.metadate == "hide" %} 
+                                    {{ page.date | date: '%B %d, %Y' }} 
+                                {% endunless %}
+                                {% if page.author %}
+                                    , by {{page.author | capitalize}} 
+                                {% endif %}
+                            </small>
+                            {{ content }}
+                        </div>
+                        <div class="col-md-4">
+                            {% if page.download_url %}
+                                <p><a target="_blank" href="{{page.download_url}}" class="btn btn-primary d-block font-weight-bold">
+                                    <i class="fas fa-download"></i> Tải về ok</a>
+                                </p>
+                            {% endif %}
+                            {% if page.visit %}
+                                <p><a target="_blank" href="{{page.visit}}" class="btn btn-gray d-block font-weight-bold">
+                                    Visit <i class="fas fa-external-link-alt"></i></a>
+                                </p>
+                            {% endif %}
+                            {% for category in page.categories %}
+                              <a class="btn btn-sm btn-primary mt-2" href="{{site.baseurl}}/categories.html#{{ category | downcase }}">
+                                # {{ category | downcase }}
+                              </a>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% include comments.html %}
+                </div>
+                </article>
+                
+                <!-- Related Posts Section -->
+                {% assign current_categories = page.categories %}
+                {% assign related_posts = "" | split: "," %}
+
+                {% for post in site.posts %}
+                    {% unless post.url == page.url %}
+                        {% assign common_categories = post.categories | intersection: current_categories %}
+                        {% if common_categories.size > 0 %}
+                            {% assign related_posts = related_posts | push: post %}
                         {% endif %}
-                    </small>                    
-                    
-    				{{ content }}
-                    
-                    {% if page.visit %}
-                    <p><a target="_blank" href="{{page.visit}}" class="btn btn-gray d-block font-weight-bold">
-                        Visit <i class="fas fa-external-link-alt"></i></a>
-                    </p>
-                    {% endif %}
-                    
-                    {% for category in page.categories %}
-                      <a class="btn btn-sm btn-primary mt-2" href="{{site.baseurl}}/categories.html#{{ category | downcase }}">
-                        # {{ category | downcase }}
-                      </a>
-                    {% endfor %}
-                    
-    				{% include comments.html %}
-                    
-    			</div>  
-                    
-    			</article>
+                    {% endunless %}
+                {% endfor %}
+
+                {% assign sorted_related_posts = related_posts | sort: "date" | reverse | limit: 4 %}
+
+                {% if sorted_related_posts.size > 0 %}
+                  <div class="related-posts-section mt-5">
+                    <h3 class="h4 text-center mb-4">Các bài viết liên quan</h3>
+                    <div class="row">
+                        {% for post in sorted_related_posts %}
+                            <div class="col-md-6 mb-4">
+                                <a href="{{ post.url | absolute_url }}"><div class="card h-100">
+                                    {% if post.image %}
+                                      <img class="card-img-top" src="{% if post.image contains "://" %}{{ post.image }}{% else %}{{ post.image | absolute_url }}{% endif %}" alt="{{ post.title }}">
+                                    {% endif %}
+                                    <div class="card-body d-flex flex-column">
+                                        <h5 class="card-title">{{ post.title }}</h5>
+                                        <!--p class="card-text text-muted small">{{ post.date | date: "%B %d, %Y" }}</p>
+                                        <a href="{{ post.url | absolute_url }}" class="btn btn-sm btn-primary mt-auto">Xem thêm</a-->
+                                    </div>
+                                </div></a>
+                            </div>
+                        {% endfor %}
+                    </div>
+                  </div>
+                {% endif %}
+                <!-- End of Related Posts Section -->
                 
                 <div class="PageNavigation">
                   {% if page.next.url %}
@@ -59,7 +98,7 @@ layout: default
                   {% endif %}
                 </div>
                 
-    		</div>
-    	</div>
+            </div>
+        </div>
     </div>
 </section>
