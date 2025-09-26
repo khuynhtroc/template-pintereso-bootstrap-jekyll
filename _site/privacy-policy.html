@@ -611,4 +611,26 @@ function lunr_search(term) {
 
 <!-- Cookie Consent, nothing for you to replace here. Remove it if you want  -->
 <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.0.3/cookieconsent.min.css" />
-<script src="//cdnjs.cl
+<script src="//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.0.3/cookieconsent.min.js"></script>
+<script>
+window.addEventListener("load", function(){
+window.cookieconsent.initialise({
+  "palette": {
+    "popup": {
+      "background": "#eb6c44",
+      "text": "#ffffff"
+    },
+    "button": {
+      "background": "#f5d948"
+    }
+  },
+  "position": "bottom-left",
+  "content": {
+    "href": "http://localhost:4000/template-pintereso-bootstrap-jekyll/privacy-policy.html"
+  }
+})});
+</script>
+    
+</body>
+    
+</html>
