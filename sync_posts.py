@@ -123,6 +123,7 @@ def main():
             content = f"""---
 title: "{title}"
 metadate: "{post.get('metadate', '')}"
+layout: "post"
 categories: {categories_formatted}
 image: "{image_path}"
 visit: "{post.get('visit', '')}"
@@ -148,19 +149,3 @@ download_url: "{download_url}"
 
 if __name__ == "__main__":
     main()
-```
-eof
-
-Với cách này, bạn sẽ **không cần tạo thư mục `redirects/` hoặc tệp `redirect.html`** nữa. Thay vào đó, bạn chỉ cần sử dụng trường `redirect_from` trong Front Matter của mỗi bài viết.
-
----
-
-### Cách 2: Sửa file `_config.yml` để Jekyll xử lý thư mục
-
-Nếu bạn không muốn sử dụng plugin, bạn có thể buộc Jekyll xử lý các file trong thư mục `redirects/` bằng cách thêm nó vào danh sách `include` trong file cấu hình.
-
-Thêm dòng sau vào file `_config.yml` của bạn:
-
-```yaml
-# Thêm thư mục redirects để Jekyll xử lý
-include: [ "redirects" ]
