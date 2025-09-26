@@ -9,6 +9,7 @@ disqus: 'demowebsite'
 email: 'wowthemesnet@gmail.com'
 
 include: ["_pages"]
+include: [ "redirects" ]
 permalink: /:title/
 
 # Plugins
