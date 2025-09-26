@@ -1,7 +1,7 @@
 ---
 title: "Bài Viết Đầu Tiên Của Tôi"
 metadate: "hide"
-categories: ["Graphic"]
+categories: ["graphic"]
 image: "/assets/images/iso.jpg"
 visit: "#"
 date: 2025-09-25 00:00:00 +0700

@@ -1,7 +1,7 @@
 ---
 title:  "Dashboard Kit"
 metadate: "hide"
-categories: [ Premium, UI, Graphics ]
+categories: [ premium, ui, graphics ]
 image: "/assets/images/dashboard-kit.jpg"
 visit: "https://crmrkt.com/pwNyQ4"
 ---

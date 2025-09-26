@@ -1,13 +1,55 @@
 ---
 layout: default
 ---
-<div class="container mx-auto px-4 py-8">
-    <h1 class="text-3xl font-bold mb-6">Danh mục: {{ page.category }}</h1>
-    <ul>
-        {% for post in site.categories[page.category] %}
-            <li>
-                <a href="{{ post.url }}">{{ post.title }}</a>
-            </li>
+<section class="mt-4 mb-5">
+
+  <div class="container mb-6">
+    <h3 class="font-weight-bold title">Explore</h3>
+    <div class="row">
+      {% include menu-categories.html %}
+    </div>
+  </div>
+
+  {% comment %}
+    Xác định slug danh mục:
+    - Ưu tiên page.category nếu có.
+    - Nếu không có, trích từ URL: '/category/<slug>/' => lấy phần tử thứ 2 sau 'category'.
+  {% endcomment %}
+  {% assign cat_from_page = page.category | downcase %}
+  {% assign url_parts = page.url | split:'/' %}
+  {% assign cat_from_url = url_parts[2] | downcase %}
+  {% assign cat_slug = cat_from_page | default: cat_from_url %}
+
+  {% comment %}
+    Lấy metadata từ _data/categories.yml:
+    site.data.categories[cat_slug] => { title, description, image, ... }
+  {% endcomment %}
+  {% assign cat_meta = site.data.categories[cat_slug] %}
+  {% assign cat_title = cat_meta.title | default: page.title | default: cat_slug %}
+  {% assign cat_desc  = cat_meta.description %}
+
+  <div class="container mb-4">
+    <h1 class="text-3xl font-bold mb-2">Chủ đề: {{ cat_title }}</h1>
+    {% if cat_desc and cat_desc != '' %}
+      <p class="text-muted mb-4">{{ cat_desc }}</p>
+    {% endif %}
+  </div>
+
+  {% comment %}
+    Lấy danh sách bài trong danh mục, sắp xếp mới nhất.
+  {% endcomment %}
+  {% assign posts_in_cat = site.categories[cat_slug] %}
+  <div class="container-fluid">
+    <div class="card-columns">
+      {% if posts_in_cat and posts_in_cat.size > 0 %}
+        {% assign posts_sorted = posts_in_cat | sort: "date" | reverse %}
+        {% for post in posts_sorted %}
+          {% include card-post.html %}
         {% endfor %}
-    </ul>
-</div>
+      {% else %}
+        <p>Không tìm thấy bài viết nào trong danh mục này.</p>
+      {% endif %}
+    </div>
+  </div>
+
+</section>

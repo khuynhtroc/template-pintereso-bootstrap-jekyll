@@ -1,7 +1,7 @@
 ---
 title:  "Empty States"
 metadate: "hide"
-categories: [ Graphics ]
+categories: [ graphics ]
 image: "/assets/images/empty-states.jpg"
 visit: "https://crmrkt.com/E4OyDQ"
 ---

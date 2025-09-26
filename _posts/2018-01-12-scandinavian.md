@@ -1,7 +1,7 @@
 ---
 title:  "Scandinavian"
 metadate: "hide"
-categories: [ Premium, UI, WordPress, Themes ]
+categories: [ premium, ui, wordpress, themes ]
 image: "/assets/images/scandinavian.jpg"
 visit: "https://crmrkt.com/Rzq1GQ"
 ---

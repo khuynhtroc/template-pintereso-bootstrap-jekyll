@@ -1,7 +1,7 @@
 ---
 title:  "Graphic Bundle"
 metadate: "hide"
-categories: [ Graphics ]
+categories: [ graphics ]
 image: "/assets/images/iso.jpg"
 visit: "https://crmrkt.com/MWxQNz"
 ---

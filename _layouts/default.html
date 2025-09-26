@@ -6,6 +6,8 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">    
     <title>{{page.title}} | {{site.name}}</title>
     
+    {% assign page.title = cat_title | append: ' | ' | append: site.title %}
+    {% if cat_desc %}{% assign page.description = cat_desc %}{% endif %}
     {% seo %}
     
     <link rel="shortcut icon" type="image/x-icon" href="{{site.baseurl}}/{{site.favicon}}">
@@ -25,7 +27,7 @@
 <body>
     
     <nav class="navbar navbar-expand-lg navbar-light bg-white fixed-top">
-    <a class="navbar-brand font-weight-bolder mr-3" href="{{site.baseurl}}/index.html"><img src="{{site.baseurl}}/{{site.logo}}"></a>
+    <a class="navbar-brand font-weight-bolder mr-3" href="{{site.baseurl}}/"><img src="{{site.baseurl}}/{{site.logo}}"></a>
     <button class="navbar-light navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsDefault" aria-controls="navbarsDefault" aria-expanded="false" aria-label="Toggle navigation">
     <span class="navbar-toggler-icon"></span>
     </button>

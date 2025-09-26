@@ -1,21 +1,62 @@
 ---
-layout: page
+layout: default
 title: Categories
 permalink: /categories/
 ---
 
-<div class="container mx-auto px-4 py-8">
-    <h1 class="text-3xl font-bold mb-6">Tất cả danh mục</h1>
-    {% assign all_categories = site.categories | sort %}
-    {% for category in all_categories %}
-        {% assign category_name = category | first %}
-        {% assign category_count = category | last | size %}
-        <div class="mb-4">
-            <h2 class="text-xl font-semibold">
-                <a href="{{ site.baseurl }}/category/{{ category_name | slugify }}">
-                    {{ category_name }} ({{ category_count }})
-                </a>
-            </h2>
+<section class="mt-4 mb-5">
+
+  <div class="container mb-4">
+    <h1 class="font-weight-bold title">Danh mục</h1>
+    <p class="text-muted mb-0">Khám phá các chủ đề và tài nguyên theo danh mục.</p>
+  </div>
+
+  {% comment %}
+    site.categories là mảng các cặp [slug, posts].
+    Ghép với site.data.categories[slug] để lấy title/description/image/color.
+  {% endcomment %}
+  {% assign cats = site.categories | sort %}
+
+  <!-- Lưới card giống homepage -->
+  <div class="container">
+    <div class="row">
+      {% for cat in cats %}
+        {% assign slug = cat[0] | downcase %}
+        {% assign posts_in_cat = cat[1] %}
+        {% assign meta = site.data.categories[slug] %}
+        {% assign title = meta.title | default: slug %}
+        {% assign desc  = meta.description %}
+        {% assign image = meta.image %}
+        {% assign color = meta.color | default: '#0f172a' %}
+        {% assign url   = '/category/' | append: slug | relative_url %}
+
+        <div class="col-xl-3 col-lg-4 col-md-6 mb-4 d-flex">
+          <a class="card w-100 text-reset text-decoration-none" href="{{ url }}">
+            {% if image %}
+              <div class="position-relative" style="padding-top: 56.25%; background-color: {{ color }};">
+                <div style="
+                  background-image: url('{{ image | relative_url }}');
+                  background-size: cover;
+                  background-position: center;
+                  position: absolute; inset: 0;">
+                </div>
+              </div>
+            {% else %}
+              <div class="position-relative" style="padding-top: 56.25%; background-color: {{ color }};"></div>
+            {% endif %}
+
+            <div class="card-body">
+              <h3 class="h6 mb-2">{{ title }}</h3>
+              {% if desc and desc != '' %}
+                <p class="mb-2 text-muted">{{ desc }}</p>
+              {% endif %}
+              <p class="mb-0 text-muted small">{{ posts_in_cat | size }} bài viết</p>
+            </div>
+          </a>
         </div>
-    {% endfor %}
-</div>
+      {% endfor %}
+    </div>
+  </div>
+
+</section>
+

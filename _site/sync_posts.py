@@ -2,6 +2,7 @@ import gspread
 import json
 import os
 import re
+import requests
 from oauth2client.service_account import ServiceAccountCredentials
 from datetime import datetime
 
@@ -27,6 +28,34 @@ def slugify(text):
     text = re.sub(r'[^\w\s-]', '', text)
     text = re.sub(r'\s+', '-', text)
     return text
+
+def download_image(url):
+    """Tải hình ảnh từ URL và lưu vào thư mục assets."""
+    try:
+        if not url:
+            return None
+
+        if not os.path.exists(ASSETS_DIR):
+            os.makedirs(ASSETS_DIR)
+
+        filename = os.path.basename(url.split('?')[0])
+        filepath = os.path.join(ASSETS_DIR, filename)
+
+        if os.path.exists(filepath):
+            print(f"Hình ảnh đã tồn tại, bỏ qua tải xuống: {filepath}")
+            return f"/{ASSETS_DIR}/{filename}"
+
+        response = requests.get(url, stream=True)
+        response.raise_for_status()
+
+        with open(filepath, 'wb') as f:
+            for chunk in response.iter_content(chunk_size=8192):
+                f.write(chunk)
+        print(f"Hình ảnh đã được tải xuống: {filepath}")
+        return f"/{ASSETS_DIR}/{filename}"
+    except requests.exceptions.RequestException as e:
+        print(f"Lỗi khi tải hình ảnh từ {url}: {e}")
+        return None
 
 def main():
     """Tải dữ liệu từ Google Sheet và tạo các bài đăng Jekyll."""
@@ -55,8 +84,6 @@ def main():
         # Tạo thư mục _posts nếu chưa tồn tại
         if not os.path.exists(POSTS_DIR):
             os.makedirs(POSTS_DIR)
-        if not os.path.exists(REDIRECTS_DIR):
-            os.makedirs(REDIRECTS_DIR)
 
         print(f"Tìm thấy {len(posts_data)} hàng trong Google Sheet.")
 
@@ -84,33 +111,24 @@ def main():
             filename = f"{date_prefix}-{title_slug}.md"
             filepath = os.path.join(POSTS_DIR, filename)
 
-            download_link = post.get('download_link', '')
-            redirect_path = ""
-            if download_link:
-                redirect_filename = f"{title_slug}.md"
-                redirect_filepath = os.path.join(REDIRECTS_DIR, redirect_filename)
-                
-                # Tạo file redirect
-                redirect_content = f"""---
-permalink: /redirects/{title_slug}
-download_url: "{download_link}"
-layout: "redirect"
----
-"""
-                with open(redirect_filepath, 'w', encoding='utf-8') as f:
-                    f.write(redirect_content)
-                print(f"Đã tạo file chuyển hướng: {redirect_filename}")
-                redirect_path = f"/redirects/{title_slug}"
+            image_url = post.get('image', '')
+            image_path = download_image(image_url)
 
-            # Tạo nội dung bài viết chính
+            download_url = post.get('download_link', '')
+            
+            categories_str = post.get('categories', '')
+            categories_list = [f'"{c.strip()}"' for c in categories_str.split(',') if c.strip()]
+            categories_formatted = f"[{', '.join(categories_list)}]"
+            
             content = f"""---
 title: "{title}"
 metadate: "{post.get('metadate', '')}"
-categories: {post.get('categories', '[]')}
-image: "{post.get('image', '')}"
+categories: {categories_formatted}
+image: "{image_path}"
 visit: "{post.get('visit', '')}"
 date: {post_date.strftime('%Y-%m-%d %H:%M:%S +0700')}
-download_url: "{redirect_path}"
+download_url: "{download_url}"
+redirect_from: "/redirects/{title_slug}"
 ---
 {post.get('content', '')}
 """

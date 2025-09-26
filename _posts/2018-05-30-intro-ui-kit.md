@@ -1,7 +1,7 @@
 ---
 title:  "Intro UI Kit"
 metadate: "hide"
-categories: [ Premium, UI, Graphics, Templates ]
+categories: [ premium, ui, graphics, templates ]
 image: "assets/images/intr-ui.jpg"
 visit: "https://crmrkt.com/jVoy2b"
 ---

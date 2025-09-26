@@ -1,7 +1,7 @@
 ---
 title: "Hai Tiêu Đề Hấp Dẫn Khác"
 metadate: "hide"
-categories: ["Graphic"]
+categories: ["graphic"]
 image: "/assets/images/iso.jpg"
 visit: "#"
 date: 2025-09-26 00:00:00 +0700

@@ -1,7 +1,7 @@
 ---
 title:  "Web Concepts Library"
 metadate: "hide"
-categories: [ Premium, UI, Graphics ]
+categories: [ premium, ui, graphics ]
 image: "/assets/images/web-concepts-library.jpg"
 visit: "https://crmrkt.com/Vdaek1"
 ---

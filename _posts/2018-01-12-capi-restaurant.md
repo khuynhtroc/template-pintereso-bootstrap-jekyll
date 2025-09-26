@@ -1,7 +1,7 @@
 ---
 title:  "Capi Restaurant"
 metadate: "hide"
-categories: [ Premium, UI, Graphics, Templates ]
+categories: [ premium, ui, graphics, templates ]
 image: "/assets/images/capi.jpg"
 visit: "https://crmrkt.com/2QKymR"
 ---

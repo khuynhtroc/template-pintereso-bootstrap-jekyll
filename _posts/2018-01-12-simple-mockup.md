@@ -1,7 +1,7 @@
 ---
 title:  "Simple Mockups Bundle"
 metadate: "hide"
-categories: [ Premium, UI, Graphics ]
+categories: [ premium, ui, graphics ]
 image: "assets/images/simple-mockup.jpg"
 visit: "https://crmrkt.com/Bd1d60"
 ---

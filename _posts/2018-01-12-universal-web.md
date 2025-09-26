@@ -1,7 +1,7 @@
 ---
 title:  "Universal Web UI Kit"
 metadate: "hide"
-categories: [ Premium, Graphics ]
+categories: [ premium, graphics ]
 image: "/assets/images/universal.jpg"
 visit: "https://crmrkt.com/Ojajy8"
 ---

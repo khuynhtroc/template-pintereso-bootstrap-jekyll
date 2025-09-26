@@ -1,7 +1,7 @@
 ---
 title:  "Mediumsih Jekyll Theme"
 metadate: "hide"
-categories: [ Free, Jekyll, Themes ]
+categories: [ free, jekyll, themes ]
 image: "/assets/images/jekyll-mediumish.png"
 visit: "https://www.wowthemes.net/mediumish-free-jekyll-template/"
 ---

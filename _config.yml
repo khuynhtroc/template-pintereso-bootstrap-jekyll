@@ -8,9 +8,17 @@ avatar: 'assets/images/sal.jpg'
 disqus: 'demowebsite'
 email: 'wowthemesnet@gmail.com'
 
-include: ["_pages"]
+include:
+  - "_pages"
+  - "category"
+  - "redirects"
 permalink: /:title/
 
+collections:
+  pages:
+    output: true
+    permalink: /:path/
+    
 # Plugins
 plugins: 
   - jekyll-feed
@@ -20,6 +28,10 @@ plugins:
   - jekyll-redirect-from
   - jekyll-archives
 
+plugins:
+  - jekyll-archives
+
+# Cấu hình jekyll-archives để tạo trang danh mục
 jekyll-archives:
   enabled:
     - categories
@@ -27,6 +39,11 @@ jekyll-archives:
   permalinks:
     category: '/category/:name/'
      
+# Cấu hình jekyll-redirect-from để xử lý chuyển hướng
+redirect_from:
+  enabled: true
+
+
 # Defaults
 defaults:
 
@@ -53,6 +70,3 @@ paginate: 20
 
 # Exclude metadata and development time dependencies (like Grunt plugins)
 exclude: [README.markdown, package.json, grunt.js, Gruntfile.js, Gruntfile.coffee, node_modules]
-
-# Thêm thư mục redirects để Jekyll xử lý
-include: [ "redirects" ]
