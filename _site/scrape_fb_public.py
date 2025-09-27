@@ -130,33 +130,38 @@ def fetch_page_index(page_username, limit_links=50):
             logger.warning(f"Status {r.status_code} for {url}")
             break
         soup = BeautifulSoup(r.text, "html.parser")
-        for a in soup.find_all("a", href=True):
-            href = a['href']
-            if any(x in href for x in ("/story.php", "/permalink.php", "/photo.php", "/posts/")):
-                full = urljoin(BASE, href)
-                if full not in visited:
-                    visited.add(full)
-                    links.append(full)
-                    count += 1
-                    if count >= limit_links:
-                        return links
-        # find "See more" or next link
+
+        # ----- Bổ sung cho profile cá nhân -----
+        articles = soup.find_all("article")
+        if not articles:
+            articles = soup.find_all("div", {"role": "article"})
+
+        for art in articles:
+            a = art.find("a", href=True)
+            if a:
+                href = a["href"]
+                if "story.php" in href or "posts" in href or "permalink.php" in href:
+                    full = urljoin(BASE, href)
+                    if full not in visited:
+                        visited.add(full)
+                        links.append(full)
+                        count += 1
+                        if count >= limit_links:
+                            return links
+
+        # tìm link next page
         more = None
         for a in soup.find_all("a", href=True):
             text = a.get_text().strip().lower()
             if text in ("see more", "xem thêm", "next", "older posts", "load more posts"):
-                more = urljoin(BASE, a['href'])
+                more = urljoin(BASE, a["href"])
                 break
-        if not more:
-            # try link with "m_more_item" id/class
-            next_link = soup.find("a", string=re.compile("See more|Xem thêm|Older"))
-            if next_link and next_link.has_attr("href"):
-                more = urljoin(BASE, next_link['href'])
         if not more:
             break
         url = more
         time.sleep(random.uniform(1.5, 3.5))
     return links
+
 
 def parse_post_page(post_url):
     """
@@ -170,7 +175,7 @@ def parse_post_page(post_url):
         return None
     soup = BeautifulSoup(r.text, "html.parser")
 
-    # ID: try to get from URL query or path
+    # ID
     post_id = None
     parsed = urlparse(post_url)
     q = parsed.query
@@ -178,73 +183,48 @@ def parse_post_page(post_url):
         m = re.search(r"story_fbid=(\d+)", q)
         if m:
             post_id = m.group(1)
-    # fallback: use path
     if not post_id:
-        # generate an id from path + timestamp
-        post_id = re.sub(r'\W+', '-', parsed.path).strip('-')
+        post_id = re.sub(r"\W+", "-", parsed.path).strip("-")
 
-    # message: in mbasic it's often in divs, try multiple heuristics
+    # message
     message = ""
-    # the main message is often in the first div with data-ft or the one before "Like" link
-    # simple heuristic:
-    main_div = None
-    for div in soup.find_all("div"):
-        if div.get("data-ft") and div.get_text(strip=True):
-            main_div = div
-            break
+    # fanpage layout
+    main_div = soup.find("div", {"data-ft": True})
     if main_div:
         message = main_div.get_text(separator="\n").strip()
-    else:
-        # fallback: find big text blocks
-        ptexts = [d.get_text(separator="\n").strip() for d in soup.find_all("div") if d.get_text(strip=True)]
-        message = ptexts[0] if ptexts else ""
+    # profile layout fallback
+    if not message:
+        art = soup.find("div", {"role": "article"})
+        if art:
+            message = art.get_text(separator="\n").strip()
 
-    # date: find timestamp link
-    date_str = None
-    date_a = soup.find("a", href=True)
-    if date_a and date_a.get_text(strip=True):
-        date_text = date_a.get_text(strip=True)
-        # not always machine parseable; we'll use current time if not found
-        date_str = date_text
-
-    # image: find first <img> inside article area but avoid profile images; heuristic: big images have src with "scontent"
+    # image
     image_url = None
-    # find image tags that are direct children of a <div role="article"> maybe not present
     for img in soup.find_all("img"):
         src = img.get("src")
-        if not src:
-            continue
-        # skip tiny icons (src containing "emoji.php" or "profile_pic")
-        if any(x in src for x in ("emoji.php", "profile_pic")):
-            continue
-        # heuristics: if src contains 'scontent' or '/photo.php' or is not a data: URI
-        if src.startswith("http"):
+        if src and "scontent" in src:
             image_url = src
             break
 
-    # comments: find blocks with comments, extract link
+    # comment link (download_url)
     download_link = None
-    # search for any text nodes containing http or www, prioritize comments area
-    text_nodes = soup.find_all(text=True)
-    for t in text_nodes:
+    for t in soup.find_all(text=True):
         txt = t.strip()
-        if not txt:
-            continue
         if "http" in txt or "www." in txt:
             link = extract_first_url(txt)
             if link:
                 download_link = link
                 break
 
-    # fallback: look for "See more comments" link and fetch comment page (skipped for simplicity)
     return {
         "id": post_id,
         "url": post_url,
-        "date_text": date_str,
+        "date_text": datetime.utcnow().isoformat(),
         "message": message,
         "image_url": image_url,
         "download_url": download_link
     }
+
 
 # -------------------------
 # S3 helper
