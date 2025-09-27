@@ -1,5 +1,5 @@
 ---
-layout: "category-page.html"
+layout: "category-page"
 title: "free"
 description: "Tải Graphic Elements: icon, pattern, UI assets."
 permalink: "/category/free/"
