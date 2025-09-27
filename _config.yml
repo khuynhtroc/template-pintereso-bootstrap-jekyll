@@ -29,9 +29,6 @@ plugins:
   - jekyll-redirect-from
   - jekyll-archives
 
-plugins:
-  - jekyll-archives
-
 # Cấu hình jekyll-archives để tạo trang danh mục
 jekyll-archives:
   enabled:
