@@ -3,7 +3,7 @@ name: Sync Jekyll Posts to Supabase
 on:
   push:
     branches:
-      - main # Đảm bảo đây là nhánh chính của bạn
+      - master # Đảm bảo đây là nhánh chính của bạn
     paths:
       - '_posts/**'
       - 'scripts/sync_supabase.js' # Thêm dòng này để action chạy lại nếu bạn sửa script
@@ -36,5 +36,5 @@ jobs:
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
-        run: node scripts/sync.js
+        run: node scripts/sync_supabase.js.js
 
