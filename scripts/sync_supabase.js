@@ -42,7 +42,7 @@ async function syncPosts() {
             sku: frontMatter.sku,
             download_url: frontMatter.download_url,
             categories: frontMatter.categories,
-            date: date,
+            date: frontMatter.date,
             // Thêm các trường khác nếu có
         };
     });
