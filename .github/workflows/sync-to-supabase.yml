@@ -26,7 +26,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4 # Sử dụng phiên bản mới nhất
         with:
-          node-version: '18'
+          node-version: '20'
           cache: 'npm' # Thêm cache để tăng tốc các lần chạy sau
 
       - name: Install dependencies
