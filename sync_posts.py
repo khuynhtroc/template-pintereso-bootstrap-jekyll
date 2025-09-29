@@ -116,7 +116,13 @@ def main():
 
             download_url = post.get('download_link', '')
             
+            # === START MODIFICATION: Lấy SKU và Price ===
+            sku = post.get('sku', '')
+            price = post.get('price', '')
+            # === END MODIFICATION ===
+            
             categories_str = post.get('categories', '')
+            # Đảm bảo categories được định dạng đúng là YAML array, ví dụ: ["Graphic", "Design"]
             categories_list = [f'"{c.strip()}"' for c in categories_str.split(',') if c.strip()]
             categories_formatted = f"[{', '.join(categories_list)}]"
             
@@ -128,6 +134,8 @@ image: "{image_path}"
 visit: "{post.get('visit', '')}"
 date: {post_date.strftime('%Y-%m-%d %H:%M:%S +0700')}
 download_url: "{download_url}"
+sku: "{sku}"
+price: "{price}"
 redirect_from: "/redirects/{title_slug}"
 ---
 {post.get('content', '')}

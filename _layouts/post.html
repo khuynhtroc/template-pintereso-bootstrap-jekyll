@@ -45,6 +45,36 @@ layout: default
                                 # {{ category | downcase }}
                               </a>
                             {% endfor %}
+                            <!-- Thêm data-sku để JS có thể lấy được SKU của sản phẩm từ front matter của Jekyll -->
+                            <div id="product-details" data-sku="{{ page.sku }}">
+                                <p>Giá: <span id="product-price">Đang tải...</span></p>
+                                <button id="buy-button">Mua ngay</button>
+                            </div>
+                            
+                            <script>
+                                document.addEventListener('DOMContentLoaded', async () => {
+                                    const productDetailsElement = document.getElementById('product-details');
+                                    if (productDetailsElement) {
+                                        const productSKU = productDetailsElement.dataset.sku;
+                                        
+                                        // Gọi Supabase để lấy thông tin sản phẩm dựa trên SKU
+                                        const { data, error } = await supabase
+                                            .from('products')
+                                            .select('price, name') // Lấy giá và tên sản phẩm
+                                            .eq('sku', productSKU)
+                                            .single(); // Lấy một dòng duy nhất
+                            
+                                        if (error) {
+                                            console.error('Lỗi lấy thông tin sản phẩm:', error.message);
+                                            document.getElementById('product-price').innerText = 'Không có sẵn';
+                                        } else if (data) {
+                                            // Cập nhật giá lên giao diện
+                                            document.getElementById('product-price').innerText = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(data.price);
+                                        }
+                                    }
+                                });
+                            </script>
+
                         </div>
                     </div>
                     {% include comments.html %}
