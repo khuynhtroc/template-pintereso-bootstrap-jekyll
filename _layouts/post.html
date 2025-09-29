@@ -40,17 +40,23 @@ layout: default
                                     Visit <i class="fas fa-external-link-alt"></i></a>
                                 </p>
                             {% endif %}
-                            {% for category in page.categories %}
-                              <a class="btn btn-sm btn-primary mt-2" href="{{site.baseurl}}/category/{{ category | downcase }}">
-                                # {{ category | downcase }}
-                              </a>
-                            {% endfor %}
+
                             <!-- Thêm data-sku để JS có thể lấy được SKU của sản phẩm từ front matter của Jekyll -->
+                            {% if page.sku %}
                             <div id="product-details" data-sku="{{ page.sku }}">
                                 <p>Giá: <span id="product-price">Đang tải...</span></p>
                                 <button id="buy-button">Mua ngay</button>
                             </div>
-                            
+                            {% endif %}
+                            {% if page.price %}
+                            <div class="buy-box text-center">
+                                <p class="text-muted">Mua lẻ để sở hữu vĩnh viễn tài nguyên này</p>
+                                <p style="color: #898989; font-weight: 600;">(Tự động kích hoạt sau 20s)</p>
+                                <div class="price mb-3">{{ page.price }}</div>
+                                <a href="#" class="btn btn-success w-100 fw-bold fs-5"><i class="fas fa-shopping-cart"></i> Mua File Này</a>
+                                
+                            </div>
+                            {% endif %}
                             <script>
                                 document.addEventListener('DOMContentLoaded', async () => {
                                     const productDetailsElement = document.getElementById('product-details');
@@ -75,6 +81,11 @@ layout: default
                                 });
                             </script>
 
+                            {% for category in page.categories %}
+                              <a class="btn btn-sm btn-primary mt-2" href="{{site.baseurl}}/category/{{ category | downcase }}">
+                                # {{ category | downcase }}
+                              </a>
+                            {% endfor %}
                         </div>
                     </div>
                     {% include comments.html %}

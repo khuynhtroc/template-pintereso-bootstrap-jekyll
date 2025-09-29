@@ -510,3 +510,9 @@ a.next {
 .highlight {
   background-color: #f8f8f8;
 }
+
+.buy-box .price {
+    font-size: 2rem;
+    font-weight: bold;
+    color: var(--bs-danger);
+}
