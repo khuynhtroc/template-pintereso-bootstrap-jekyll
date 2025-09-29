@@ -1,5 +1,26 @@
 {
   "dependencies": {
+    "@supabase/supabase-js": "^2.58.0",
+    "glob": "^11.0.3",
+    "gray-matter": "^4.0.3",
     "react-router-dom": "^7.9.3"
-  }
+  },
+  "name": "template-pintereso-bootstrap-jekyll",
+  "version": "1.0.0",
+  "description": "[Live Demo](https://wowthemesnet.github.io/template-pintereso-bootstrap-jekyll/) &nbsp; | &nbsp; [Download](https://github.com/wowthemesnet/template-pintereso-bootstrap-jekyll/archive/master.zip) &nbsp; | &nbsp; [Buy me a coffee](https://www.wowthemes.net/donate/) &nbsp; | &nbsp; [Documentation](https://bootstrapstarter.com/template-pintereso-bootstrap-jekyll/) &nbsp; | &nbsp; [WordPress version](https://www.wowthemes.net/themes/pinpresso-wordpress/)",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/khuynhtroc/template-pintereso-bootstrap-jekyll.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/khuynhtroc/template-pintereso-bootstrap-jekyll/issues"
+  },
+  "homepage": "https://github.com/khuynhtroc/template-pintereso-bootstrap-jekyll#readme"
 }

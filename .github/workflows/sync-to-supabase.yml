@@ -1,0 +1,30 @@
+name: Sync Jekyll Posts to Supabase
+
+on:
+  push:
+    branches:
+      - main # Hoặc nhánh chính của bạn
+    paths:
+      - '_posts/**' # Chỉ chạy khi có thay đổi trong thư mục _posts
+  workflow_dispatch: # Cho phép chạy thủ công
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run sync script
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        run: node scripts/sync_supabase.js
