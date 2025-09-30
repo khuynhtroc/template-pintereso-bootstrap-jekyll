@@ -29,16 +29,22 @@ def slugify(text):
     text = re.sub(r'\s+', '-', text)
     return text
 
-def download_image(url):
-    """Tải hình ảnh từ URL và lưu vào thư mục assets."""
+# === ĐÃ SỬA: Thêm tham số 'slug' để đặt tên file ===
+def download_image(url, slug):
+    """Tải hình ảnh từ URL và lưu vào thư mục assets với tên file là slug của bài viết."""
     try:
-        if not url:
+        if not url or not slug:
             return None
 
         if not os.path.exists(ASSETS_DIR):
             os.makedirs(ASSETS_DIR)
 
-        filename = os.path.basename(url.split('?')[0])
+        # Lấy phần mở rộng của file ảnh gốc
+        url_path = url.split('?')[0]
+        file_extension = os.path.splitext(url_path)[1]
+        
+        # Tạo tên file mới: slug + extension (ví dụ: test-5.jpg)
+        filename = f"{slug}{file_extension}"
         filepath = os.path.join(ASSETS_DIR, filename)
 
         if os.path.exists(filepath):
@@ -112,17 +118,16 @@ def main():
             filepath = os.path.join(POSTS_DIR, filename)
 
             image_url = post.get('image', '')
-            image_path = download_image(image_url)
+            
+            # === ĐÃ SỬA: Truyền title_slug vào hàm download_image ===
+            image_path = download_image(image_url, title_slug)
 
             download_url = post.get('download_link', '')
             
-            # === START MODIFICATION: Lấy SKU và Price ===
             sku = post.get('sku', '')
             price = post.get('price', '')
-            # === END MODIFICATION ===
             
             categories_str = post.get('categories', '')
-            # Đảm bảo categories được định dạng đúng là YAML array, ví dụ: ["Graphic", "Design"]
             categories_list = [f'"{c.strip()}"' for c in categories_str.split(',') if c.strip()]
             categories_formatted = f"[{', '.join(categories_list)}]"
             

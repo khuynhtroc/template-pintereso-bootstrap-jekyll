@@ -14,15 +14,7 @@ layout: default
                     </span>
                     <img class="card-img-top mb-2" src="{% if page.image contains "://" %}{{ page.image }}{% else %}{{ page.image | absolute_url }}{% endif %}" alt="{{ page.title }}"> 
                 {% endif %}
-                {% if page.image and page.image != 'None' %}
-                    <div class="post-image mb-6">
-                        <span class="pinme">
-                            <a data-pin-do="buttonPin" data-pin-tall="true" href="https://www.pinterest.com/pin/create/button/?url={{site.url}}{{site.baseurl}}{{page.url}}&media={{site.url}}{{site.baseurl}}/{{page.image}}&description={{ page.title }}- {{ page.content | strip_html | truncatewords:25 }}"></a>
-                        </span>
-                        <!-- Đảm bảo dùng relative_url để ảnh hoạt động trên Custom Domain -->
-                        <img src="{{ page.image | relative_url }}" alt="{{ page.title }}" class="rounded-lg shadow-md w-full h-auto object-cover">
-                    </div>
-                {% endif %}
+
                 <div class="card-body">
                     <div class="row">
                         <div class="col-md-8">
@@ -49,13 +41,7 @@ layout: default
                                 </p>
                             {% endif %}
 
-                            <!-- Thêm data-sku để JS có thể lấy được SKU của sản phẩm từ front matter của Jekyll -->
-                            {% if page.sku %}
-                            <div id="product-details" data-sku="{{ page.sku }}">
-                                <p>Giá: <span id="product-price">Đang tải...</span></p>
-                                <button id="buy-button">Mua ngay</button>
-                            </div>
-                            {% endif %}
+
                             {% if page.sku %}
                                 <p class="text-lg mb-1">
                                     <strong>SKU:</strong> 
@@ -64,43 +50,17 @@ layout: default
                             {% endif %}
                         
                             {% if page.price %}
-                                <p class="text-lg mb-1">
-                                    <strong>Giá:</strong> 
-                                    <span class="text-red-600 font-bold">{{ page.price | append: ' VNĐ' }}</span>
-                                </p>
-                            {% endif %}
-                            {% if page.price %}
                             <div class="buy-box text-center">
                                 <p class="text-muted">Mua lẻ để sở hữu vĩnh viễn tài nguyên này</p>
                                 <p style="color: #898989; font-weight: 600;">(Tự động kích hoạt sau 20s)</p>
-                                <div class="price mb-3">{{ page.price }}</div>
+                                <div class="price mb-3">
+                                    <strong>Giá:</strong> 
+                                    <span class="text-red-600 font-bold">{{ page.price | append: ' VNĐ' }}</span>
+                                </div>
                                 <a href="#" class="btn btn-success w-100 fw-bold fs-5"><i class="fas fa-shopping-cart"></i> Mua File Này</a>
                                 
                             </div>
                             {% endif %}
-                            <script>
-                                document.addEventListener('DOMContentLoaded', async () => {
-                                    const productDetailsElement = document.getElementById('product-details');
-                                    if (productDetailsElement) {
-                                        const productSKU = productDetailsElement.dataset.sku;
-                                        
-                                        // Gọi Supabase để lấy thông tin sản phẩm dựa trên SKU
-                                        const { data, error } = await supabase
-                                            .from('products')
-                                            .select('price, name') // Lấy giá và tên sản phẩm
-                                            .eq('sku', productSKU)
-                                            .single(); // Lấy một dòng duy nhất
-                            
-                                        if (error) {
-                                            console.error('Lỗi lấy thông tin sản phẩm:', error.message);
-                                            document.getElementById('product-price').innerText = 'Không có sẵn';
-                                        } else if (data) {
-                                            // Cập nhật giá lên giao diện
-                                            document.getElementById('product-price').innerText = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(data.price);
-                                        }
-                                    }
-                                });
-                            </script>
 
                             {% for category in page.categories %}
                               <a class="btn btn-sm btn-primary mt-2" href="{{site.baseurl}}/category/{{ category | downcase }}">
