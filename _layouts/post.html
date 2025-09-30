@@ -14,7 +14,12 @@ layout: default
                     </span>
                     <img class="card-img-top mb-2" src="{% if page.image contains "://" %}{{ page.image }}{% else %}{{ page.image | absolute_url }}{% endif %}" alt="{{ page.title }}"> 
                 {% endif %}
-                    
+                {% if page.image and page.image != 'None' %}
+                    <div class="post-image mb-6">
+                        <!-- Đảm bảo dùng relative_url để ảnh hoạt động trên Custom Domain -->
+                        <img src="{{ page.image | relative_url }}" alt="{{ page.title }}" class="rounded-lg shadow-md w-full h-auto object-cover">
+                    </div>
+                {% endif %}
                 <div class="card-body">
                     <div class="row">
                         <div class="col-md-8">
@@ -47,6 +52,19 @@ layout: default
                                 <p>Giá: <span id="product-price">Đang tải...</span></p>
                                 <button id="buy-button">Mua ngay</button>
                             </div>
+                            {% endif %}
+                            {% if page.sku %}
+                                <p class="text-lg mb-1">
+                                    <strong>SKU:</strong> 
+                                    <span class="text-blue-600 font-mono">{{ page.sku }}</span>
+                                </p>
+                            {% endif %}
+                        
+                            {% if page.price %}
+                                <p class="text-lg mb-1">
+                                    <strong>Giá:</strong> 
+                                    <span class="text-red-600 font-bold">{{ page.price | append: ' VNĐ' }}</span>
+                                </p>
                             {% endif %}
                             {% if page.price %}
                             <div class="buy-box text-center">
