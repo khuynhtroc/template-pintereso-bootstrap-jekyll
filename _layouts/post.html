@@ -16,6 +16,9 @@ layout: default
                 {% endif %}
                 {% if page.image and page.image != 'None' %}
                     <div class="post-image mb-6">
+                        <span class="pinme">
+                            <a data-pin-do="buttonPin" data-pin-tall="true" href="https://www.pinterest.com/pin/create/button/?url={{site.url}}{{site.baseurl}}{{page.url}}&media={{site.url}}{{site.baseurl}}/{{page.image}}&description={{ page.title }}- {{ page.content | strip_html | truncatewords:25 }}"></a>
+                        </span>
                         <!-- Đảm bảo dùng relative_url để ảnh hoạt động trên Custom Domain -->
                         <img src="{{ page.image | relative_url }}" alt="{{ page.title }}" class="rounded-lg shadow-md w-full h-auto object-cover">
                     </div>
