@@ -6,8 +6,8 @@
     const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 </script>
 
-  <script src="/assets/js/config.supabase.js"></script>
-  <script type="module" src="/assets/js/auth-modal.js"></script>
+<script src="{{ '/assets/js/config.supabase.js' | relative_url }}"></script>
+<script type="module" src="{{ '/assets/js/auth-modal.js' | relative_url }}"></script>
 
 <script>
 document.addEventListener("DOMContentLoaded", function() {
