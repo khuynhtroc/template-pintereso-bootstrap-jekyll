@@ -6,22 +6,33 @@
     const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 </script>
 
-<!-- Modal Đăng nhập -->
-<div class="modal fade" id="authModal" tabindex="-1" role="dialog" aria-labelledby="authModalLabel" aria-hidden="true">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content text-center">
-      <div class="modal-header">
-        <h5 class="modal-title" id="authModalLabel">Đăng nhập/Đăng ký để tải file</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        <p>Bạn cần đăng nhập để tải file này. Nếu đã có tài khoản, hãy <a href="/login">đăng nhập</a>. Nếu chưa, hãy <a href="/register">đăng ký</a> trước.</p>
-      </div>
-    </div>
-  </div>
-</div>
+  <script src="/assets/js/config.supabase.js"></script>
+  <script type="module" src="/assets/js/auth-modal.js"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  var btn = document.getElementById('downloadBtn');
+  if (!btn) return;
+  btn.addEventListener('click', function(e) {
+    e.preventDefault();
+
+    // Giả sử window.currentUser có các trường: isLoggedIn: Boolean, isVip: Boolean
+    if(!window.currentUser || !window.currentUser.isLoggedIn) {
+      $('#authModal').modal('show'); // dùng bootstrap modal
+      return false;
+    }
+
+    // Nếu cần check VIP:
+    if(btn.dataset.requiresVip === "true" && !window.currentUser.isVip) {
+      alert('Bạn cần nâng cấp gói thành viên VIP để tải file này!');
+      return false;
+    }
+
+    // Đủ quyền thì mở link download
+    window.open(btn.dataset.downloadUrl, '_blank');
+  });
+});
+</script>
 
 
 <!-- AddThis, replace this with your own code from https://www.addthis.com/ --> 

@@ -1,0 +1,10 @@
+/* assets/css/auth-modal.css */
+.auth-hide { display: none; }
+#auth-backdrop {
+  position: fixed; inset: 0; background: rgba(0,0,0,.5);
+  display: flex; align-items: center; justify-content: center;
+}
+.auth-modal { background: #fff; padding: 16px; border-radius: 8px; width: 360px; }
+.auth-tabs { display: flex; gap: 8px; margin-bottom: 12px; }
+.auth-tabs button.active { font-weight: 600; }
+.auth-modal form { display: flex; flex-direction: column; gap: 8px; margin-bottom: 10px; }
