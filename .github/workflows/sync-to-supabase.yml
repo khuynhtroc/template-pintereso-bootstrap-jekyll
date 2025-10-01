@@ -7,8 +7,6 @@ on:
     paths:
       - '_posts/**'
       - 'scripts/sync_supabase.js' # Thêm dòng này để action chạy lại nếu bạn sửa script
-# Kích hoạt workflow
-on:
   # Chạy tự động mỗi 6 giờ
   schedule:
     - cron: "0 */6 * * *"
