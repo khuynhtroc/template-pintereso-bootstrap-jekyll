@@ -1,4 +1,3 @@
-// scripts/sync_supabase.js
 const { createClient } = require('@supabase/supabase-js');
 const fs = require('fs');
 const path = require('path');
@@ -34,10 +33,11 @@ async function syncPosts() {
         // Tạo slug từ tên file, ví dụ: 2025-09-29-san-pham-a.md -> san-pham-a
         const slug = path.basename(filePath, '.md').substring(11);
 
+        // Lưu ý: Đảm bảo tất cả các trường dưới đây tồn tại trong bảng 'products' của bạn
         return {
             slug: slug,
             name: frontMatter.title,
-            description: frontMatter.description,
+            description: frontMatter.description, // Đảm bảo trường này có trong Front Matter
             price: frontMatter.price,
             sku: frontMatter.sku,
             download_url: frontMatter.download_url,
@@ -47,10 +47,12 @@ async function syncPosts() {
         };
     });
 
-    // Sử dụng 'upsert' để chèn mới hoặc cập nhật nếu đã tồn tại dựa trên cột 'slug'
+    // === ĐÃ SỬA: Thay đổi onConflict từ 'slug' sang 'sku' ===
+    // Lý do: Lỗi "products_sku_key" chỉ ra rằng ràng buộc UNIQUE đang áp dụng trên cột 'sku'.
+    // Chúng ta phải sử dụng 'sku' làm khóa để upsert.
     const { data, error } = await supabase
         .from('products')
-        .upsert(productsToUpsert, { onConflict: 'slug' });
+        .upsert(productsToUpsert, { onConflict: 'sku' });
 
     if (error) {
         console.error('Error syncing data to Supabase:', error);
