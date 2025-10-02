@@ -1,24 +1,21 @@
-// assets/js/auth-modal.js (đoạn xử lý sign up / sign in)
-ui.emailSignup?.addEventListener('submit', async (e)=>{
-  e.preventDefault();
-  const fd = new FormData(e.currentTarget);
-  const { error } = await supabase.auth.signUp({
-    email: fd.get('email'),
-    password: fd.get('password'),
-    options: { data: { username: fd.get('username') || null } }
-  });
-  if (error) return alert(error.message); // sẽ thấy lỗi chi tiết từ Supabase
-  alert('Đăng ký thành công, kiểm tra email nếu được yêu cầu xác minh');
-  closeModal();
-});
+// assets/js/auth-modal.js
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
-ui.emailLogin?.addEventListener('submit', async (e)=>{
-  e.preventDefault();
-  const fd = new FormData(e.currentTarget);
-  const { error } = await supabase.auth.signInWithPassword({
-    email: fd.get('email'), password: fd.get('password')
-  });
-  if (error) return alert(error.message);
-  await syncProfile();
-  closeModal();
+const supabase = createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
+
+document.addEventListener('DOMContentLoaded', () => {
+  const $ = (s) => document.querySelector(s);
+  const backdrop = $('#auth-backdrop');            // phải tồn tại trong DOM
+  const btnClose = $('#auth-close');
+  const avatar = $('#user-avatar');
+
+  const openModal = () => backdrop.classList.add('is-open');
+  const closeModal = () => backdrop.classList.remove('is-open');
+
+  avatar?.addEventListener('click', openModal);    // chỉ mở khi bấm avatar
+  btnClose?.addEventListener('click', closeModal); // nút Đóng
+  backdrop?.addEventListener('click', (e) => { if (e.target === backdrop) closeModal(); }); // click ra ngoài
+  window.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });     // phím Esc
+
+  // KHÔNG gọi openModal() ở đây
 });
