@@ -1,5 +1,12 @@
 <!-- This goes before </head> closing tag, Google Analytics can be placed here --> 
 
-<script src="/assets/js/config.supabase.js"></script>           <!-- khai báo window.SUPABASE_URL/ANON_KEY -->
-<script type="module" src="/assets/js/sb-client.js"></script>    <!-- tạo window.__sb duy nhất -->
-<script type="module" src="/assets/js/pricing.js"></script>      <!-- hoặc checkout.js / auth-modal.js -->
+<!-- 1) Cấu hình URL/KEY -->
+<script src="/assets/js/config.supabase.js"></script>
+
+<!-- 2) Tạo client chung một lần -->
+<script type="module" src="/assets/js/sb-client.js"></script>
+
+<!-- 3) Mọi file khác (module) chỉ import { sb } -->
+<script type="module" src="/assets/js/auth-modal.js"></script>
+<script type="module" src="/assets/js/pricing.js"></script>
+
