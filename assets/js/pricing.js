@@ -5,25 +5,34 @@ const supabase = createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
 const $  = (s) => document.querySelector(s);
 const $$ = (s) => Array.from(document.querySelectorAll(s));
 
-const fmtVND = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND', maximumFractionDigits: 0 });
+// Định dạng tiền tệ theo currency/locale
+const money = (amt, cur = 'VND') =>
+  new Intl.NumberFormat(cur === 'USD' ? 'en-US' : 'vi-VN', {
+    style: 'currency', currency: cur, maximumFractionDigits: 0
+  }).format(amt || 0);
 
-function parseFeatures(f) {
+// Ép features về mảng chuỗi
+function toArray(f) {
   if (!f) return [];
   if (Array.isArray(f)) return f;
-  return String(f).split('\n').map(x => x.trim()).filter(Boolean);
+  try {
+    const v = typeof f === 'string' ? JSON.parse(f) : f;
+    return Array.isArray(v) ? v : [];
+  } catch { return []; }
 }
 
 function planCardHTML(p) {
-  const price     = typeof p.price === 'number' ? fmtVND.format(p.price) : '';
-  const compare   = typeof p.compare_at_price === 'number' && p.compare_at_price > (p.price||0)
-                    ? fmtVND.format(p.compare_at_price) : null;
-  const badge     = p.badge_text || (p.is_popular ? 'Tiết kiệm' : null);
-  const features  = parseFeatures(p.features);
-  const subTitle  = p.subtitle || (p.duration_months ? `${p.duration_months} tháng` : '');
-  const title     = p.name || 'Gói thành viên';
-  const downloads = p.daily_downloads ? `Tải xuống ${p.daily_downloads} file mỗi ngày` : null;
+  const cur      = p.currency || 'VND';
+  const price    = typeof p.price === 'number' ? money(p.price, cur) : '';
+  const compare  = (typeof p.compare_at_price === 'number' && p.compare_at_price > (p.price || 0))
+                    ? money(p.compare_at_price, cur) : null;
+  const badge    = p.badge_text || (p.is_popular ? 'Tiết kiệm' : null);
+  const features = toArray(p.features);
+  const subTitle = p.subtitle || (p.duration_months ? `${p.duration_months} tháng` : '');
+  const title    = p.name || 'Gói thành viên';
+  const dl       = p.daily_downloads ? `Tải xuống ${p.daily_downloads} file mỗi ngày` : null;
 
-  const feats = [downloads, ...features].filter(Boolean);
+  const feats = [dl, ...features].filter(Boolean);
 
   return `
   <article class="plan ${p.is_popular ? 'popular' : ''}">
@@ -37,7 +46,7 @@ function planCardHTML(p) {
       ${feats.map(x => `<li>✅ <span>${x}</span></li>`).join('')}
     </ul>
 
-    <button class="plan-cta" data-plan-id="${p.id}">MUA GÓI NÀY</button>
+    <button class="plan-cta" data-plan-slug="${p.slug || ''}" data-plan-id="${p.id}">MUA GÓI NÀY</button>
   </article>`;
 }
 
@@ -48,7 +57,7 @@ async function fetchPlans() {
   try {
     const { data, error } = await supabase
       .from('membership_plans')
-      .select('id, name, subtitle, duration_months, price, compare_at_price, daily_downloads, features, is_popular, badge_text, sort_order, is_active')
+      .select('id, slug, name, subtitle, duration_months, price, compare_at_price, currency, daily_downloads, features, is_popular, badge_text, sort_order, is_active')
       .eq('is_active', true)
       .order('sort_order', { ascending: true })
       .order('price', { ascending: true });
@@ -56,44 +65,44 @@ async function fetchPlans() {
 
     grid.innerHTML = (data || []).map(planCardHTML).join('') || '<p>Chưa có gói nào.</p>';
 
-    // CTA handler
+    // CTA handler (ưu tiên slug; fallback id)
     $$('.plan-cta').forEach(btn => {
       btn.addEventListener('click', async () => {
-        const planId = btn.getAttribute('data-plan-id');
+        const slug = btn.getAttribute('data-plan-slug');
+        const id   = btn.getAttribute('data-plan-id');
 
         // 1) Kiểm tra đăng nhập
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) { window.fvOpenAuth?.(); return; }
 
-        // 2) Lấy lại thông tin gói (đảm bảo dữ liệu mới nhất cho trang checkout)
-        const { data: plan, error: ePlan } = await supabase
-          .from('membership_plans')
-          .select('id, name, subtitle, duration_months, price, compare_at_price')
-          .eq('id', planId)
-          .maybeSingle();
+        // 2) Lấy lại thông tin gói bằng slug (nếu có), nếu không thì theo id
+        const sel = 'id, slug, name, subtitle, duration_months, price, currency, compare_at_price';
+        let plan = null, ePlan = null;
+        if (slug) {
+          ({ data: plan, error: ePlan } = await supabase
+            .from('membership_plans').select(sel).eq('slug', slug).maybeSingle());
+        } else {
+          ({ data: plan, error: ePlan } = await supabase
+            .from('membership_plans').select(sel).eq('id', id).maybeSingle());
+        }
         if (ePlan) { alert(ePlan.message); return; }
         if (!plan) { alert('Gói không tồn tại.'); return; }
 
-        // 3) Chuyển tới trang checkout kèm tham số
-        //    Sử dụng id, name, price, duration để trang /checkout/ render đúng như ảnh.
+        // 3) Chuyển tới checkout kèm slug/id và thông tin hiển thị
         const qs = new URLSearchParams({
-          plan_id: plan.id,
-          name: plan.name || '',
+          plan: plan.slug || plan.id,
           price: String(plan.price ?? ''),
-          duration: String(plan.duration_months ?? ''),
+          currency: plan.currency || 'VND',
+          name: plan.name || '',
+          duration: String(plan.duration_months ?? '')
         }).toString();
         window.location.href = `/checkout/?${qs}`;
       });
     });
   } catch (e) {
-    const grid = $('#plans');
-    const errorBox = $('#plans-error');
     if (grid) grid.innerHTML = '';
-    if (errorBox) {
-      errorBox.hidden = false;
-      errorBox.textContent = e.message || 'Không thể tải dữ liệu gói.';
-    }
+    if (errorBox) { errorBox.hidden = false; errorBox.textContent = e.message || 'Không thể tải dữ liệu gói.'; }
   }
 }
 
-document.addEventListener('DOMContentLoaded', fetchPlans);
+document.addEventListener('DOMContentLoaded', fetch
