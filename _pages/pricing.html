@@ -1,0 +1,25 @@
+---
+layout: default
+title: Thành viên VIP
+permalink: /pricing/
+---
+
+<link rel="stylesheet" href="{{ '/assets/css/pricing.css' | relative_url }}">
+
+<section class="pricing-wrap">
+  <h1 class="pricing-title">THÀNH VIÊN VIP</h1>
+  <p class="pricing-sub">Mở khóa toàn bộ tài nguyên với các gói thành viên của chúng tôi.</p>
+
+  <div id="plans" class="plans-grid">
+    <!-- Skeleton trong khi tải -->
+    <div class="plan-skel"></div>
+    <div class="plan-skel"></div>
+    <div class="plan-skel"></div>
+    <div class="plan-skel"></div>
+  </div>
+
+  <div id="plans-error" class="plans-error" hidden></div>
+</section>
+
+<script src="{{ '/assets/js/config.supabase.js' | relative_url }}"></script>
+<script type="module" src="{{ '/assets/js/pricing.js' | relative_url }}"></script>
