@@ -1,4 +1,11 @@
 <!-- _includes/header-avatar.html -->
-<div id="user-avatar" style="cursor:pointer;">
+<!--div id="user-avatar" style="cursor:pointer;">
   <img class="rounded-circle mr-2" src="{{site.baseurl}}/{{site.avatar}}" alt="avatar" width="32" height="32" />
-</div>
+</div-->
+
+
+  <a id="user-menu" class="nav-link p-0 d-inline-flex align-items-center" href="#" aria-label="Account">
+    <img id="user-avatar" class="rounded-circle" src="{{ site.avatar | relative_url }}" width="30" height="30" alt="avatar">
+    <span id="user-name" class="ml-2">Đăng nhập</span>
+  </a>
+

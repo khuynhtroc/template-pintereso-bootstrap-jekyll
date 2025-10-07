@@ -1,4 +1,3 @@
-// assets/js/auth-modal.js
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 const supabase = createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
@@ -6,92 +5,105 @@ const supabase = createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
 document.addEventListener('DOMContentLoaded', () => {
   const $ = (s) => document.querySelector(s);
 
-  // Phần tử UI
-  const backdrop   = $('#auth-backdrop');
-  const modal      = backdrop?.querySelector('.fv-modal');
-  const avatar     = $('#user-avatar');
-  const btnClose   = $('#auth-close');
+  // Elements
+  const backdrop = $('#auth-backdrop');
+  const modal = backdrop?.querySelector('.fv-modal');
+  const avatarBtn = $('#user-avatar'); // ảnh trong menu
+  const userNameSpan = $('#user-name'); // span để hiển thị tên cạnh ảnh
+  const accountLink = $('#user-menu'); // thẻ <a> bao ảnh + tên, href=/account/
+  const btnClose = $('#auth-close');
 
-  const tabLogin   = $('#tab-login');
-  const tabSignup  = $('#tab-signup');
+  const tabLogin = $('#tab-login');
+  const tabSignup = $('#tab-signup');
   const panelLogin = $('#panel-login');
-  const panelSignup= $('#panel-signup');
-
-  const formLogin  = $('#auth-email-login');
+  const panelSignup = $('#panel-signup');
+  const formLogin = $('#auth-email-login');
   const formSignup = $('#auth-email-signup');
-  const btnGoogle  = $('#auth-google');
+  const btnGoogle = $('#auth-google');
 
-  // Mở/đóng modal
-  const openModal  = () => { backdrop?.classList.add('is-open'); (modal?.querySelector('input,button'))?.focus(); };
-  const closeModal = () => { backdrop?.classList.remove('is-open'); avatar?.focus?.(); };
+  // Modal open/close
+  const openModal = () => { backdrop?.classList.add('is-open'); (modal?.querySelector('input,button'))?.focus(); };
+  const closeModal = () => { backdrop?.classList.remove('is-open'); accountLink?.focus?.(); };
 
-  avatar?.addEventListener('click', (e)=>{ e.preventDefault(); openModal(); });
+  accountLink?.addEventListener('click', (e) => {
+    // Nếu chưa đăng nhập => mở modal, nếu đã đăng nhập => đi /account/
+    if (!accountLink.dataset.signedin) { e.preventDefault(); openModal(); }
+  });
+  avatarBtn?.addEventListener('click', (e) => { e.preventDefault(); openModal(); });
   btnClose?.addEventListener('click', closeModal);
-  backdrop?.addEventListener('click', (e)=>{ if (e.target === backdrop) closeModal(); });
-  window.addEventListener('keydown', (e)=>{ if (e.key === 'Escape' && backdrop?.classList.contains('is-open')) closeModal(); });
+  backdrop?.addEventListener('click', (e) => { if (e.target === backdrop) closeModal(); });
+  window.addEventListener('keydown', (e) => { if (e.key === 'Escape' && backdrop?.classList.contains('is-open')) closeModal(); });
 
-  // Tabs ARIA: chuyển panel và cập nhật aria-selected/tabindex
+  // Tabs
   function activate(which){
     const isLogin = which === 'login';
     tabLogin?.setAttribute('aria-selected', String(isLogin));
     tabSignup?.setAttribute('aria-selected', String(!isLogin));
-    if (tabLogin)  tabLogin.tabIndex  = isLogin ? 0 : -1;
+    if (tabLogin) tabLogin.tabIndex = isLogin ? 0 : -1;
     if (tabSignup) tabSignup.tabIndex = isLogin ? -1 : 0;
-
-    tabLogin?.classList.toggle('is-active', isLogin);
-    tabSignup?.classList.toggle('is-active', !isLogin);
-
-    if (panelLogin)  panelLogin.hidden  = !isLogin;
-    if (panelSignup) panelSignup.hidden =  isLogin;
-
-    (isLogin ? panelLogin : panelSignup)?.querySelector('input')?.focus();
+    panelLogin.hidden = !isLogin;
+    panelSignup.hidden = isLogin;
+    (isLogin ? panelLogin : panelSignup).querySelector('input')?.focus();
   }
-  tabLogin?.addEventListener('click',  ()=> activate('login'));
-  tabSignup?.addEventListener('click', ()=> activate('signup'));
-  activate('login'); // mặc định mở tab Đăng nhập
+  tabLogin?.addEventListener('click', () => activate('login'));
+  tabSignup?.addEventListener('click', () => activate('signup'));
+  activate('login');
 
-  // Đăng nhập (email/password)
-  formLogin?.addEventListener('submit', async (e)=>{
-    e.preventDefault(); // chặn reload
+  // Sign in (email/password)
+  formLogin?.addEventListener('submit', async (e) => {
+    e.preventDefault();
     const fd = new FormData(e.currentTarget);
-    const email = fd.get('email'); const password = fd.get('password');
-
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) { alert(error.message); return; } // hiển thị thông điệp chuẩn
-    await syncProfile();
-    closeModal();
+    const { error } = await supabase.auth.signInWithPassword({
+      email: fd.get('email'), password: fd.get('password')
+    });
+    if (error) { alert(error.message); return; }
+    await renderHeader(); closeModal();
   });
 
-  // Đăng ký (email/password)
-  formSignup?.addEventListener('submit', async (e)=>{
-    e.preventDefault(); // chặn reload
+  // Sign up (email/password)
+  formSignup?.addEventListener('submit', async (e) => {
+    e.preventDefault();
     const fd = new FormData(e.currentTarget);
-    const email = fd.get('email'); const password = fd.get('password');
-    const username = fd.get('username') || null;
-
     const { data, error } = await supabase.auth.signUp({
-      email, password, options: { data: { username } }
+      email: fd.get('email'),
+      password: fd.get('password'),
+      options: { data: { username: fd.get('username') || null } }
     });
-    if (error) { alert(error.message); return; } // ví dụ: User already registered / password policy
-    alert('Đăng ký thành công, kiểm tra email nếu được yêu cầu xác minh'); // nếu bật confirm email
-    activate('login'); // chuyển sang tab đăng nhập
+    if (error) { alert(error.message); return; }
+    alert('Đăng ký thành công, hãy kiểm tra email nếu bật xác minh rồi đăng nhập'); // nếu bật confirm email
+    activate('login');
   });
 
   // Google OAuth
-  btnGoogle?.addEventListener('click', async ()=>{
+  btnGoogle?.addEventListener('click', async () => {
     const { error } = await supabase.auth.signInWithOAuth({ provider: 'google' });
     if (error) alert(error.message);
   });
 
-  // Đồng bộ profile sau khi đã có user
-  async function syncProfile(){
+  // Vẽ tên cạnh avatar và gắn href đến trang tài khoản
+  async function renderHeader(){
     const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
-    await supabase.from('profiles').upsert({
-      id: user.id,
-      email: user.email,
-      full_name: user.user_metadata?.full_name || null,
-      avatar_url: user.user_metadata?.avatar_url || null
-    });
+    if (!user) {
+      if (userNameSpan) userNameSpan.textContent = 'Đăng nhập';
+      if (accountLink) { accountLink.dataset.signedin = ''; accountLink.href = '#'; }
+      return;
+    }
+    // Ưu tiên tên trong profiles, fallback username metadata/email
+    let displayName = user.user_metadata?.username || user.user_metadata?.full_name || (user.email?.split('@')[0] ?? 'Tài khoản');
+    try {
+      const { data: p } = await supabase.from('profiles').select('full_name').eq('id', user.id).maybeSingle();
+      if (p?.full_name) displayName = p.full_name;
+    } catch {}
+    if (userNameSpan) userNameSpan.textContent = displayName;
+    if (accountLink) { accountLink.dataset.signedin = '1'; accountLink.href = '/account/'; }
   }
+
+  // Lắng nghe sự kiện Auth để cập nhật UI tức thì
+  supabase.auth.onAuthStateChange((_event, _session) => { renderHeader(); });
+
+  // Khởi tạo
+  renderHeader();
+
+  // Đăng xuất (nếu cần dùng ở menu)
+  window.supabaseSignOut = async () => { await supabase.auth.signOut(); renderHeader(); };
 });
