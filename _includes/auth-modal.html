@@ -1,14 +1,17 @@
 <div id="auth-backdrop" class="fv-backdrop" role="dialog" aria-modal="true" aria-labelledby="auth-title">
   <div class="fv-modal" role="document">
-    <button class="fv-close" id="auth-close" aria-label="Close">&times;</button>
+    <button class="fv-close" id="auth-close" aria-label="Close" type="button">&times;</button>
 
     <h3 id="auth-title" class="fv-title">Sign in</h3>
     <nav class="fv-tabs" role="tablist" aria-label="Auth tabs">
-      <button id="tab-login"  role="tab" aria-selected="true"  aria-controls="panel-login"  tabindex="0"  class="fv-tab is-active">Đăng nhập</button>
-      <button id="tab-signup" role="tab" aria-selected="false" aria-controls="panel-signup" tabindex="-1" class="fv-tab">Đăng ký</button>
+      <button id="tab-login"  class="fv-tab is-active" role="tab"
+              aria-selected="true" aria-controls="panel-login"  tabindex="0" type="button">Đăng nhập</button>
+      <button id="tab-signup" class="fv-tab" role="tab"
+              aria-selected="false" aria-controls="panel-signup" tabindex="-1" type="button">Đăng ký</button>
     </nav>
 
-    <section id="panel-login" class="fv-panel is-active" role="tabpanel" aria-labelledby="tab-login">
+    <section id="panel-login" class="fv-panel is-active" role="tabpanel"
+             aria-labelledby="tab-login">
       <form id="auth-email-login" class="fv-form">
         <label class="fv-label">Email</label>
         <input name="email" type="email" class="fv-input" required>
@@ -16,10 +19,11 @@
         <input name="password" type="password" class="fv-input" required>
         <button type="submit" class="fv-btn fv-btn--primary w-100">Đăng nhập</button>
       </form>
-      <button id="auth-google" class="fv-btn fv-btn--ghost w-100 mt-3">Đăng nhập bằng Google</button>
+      <button id="auth-google" class="fv-btn fv-btn--ghost w-100 mt-3" type="button">Đăng nhập bằng Google</button>
     </section>
 
-    <section id="panel-signup" class="fv-panel" role="tabpanel" aria-labelledby="tab-signup" hidden>
+    <section id="panel-signup" class="fv-panel" role="tabpanel"
+             aria-labelledby="tab-signup" hidden>
       <form id="auth-email-signup" class="fv-form">
         <label class="fv-label">Email</label>
         <input name="email" type="email" class="fv-input" required>
