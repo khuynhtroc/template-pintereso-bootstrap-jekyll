@@ -1,17 +1,18 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
-const supabase = createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
+// 1) Singleton client tránh TDZ/xung đột tên "supabase"
+const sb = window.__sb || createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
+window.__sb = sb;
 
 const $  = (s) => document.querySelector(s);
 const $$ = (s) => Array.from(document.querySelectorAll(s));
 
-// Định dạng tiền tệ theo currency/locale (mặc định VND)
+// Định dạng tiền tệ theo currency/locale
 const money = (amt, cur = 'VND') =>
   new Intl.NumberFormat(cur === 'USD' ? 'en-US' : 'vi-VN', {
     style: 'currency', currency: cur, maximumFractionDigits: 0
   }).format(amt || 0);
 
-// Ép features về mảng chuỗi (hỗ trợ JSONB/chuỗi)
 function toArray(f) {
   if (!f) return [];
   if (Array.isArray(f)) return f;
@@ -46,6 +47,7 @@ function planCardHTML(p) {
       ${feats.map(x => `<li>✅ <span>${x}</span></li>`).join('')}
     </ul>
 
+    <!-- 2) type="button" để không submit form ngầm -->
     <button type="button" class="plan-cta" data-plan-slug="${p.slug || ''}" data-plan-id="${p.id}">MUA GÓI NÀY</button>
   </article>`;
 }
@@ -55,43 +57,41 @@ async function fetchPlans() {
   const errorBox = $('#plans-error');
 
   try {
-    const { data, error } = await supabase
+    // 3) Đọc dữ liệu gói
+    const { data, error } = await sb
       .from('membership_plans')
       .select('id, slug, name, subtitle, duration_months, price, compare_at_price, currency, daily_downloads, features, is_popular, badge_text, sort_order, is_active')
       .eq('is_active', true)
       .order('sort_order', { ascending: true })
       .order('price', { ascending: true });
-    if (error) { console.error('[pricing] select error', error); throw error; }
+    if (error) { console.error('[pricing] select error', error); throw error; } // nhìn rõ 400/column [web:293][web:330]
 
     grid.innerHTML = (data || []).map(planCardHTML).join('') || '<p>Chưa có gói nào.</p>';
 
-    // CTA handler (ưu tiên slug; fallback id)
+    // 4) Handler click: chặn hành vi mặc định + điều hướng tuyệt đối
     $$('.plan-cta').forEach(btn => {
       btn.addEventListener('click', async (e) => {
-        e.preventDefault();      // chặn submit/behavior mặc định
-        e.stopPropagation();     // chặn nổi bọt
+        e.preventDefault();   // chặn submit mặc định [web:360]
+        e.stopPropagation();  // chặn nổi bọt [web:357]
 
         const slug = btn.getAttribute('data-plan-slug');
         const id   = btn.getAttribute('data-plan-id');
 
-        // 1) Kiểm tra đăng nhập
-        const { data: { user } } = await supabase.auth.getUser();
+        // Kiểm tra đăng nhập
+        const { data: { user } } = await sb.auth.getUser(); // [web:293]
         if (!user) { window.fvOpenAuth?.(); return; }
 
-        // 2) Lấy lại thông tin gói bằng slug (nếu có), nếu không thì theo id
+        // Xác thực lại plan
         const sel = 'id, slug, name, subtitle, duration_months, price, currency, compare_at_price';
         let plan = null, ePlan = null;
         if (slug) {
-          ({ data: plan, error: ePlan } = await supabase
-            .from('membership_plans').select(sel).eq('slug', slug).maybeSingle());
+          ({ data: plan, error: ePlan } = await sb.from('membership_plans').select(sel).eq('slug', slug).maybeSingle());
         } else {
-          ({ data: plan, error: ePlan } = await supabase
-            .from('membership_plans').select(sel).eq('id', id).maybeSingle());
+          ({ data: plan, error: ePlan } = await sb.from('membership_plans').select(sel).eq('id', id).maybeSingle());
         }
         if (ePlan) { alert(ePlan.message); return; }
         if (!plan) { alert('Gói không tồn tại.'); return; }
 
-        // 3) Điều hướng tuyệt đối tới checkout
         const qs = new URLSearchParams({
           plan: plan.slug || plan.id,
           price: String(plan.price ?? ''),
@@ -100,9 +100,9 @@ async function fetchPlans() {
           duration: String(plan.duration_months ?? '')
         }).toString();
 
-        const target = `${location.origin}/checkout/?${qs}`;
+        const target = `${location.origin}/checkout/?${qs}`; // điều hướng tuyệt đối [web:344]
         console.log('[pricing] goto', target);
-        location.assign(target);
+        location.assign(target); // [web:344]
       });
     });
   } catch (e) {
@@ -111,10 +111,10 @@ async function fetchPlans() {
   }
 }
 
-// Khởi chạy an toàn (không bị miss DOMContentLoaded)
+// Khởi chạy an toàn
 function boot() { fetchPlans(); }
 if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', boot);
+  document.addEventListener('DOMContentLoaded', boot); // [web:344]
 } else {
   boot();
 }
