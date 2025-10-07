@@ -11,7 +11,7 @@ const money = (amt, cur = 'VND') =>
     style: 'currency', currency: cur, maximumFractionDigits: 0
   }).format(amt || 0);
 
-// Ép features về mảng chuỗi
+// Ép features về mảng chuỗi (hỗ trợ JSONB/chuỗi)
 function toArray(f) {
   if (!f) return [];
   if (Array.isArray(f)) return f;
@@ -46,7 +46,7 @@ function planCardHTML(p) {
       ${feats.map(x => `<li>✅ <span>${x}</span></li>`).join('')}
     </ul>
 
-    <button class="plan-cta" data-plan-slug="${p.slug || ''}" data-plan-id="${p.id}">MUA GÓI NÀY</button>
+    <button type="button" class="plan-cta" data-plan-slug="${p.slug || ''}" data-plan-id="${p.id}">MUA GÓI NÀY</button>
   </article>`;
 }
 
@@ -61,13 +61,16 @@ async function fetchPlans() {
       .eq('is_active', true)
       .order('sort_order', { ascending: true })
       .order('price', { ascending: true });
-    if (error) { console.error('[pricing] select error', error); throw error; }   // giúp nhìn lỗi 400 cột
+    if (error) { console.error('[pricing] select error', error); throw error; }
 
     grid.innerHTML = (data || []).map(planCardHTML).join('') || '<p>Chưa có gói nào.</p>';
 
     // CTA handler (ưu tiên slug; fallback id)
     $$('.plan-cta').forEach(btn => {
-      btn.addEventListener('click', async () => {
+      btn.addEventListener('click', async (e) => {
+        e.preventDefault();      // chặn submit/behavior mặc định
+        e.stopPropagation();     // chặn nổi bọt
+
         const slug = btn.getAttribute('data-plan-slug');
         const id   = btn.getAttribute('data-plan-id');
 
@@ -88,7 +91,7 @@ async function fetchPlans() {
         if (ePlan) { alert(ePlan.message); return; }
         if (!plan) { alert('Gói không tồn tại.'); return; }
 
-        // 3) Chuyển tới checkout kèm slug/id và thông tin hiển thị
+        // 3) Điều hướng tuyệt đối tới checkout
         const qs = new URLSearchParams({
           plan: plan.slug || plan.id,
           price: String(plan.price ?? ''),
@@ -96,7 +99,10 @@ async function fetchPlans() {
           name: plan.name || '',
           duration: String(plan.duration_months ?? '')
         }).toString();
-        window.location.href = `/checkout/?${qs}`;
+
+        const target = `${location.origin}/checkout/?${qs}`;
+        console.log('[pricing] goto', target);
+        location.assign(target);
       });
     });
   } catch (e) {
