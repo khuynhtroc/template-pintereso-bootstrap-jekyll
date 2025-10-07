@@ -5,7 +5,7 @@ const supabase = createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
 const $  = (s) => document.querySelector(s);
 const $$ = (s) => Array.from(document.querySelectorAll(s));
 
-// Định dạng tiền tệ theo currency/locale
+// Định dạng tiền tệ theo currency/locale (mặc định VND)
 const money = (amt, cur = 'VND') =>
   new Intl.NumberFormat(cur === 'USD' ? 'en-US' : 'vi-VN', {
     style: 'currency', currency: cur, maximumFractionDigits: 0
@@ -61,7 +61,7 @@ async function fetchPlans() {
       .eq('is_active', true)
       .order('sort_order', { ascending: true })
       .order('price', { ascending: true });
-    if (error) throw error;
+    if (error) { console.error('[pricing] select error', error); throw error; }   // giúp nhìn lỗi 400 cột
 
     grid.innerHTML = (data || []).map(planCardHTML).join('') || '<p>Chưa có gói nào.</p>';
 
@@ -105,4 +105,10 @@ async function fetchPlans() {
   }
 }
 
-document.addEventListener('DOMContentLoaded', fetchPlans);
+// Khởi chạy an toàn (không bị miss DOMContentLoaded)
+function boot() { fetchPlans(); }
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', boot);
+} else {
+  boot();
+}
