@@ -2,35 +2,46 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 const supabase = createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
 
 const $ = (s)=>document.querySelector(s);
-const fmtVND = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND', maximumFractionDigits: 0 });
+const fmt = (amt, cur='VND') => new Intl.NumberFormat(cur === 'USD' ? 'en-US' : 'vi-VN', { style:'currency', currency: cur, maximumFractionDigits: 0 }).format(amt || 0);
 
-let plan = null;
+let planRec = null;
 
-async function loadPlan(){
+const isUUID = (v) => /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(v) || /^[0-9a-f-]{36}$/i.test(v);
+
+async function loadPlan() {
   const params = new URLSearchParams(location.search);
-  const planId = params.get('plan_id');
-  if (!planId) { location.href = '/pricing/'; return; }
+  const raw = params.get('plan') || params.get('plan_id'); // hỗ trợ cả mới và cũ
+  if (!raw) { $('#co-error').hidden=false; $('#co-error').textContent='Thiếu tham số gói (plan).'; return; }
 
-  const { data, error } = await supabase
-    .from('membership_plans')
-    .select('id,name,duration_months,price,is_active')
-    .eq('id', planId)
-    .maybeSingle();
-  if (error || !data || !data.is_active) {
-    $('#co-error').hidden=false; $('#co-error').textContent = error?.message || 'Gói không khả dụng.'; return;
+  const sel = 'id, slug, name, subtitle, duration_months, price, currency, is_active';
+  let data=null, error=null;
+
+  // Ưu tiên tra slug nếu không giống UUID, fallback sang id
+  if (!isUUID(raw)) {
+    ({ data, error } = await supabase.from('membership_plans').select(sel).eq('slug', raw).maybeSingle());
+    if (!data && !error) ({ data, error } = await supabase.from('membership_plans').select(sel).eq('id', raw).maybeSingle());
+  } else {
+    ({ data, error } = await supabase.from('membership_plans').select(sel).eq('id', raw).maybeSingle());
+    if (!data && !error) ({ data, error } = await supabase.from('membership_plans').select(sel).eq('slug', raw).maybeSingle());
   }
-  plan = data;
+  if (error) { $('#co-error').hidden=false; $('#co-error').textContent = error.message; return; }
+  if (!data || data.is_active === false) { $('#co-error').hidden=false; $('#co-error').textContent='Gói không khả dụng.'; return; }
 
-  $('#co-item').textContent = `${plan.name} × 1`;
-  $('#co-subtotal').textContent = fmtVND.format(plan.price || 0);
-  $('#co-total').textContent = fmtVND.format(plan.price || 0);
+  planRec = data;
+  const cur = data.currency || 'VND';
+  $('#co-item').textContent    = `${data.name} × 1`;
+  $('#co-subtotal').textContent= fmt(data.price, cur);
+  $('#co-total').textContent   = fmt(data.price, cur);
+
+  // Điền sẵn tên gói vào hidden nếu muốn gửi kèm
+  // $('#co-plan-name').value = data.name;
 }
 
 async function createOrder(e){
   e.preventDefault();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) { window.fvOpenAuth?.(); return; }
-  if (!plan) { alert('Gói không hợp lệ'); return; }
+  if (!planRec) { alert('Gói không hợp lệ'); return; }
 
   const fullName = `${$('#co-first').value.trim()} ${$('#co-last').value.trim()}`.trim();
   const email = $('#co-email').value.trim();
@@ -40,11 +51,9 @@ async function createOrder(e){
     .from('orders')
     .insert({
       user_id: user.id,
-      plan_id: plan.id,
-      email,
-      full_name: fullName,
-      phone,
-      total: plan.price || 0,
+      plan_id: planRec.id,
+      email, full_name: fullName, phone,
+      total: planRec.price || 0,
       status: 'pending',
       payment_method: 'bank_transfer'
     })
@@ -52,13 +61,11 @@ async function createOrder(e){
     .maybeSingle();
 
   if (error || !data) { $('#co-error').hidden=false; $('#co-error').textContent = error?.message || 'Không thể tạo đơn hàng.'; return; }
-
-  const orderId = data.id;
-  // chuyển đến trang cảm ơn
-  location.href = `/cam-on/?order_id=${encodeURIComponent(orderId)}`;
+  location.href = `/cam-on/?order_id=${encodeURIComponent(data.id)}`;
 }
 
-document.addEventListener('DOMContentLoaded', ()=>{
+function boot(){
   loadPlan();
   $('#co-form')?.addEventListener('submit', createOrder);
-});
+}
+if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
