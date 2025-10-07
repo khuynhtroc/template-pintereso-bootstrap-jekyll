@@ -1,40 +1,27 @@
-<!-- _includes/auth-modal.html -->
-<div id="auth-backdrop" class="auth-hide">
-  <div class="auth-modal">
-    <div class="auth-tabs">
-      <button data-auth-tab="email" class="active">Email</button>
-      <button data-auth-tab="phone">Phone</button>
-    </div>
+<div id="auth-backdrop" role="dialog" aria-modal="true" aria-labelledby="auth-title">
+  <div class="fv-modal" role="document">
+    <button class="fv-close" id="auth-close" aria-label="Close">&times;</button>
+    <h3 id="auth-title" class="fv-title">Sign in</h3>
+    <p class="fv-sub">Use email and password or Google</p>
 
-    <div id="auth-panel-email">
-      <form id="auth-email-signup">
-        <input name="email" type="email" placeholder="Email" required />
-        <input name="password" type="password" placeholder="Mật khẩu" required />
-        <input name="username" type="text" placeholder="Username (tuỳ chọn)" />
-        <button type="submit">Đăng ký</button>
-      </form>
+    <form id="auth-email-signup" class="fv-form">
+      <label class="fv-label">Email</label>
+      <input name="email" type="email" class="fv-input" placeholder="name@email.com" required>
+      <label class="fv-label">Mật khẩu</label>
+      <input name="password" type="password" class="fv-input" placeholder="••••••••" required>
+      <label class="fv-label">Username (tuỳ chọn)</label>
+      <input name="username" type="text" class="fv-input" placeholder="username">
+      <button type="submit" class="fv-btn fv-btn--primary w-100">Đăng ký</button>
+    </form>
 
-      <form id="auth-email-login">
-        <input name="email" type="email" placeholder="Email" required />
-        <input name="password" type="password" placeholder="Mật khẩu" required />
-        <button type="submit">Đăng nhập</button>
-      </form>
+    <form id="auth-email-login" class="fv-form mt-3">
+      <label class="fv-label">Email</label>
+      <input name="email" type="email" class="fv-input" required>
+      <label class="fv-label">Mật khẩu</label>
+      <input name="password" type="password" class="fv-input" required>
+      <button type="submit" class="fv-btn fv-btn--primary w-100">Đăng nhập</button>
+    </form>
 
-      <button id="auth-google">Đăng nhập bằng Google</button>
-    </div>
-
-    <div id="auth-panel-phone" class="auth-hide">
-      <form id="auth-phone-send">
-        <input name="phone" type="tel" placeholder="+84xxxxxxxxx" required />
-        <button type="submit">Gửi mã OTP</button>
-      </form>
-      <form id="auth-phone-verify">
-        <input name="phone" type="tel" placeholder="+84xxxxxxxxx" required />
-        <input name="token" type="text" placeholder="Mã OTP" required />
-        <button type="submit">Xác minh & Đăng nhập</button>
-      </form>
-    </div>
-
-    <button id="auth-close">Đóng</button>
+    <button id="auth-google" class="fv-btn fv-btn--ghost w-100 mt-3">Đăng nhập bằng Google</button>
   </div>
 </div>
