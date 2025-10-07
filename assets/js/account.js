@@ -11,7 +11,7 @@ const avEl    = $('#acct-avatar');
 
 async function requireAuth() {
   // Lấy user hiện tại; nếu chưa đăng nhập thì hiển thị trạng thái khách
-  const { data: { user } } = await supabase.auth.getUser(); // getUser
+  const { data: { user } } = await sb.auth.getUser(); // getUser
   if (!user) {
     guest.hidden = false; sec.hidden = true;                 // bảo vệ trang
     return null;
@@ -22,7 +22,7 @@ async function requireAuth() {
 
 async function loadProfile(user) {
   // Đọc profile từ bảng profiles (id trùng auth.users.id)
-  const { data, error } = await supabase
+  const { data, error } = await sb
     .from('profiles')
     .select('email, full_name, avatar_url, created_at')
     .eq('id', user.id)
@@ -40,7 +40,7 @@ async function saveProfile(user) {
     avatar_url: avEl.value || null,
     // id làm điều kiện where
   };
-  const { error } = await supabase
+  const { error } = await sb
     .from('profiles')
     .update(updates)
     .eq('id', user.id);                                     // UPDATE theo id
@@ -61,13 +61,13 @@ async function init() {
 
   // Đăng xuất
   $('#acct-signout')?.addEventListener('click', async ()=>{
-    const { error } = await supabase.auth.signOut();        // signOut
+    const { error } = await sb.auth.signOut();        // signOut
     if (error) alert(error.message);
     await requireAuth();                                    // cập nhật UI
   });
 
   // Lắng nghe thay đổi Auth để cập nhật UI nếu phiên thay đổi
-  supabase.auth.onAuthStateChange(() => { requireAuth(); }); // onAuthStateChange
+  sb.auth.onAuthStateChange(() => { requireAuth(); }); // onAuthStateChange
 }
 
 // Mở modal đăng nhập (nếu có) khi là khách

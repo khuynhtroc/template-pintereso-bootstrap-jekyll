@@ -22,7 +22,7 @@ async function loadOrder(){
   const id = new URLSearchParams(location.search).get('order_id');
   if (!id) { location.href = '/'; return; }
 
-  const { data: order, error } = await supabase
+  const { data: order, error } = await sb
     .from('orders')
     .select('id, created_at, email, total, status, plan_id')
     .eq('id', id)

@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Chỉ xử lý click trên anchor tổng; kiểm tra phiên rồi quyết định
   accountLink?.addEventListener('click', async (e) => {
-    const { data: { user } } = await supabase.auth.getUser(); // kiểm tra phiên realtime
+    const { data: { user } } = await sb.auth.getUser(); // kiểm tra phiên realtime
     if (!user) { e.preventDefault(); openModal(); }            // chưa đăng nhập -> mở modal
     // có user -> giữ nguyên href=/account/ để điều hướng
   });
@@ -57,7 +57,7 @@ document.addEventListener('DOMContentLoaded', () => {
   formLogin?.addEventListener('submit', async (e) => {
     e.preventDefault();
     const fd = new FormData(e.currentTarget);
-    const { error } = await supabase.auth.signInWithPassword({
+    const { error } = await sb.auth.signInWithPassword({
       email: fd.get('email'),
       password: fd.get('password')
     });
@@ -69,7 +69,7 @@ document.addEventListener('DOMContentLoaded', () => {
   formSignup?.addEventListener('submit', async (e) => {
     e.preventDefault();
     const fd = new FormData(e.currentTarget);
-    const { error } = await supabase.auth.signUp({
+    const { error } = await sb.auth.signUp({
       email: fd.get('email'),
       password: fd.get('password'),
       options: { data: { username: fd.get('username') || null } }
@@ -81,13 +81,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Google OAuth
   btnGoogle?.addEventListener('click', async () => {
-    const { error } = await supabase.auth.signInWithOAuth({ provider: 'google' });
+    const { error } = await sb.auth.signInWithOAuth({ provider: 'google' });
     if (error) alert(error.message);
   });
 
   // Cập nhật tên và href cạnh avatar
   async function renderHeader(){
-    const { data: { user } } = await supabase.auth.getUser();
+    const { data: { user } } = await sb.auth.getUser();
     if (!user) {
       if (userNameSpan) userNameSpan.textContent = 'Đăng nhập';
       if (accountLink)  accountLink.href = '#';
@@ -95,7 +95,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     let displayName = user.user_metadata?.username || user.user_metadata?.full_name || (user.email?.split('@')[0] ?? 'Tài khoản');
     try {
-      const { data: p } = await supabase.from('profiles').select('full_name, avatar_url').eq('id', user.id).maybeSingle();
+      const { data: p } = await sb.from('profiles').select('full_name, avatar_url').eq('id', user.id).maybeSingle();
       if (p?.full_name) displayName = p.full_name;
       // (tuỳ chọn) cập nhật ảnh nếu có
       if (p?.avatar_url) { const img = document.querySelector('#user-avatar'); if (img) img.src = p.avatar_url; }
@@ -105,11 +105,11 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // Lắng nghe sự kiện Auth để cập nhật UI
-  supabase.auth.onAuthStateChange(() => { renderHeader(); });
+  sb.auth.onAuthStateChange(() => { renderHeader(); });
 
   // Khởi tạo
   renderHeader();
 
   // Hàm đăng xuất (nếu dùng trong menu)
-  window.supabaseSignOut = async () => { await supabase.auth.signOut(); renderHeader(); };
+  window.sbSignOut = async () => { await sb.auth.signOut(); renderHeader(); };
 });
