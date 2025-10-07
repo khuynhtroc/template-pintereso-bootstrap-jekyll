@@ -21,5 +21,8 @@ permalink: /pricing/
   <div id="plans-error" class="plans-error" hidden></div>
 </section>
 
-<script src="{{ '/assets/js/config.supabase.js' | relative_url }}"></script>
-<script type="module" src="{{ '/assets/js/pricing.js' | relative_url }}"></script>
+<script src="/assets/js/config.supabase.js"></script> <!-- có window.SUPABASE_URL/ANON_KEY --> <!-- [web:344] -->
+<script type="module" src="/assets/js/sb-client.js"></script> <!-- tạo window.__sb duy nhất --> <!-- [web:293] -->
+<script type="module" src="/assets/js/pricing.js"></script> <!-- hoặc checkout.js --> <!-- [web:344] -->
+
+
