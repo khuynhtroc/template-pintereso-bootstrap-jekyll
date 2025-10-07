@@ -1,64 +1,31 @@
 ---
-title: "Account"
-permalink: "/account/"
-image: "/assets/images/screenshot.jpg"
+layout: default
+title: Account
+permalink: /account/
 ---
 
-<h3>Tạo tài khoản</h3>
-<input type="email" id="signup-email" placeholder="Email">
-<input type="password" id="signup-password" placeholder="Mật khẩu">
-<button onclick="signUp()">Đăng ký</button>
+<section class="container py-4">
+  <h1>Account</h1>
+  <div id="acct-secure" hidden>
+    <div class="mb-3">
+      <strong>Email:</strong> <span id="acct-email">...</span>
+    </div>
+    <form id="acct-form" class="mb-3">
+      <label class="d-block mb-2">Full name</label>
+      <input id="acct-fullname" class="form-control mb-3" type="text" placeholder="Your name">
+      <label class="d-block mb-2">Avatar URL</label>
+      <input id="acct-avatar" class="form-control mb-3" type="url" placeholder="https://...">
+      <button class="btn btn-primary" type="submit">Save</button>
+    </form>
+    <button id="acct-signout" class="btn btn-outline-secondary">Sign out</button>
+  </div>
 
-<hr>
+  <div id="acct-guest" hidden>
+    <p>Need to sign in to view this page.</p>
+    <a href="#" id="acct-open-auth" class="btn btn-primary">Open sign-in</a>
+  </div>
+</section>
 
-<h3>Đăng nhập</h3>
-<input type="email" id="signin-email" placeholder="Email">
-<input type="password" id="signin-password" placeholder="Mật khẩu">
-<button onclick="signIn()">Đăng nhập</button>
-
-<hr>
-
-<button onclick="signOut()">Đăng xuất</button>
-
-
-<script>
-	async function signUp() {
-    const email = document.getElementById('signup-email').value;
-    const password = document.getElementById('signup-password').value;
-    const { data, error } = await supabase.auth.signUp({ email, password });
-    if (error) {
-        console.error('Lỗi đăng ký:', error.message);
-        alert('Lỗi đăng ký: ' + error.message);
-    } else {
-        alert('Đăng ký thành công! Vui lòng kiểm tra email để xác thực.');
-        console.log('Đăng ký thành công:', data);
-    }
-}
-
-async function signIn() {
-    const email = document.getElementById('signin-email').value;
-    const password = document.getElementById('signin-password').value;
-    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) {
-        console.error('Lỗi đăng nhập:', error.message);
-        alert('Lỗi đăng nhập: ' + error.message);
-    } else {
-        alert('Đăng nhập thành công!');
-        console.log('Đăng nhập thành công:', data);
-        // Chuyển hướng người dùng đến trang chính hoặc trang tài khoản
-        // window.location.href = '/';
-    }
-}
-
-async function signOut() {
-    const { error } = await supabase.auth.signOut();
-    if (error) {
-        console.error('Lỗi đăng xuất:', error.message);
-    } else {
-        alert('Đăng xuất thành công!');
-        // Chuyển hướng người dùng về trang chủ
-        // window.location.href = '/';
-    }
-}
-
-</script>
+<!-- nạp cấu hình + JS tài khoản -->
+<script src="{{ '/assets/js/config.supabase.js' | relative_url }}"></script>
+<script type="module" src="{{ '/assets/js/account.js' | relative_url }}"></script>
