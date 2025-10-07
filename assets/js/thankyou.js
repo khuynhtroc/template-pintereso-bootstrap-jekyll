@@ -1,5 +1,5 @@
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-const supabase = createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
+import { sb } from '/assets/js/sb-client.js';
+
 
 const $ = (s)=>document.querySelector(s);
 const fmtVND = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND', maximumFractionDigits: 0 });

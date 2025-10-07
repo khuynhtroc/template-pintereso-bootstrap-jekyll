@@ -17,7 +17,7 @@ permalink: /account/
     <!-- Sidebar -->
     <aside class="acc-sidebar">
       <div class="acc-card acc-user">
-        <img id="acc-avatar" class="acc-avatar" src="{{ '/assets/img/default-avatar.png' | relative_url }}" alt="avatar">
+        <img id="acc-avatar" class="acc-avatar" src="{{ '/assets/images/sal.jpg' | relative_url }}" alt="avatar">
         <div class="acc-user-info">
           <div id="acc-name" class="acc-name">Đang tải...</div>
           <a id="acc-signout" href="#" class="acc-signout">Đăng xuất</a>

@@ -1,6 +1,5 @@
 import { sb } from '/assets/js/sb-client.js';
 
-const supabase = createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
 
 document.addEventListener('DOMContentLoaded', () => {
   const $ = (s) => document.querySelector(s);

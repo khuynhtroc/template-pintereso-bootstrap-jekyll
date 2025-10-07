@@ -1,7 +1,6 @@
-// assets/js/account.js
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { sb } from '/assets/js/sb-client.js';
 
-const supabase = createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
+
 
 const $ = (s) => document.querySelector(s);
 const sec   = $('#acct-secure');
