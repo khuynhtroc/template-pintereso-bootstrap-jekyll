@@ -32,3 +32,12 @@
 .fv-btn--ghost{ background:rgba(255,255,255,.06); color:#fff; border:1px solid var(--fv-border); }
 .fv-btn--ghost:hover{ background:rgba(255,255,255,.12); }
 .w-100{ width:100%; } .mt-3{ margin-top:12px; }
+
+/* Kích thước nhỏ gọn */
+.fv-modal{ width:min(92vw, 420px); padding:16px 16px 18px; }
+/* Tabs */
+.fv-tabs{ display:flex; gap:6px; justify-content:center; margin:6px 0 12px; }
+.fv-tab{ border:0; padding:8px 12px; border-radius:999px; color:#cbd5e1; background:rgba(255,255,255,.08); cursor:pointer; }
+.fv-tab.is-active{ color:#fff; background:rgba(255,255,255,.22); }
+/* Panel */
+.fv-panel[hidden]{ display:none !important; }
