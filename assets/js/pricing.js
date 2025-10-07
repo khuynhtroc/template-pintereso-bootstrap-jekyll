@@ -105,4 +105,4 @@ async function fetchPlans() {
   }
 }
 
-document.addEventListener('DOMContentLoaded', fetch
+document.addEventListener('DOMContentLoaded', fetchPlans);
