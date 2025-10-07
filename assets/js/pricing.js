@@ -37,7 +37,7 @@ function planCardHTML(p) {
       ${feats.map(x => `<li>✅ <span>${x}</span></li>`).join('')}
     </ul>
 
-    <button class="plan-cta" data-plan="${p.slug || p.id}">MUA GÓI NÀY</button>
+    <button class="plan-cta" data-plan-id="${p.id}">MUA GÓI NÀY</button>
   </article>`;
 }
 
@@ -46,29 +46,53 @@ async function fetchPlans() {
   const errorBox = $('#plans-error');
 
   try {
-    // Lọc is_active = true, sắp xếp sort_order tăng dần, rồi price tăng dần
     const { data, error } = await supabase
       .from('membership_plans')
-      .select('id, slug, name, subtitle, duration_months, price, compare_at_price, daily_downloads, features, is_popular, badge_text, sort_order, is_active')
+      .select('id, name, subtitle, duration_months, price, compare_at_price, daily_downloads, features, is_popular, badge_text, sort_order, is_active')
       .eq('is_active', true)
-      .order('sort_order', { ascending: true, nullsFirst: false })
+      .order('sort_order', { ascending: true })
       .order('price', { ascending: true });
     if (error) throw error;
 
     grid.innerHTML = (data || []).map(planCardHTML).join('') || '<p>Chưa có gói nào.</p>';
 
-    // Gắn hành vi cho CTA: nếu chưa đăng nhập thì mở modal, nếu đã đăng nhập thì chuyển tới /checkout
+    // CTA handler
     $$('.plan-cta').forEach(btn => {
       btn.addEventListener('click', async () => {
-        const planKey = btn.getAttribute('data-plan');
+        const planId = btn.getAttribute('data-plan-id');
+
+        // 1) Kiểm tra đăng nhập
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) { window.fvOpenAuth?.(); return; }
-        window.location.href = `/checkout/?plan=${encodeURIComponent(planKey)}`;
+
+        // 2) Lấy lại thông tin gói (đảm bảo dữ liệu mới nhất cho trang checkout)
+        const { data: plan, error: ePlan } = await supabase
+          .from('membership_plans')
+          .select('id, name, subtitle, duration_months, price, compare_at_price')
+          .eq('id', planId)
+          .maybeSingle();
+        if (ePlan) { alert(ePlan.message); return; }
+        if (!plan) { alert('Gói không tồn tại.'); return; }
+
+        // 3) Chuyển tới trang checkout kèm tham số
+        //    Sử dụng id, name, price, duration để trang /checkout/ render đúng như ảnh.
+        const qs = new URLSearchParams({
+          plan_id: plan.id,
+          name: plan.name || '',
+          price: String(plan.price ?? ''),
+          duration: String(plan.duration_months ?? ''),
+        }).toString();
+        window.location.href = `/checkout/?${qs}`;
       });
     });
   } catch (e) {
-    errorBox.hidden = false;
-    errorBox.textContent = e.message || 'Không thể tải dữ liệu gói.';
+    const grid = $('#plans');
+    const errorBox = $('#plans-error');
+    if (grid) grid.innerHTML = '';
+    if (errorBox) {
+      errorBox.hidden = false;
+      errorBox.textContent = e.message || 'Không thể tải dữ liệu gói.';
+    }
   }
 }
 
