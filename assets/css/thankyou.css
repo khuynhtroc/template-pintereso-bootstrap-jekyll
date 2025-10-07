@@ -1,0 +1,8 @@
+.ty-wrap{max-width:1100px;margin:0 auto;padding:24px 12px}
+.ty-banner{background:#d1fae5;color:#065f46;border:1px solid #a7f3d0;border-radius:8px;padding:10px 12px;margin-bottom:12px}
+.card{background:#fff;border:1px solid #e5e7eb;border-radius:10px;padding:16px;margin:12px 0}
+.qr-box{display:flex;justify-content:center;margin:10px 0}
+.qr-box img{width:260px;height:260px;border:1px solid #e5e7eb;border-radius:8px}
+.bank{width:100%;border-collapse:collapse}
+.bank td{border:1px solid #e5e7eb;padding:8px}
+.ty-error{color:#dc2626;margin-top:12px}

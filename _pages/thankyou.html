@@ -1,0 +1,40 @@
+---
+layout: default
+title: Cảm ơn
+permalink: /cam-on/
+---
+
+<link rel="stylesheet" href="{{ '/assets/css/thankyou.css' | relative_url }}">
+
+<section class="ty-wrap">
+  <div id="ty-banner" class="ty-banner">Cảm ơn bạn. Đơn hàng của bạn đã được nhận.</div>
+
+  <div class="ty-meta card">
+    <div><strong>Mã đơn hàng:</strong> <span id="ty-order">—</span></div>
+    <div><strong>Ngày:</strong> <span id="ty-date">—</span></div>
+    <div><strong>Email:</strong> <span id="ty-email">—</span></div>
+    <div><strong>Tổng cộng:</strong> <span id="ty-total">—</span></div>
+    <div><strong>Phương thức thanh toán:</strong> Chuyển khoản</div>
+  </div>
+
+  <div class="card">
+    <h2>Mã QR chuyển khoản</h2>
+    <div id="qr-box" class="qr-box">
+      <img id="qr-img" alt="VietQR" />
+    </div>
+    <h3>Thông tin chuyển khoản</h3>
+    <table class="bank">
+      <tr><td>Ngân hàng</td><td>Vietcombank</td></tr>
+      <tr><td>Chủ tài khoản</td><td>Pham Quang Ninh</td></tr>
+      <tr><td>Số tài khoản</td><td>0691000301445</td></tr>
+      <tr><td>Số tiền</td><td id="ty-total2">—</td></tr>
+      <tr><td>Nội dung</td><td id="ty-content">—</td></tr>
+    </table>
+    <p class="hint">Vui lòng chuyển khoản đúng nội dung để chúng tôi xác nhận nhanh chóng.</p>
+  </div>
+
+  <div id="ty-error" class="ty-error" hidden></div>
+</section>
+
+<script src="{{ '/assets/js/config.supabase.js' | relative_url }}"></script>
+<script type="module" src="{{ '/assets/js/thankyou.js' | relative_url }}"></script>

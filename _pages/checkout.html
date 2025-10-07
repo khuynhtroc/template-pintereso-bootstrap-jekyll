@@ -1,0 +1,69 @@
+---
+layout: default
+title: Thanh toán
+permalink: /checkout/
+---
+
+<link rel="stylesheet" href="{{ '/assets/css/checkout.css' | relative_url }}">
+
+<section class="checkout-wrap">
+  <h1 class="co-title">THANH TOÁN</h1>
+
+  <div class="co-grid">
+    <!-- Form thông tin -->
+    <form id="co-form" class="co-form card">
+      <h2>Thông tin tài khoản</h2>
+
+      <div class="grid-2">
+        <div>
+          <label>Tên</label>
+          <input id="co-first" type="text" required>
+        </div>
+        <div>
+          <label>Họ</label>
+          <input id="co-last" type="text" required>
+        </div>
+      </div>
+
+      <div>
+        <label>Số điện thoại</label>
+        <input id="co-phone" type="tel" required>
+      </div>
+
+      <div>
+        <label>Địa chỉ email</label>
+        <input id="co-email" type="email" required>
+      </div>
+
+      <div class="mt-2">
+        <label>Tôi đã đọc và đồng ý với điều khoản và điều kiện của website</label>
+        <input id="co-terms" type="checkbox" required>
+      </div>
+
+      <button type="submit" class="btn btn-primary mt-2">Đặt hàng</button>
+    </form>
+
+    <!-- Tóm tắt đơn -->
+    <aside class="co-summary card">
+      <h2>Đơn hàng của bạn</h2>
+      <div class="row">
+        <span>Sản phẩm</span>
+        <span id="co-item">—</span>
+      </div>
+      <div class="row">
+        <span>Tạm tính</span>
+        <span id="co-subtotal">—</span>
+      </div>
+      <div class="row total">
+        <span>Tổng cộng</span>
+        <span id="co-total">—</span>
+      </div>
+      <p class="muted">Chuyển khoản Ngân hàng</p>
+    </aside>
+  </div>
+
+  <div id="co-error" class="co-error" hidden></div>
+</section>
+
+<script src="{{ '/assets/js/config.supabase.js' | relative_url }}"></script>
+<script type="module" src="{{ '/assets/js/checkout.js' | relative_url }}"></script>

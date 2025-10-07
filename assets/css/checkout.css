@@ -1,0 +1,15 @@
+.checkout-wrap{max-width:1100px;margin:0 auto;padding:24px 12px}
+.co-title{text-align:center;margin:0 0 18px}
+.co-grid{display:grid;grid-template-columns:1fr 360px;gap:18px}
+@media(max-width:960px){.co-grid{grid-template-columns:1fr}}
+.card{background:#fff;border:1px solid #e5e7eb;border-radius:10px;padding:16px}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+label{display:block;font-size:13px;color:#6b7280;margin-bottom:6px}
+input[type=text],input[type=tel],input[type=email]{width:100%;height:42px;border:1px solid #e5e7eb;border-radius:8px;padding:0 12px}
+.btn{display:inline-block;padding:10px 14px;border-radius:10px;border:1px solid transparent;cursor:pointer}
+.btn-primary{background:#ef4444;color:#fff;border-color:#ef4444}
+.row{display:flex;justify-content:space-between;margin:8px 0}
+.row.total{font-weight:700}
+.muted{color:#6b7280}
+.mt-2{margin-top:12px}
+.co-error{margin-top:12px;color:#dc2626}
