@@ -66,24 +66,22 @@ document.addEventListener('DOMContentLoaded', async () => {
     checkoutForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         placeOrderBtn.disabled = true;
-        placeOrderBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Đang xử lý...';
+        placeOrderBtn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Đang xử lý...';
     
         let currentUser = user;
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
     
         if (!currentUser) {
-            // Nếu chưa đăng nhập, tiến hành đăng ký tài khoản mới
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            const firstName = document.getElementById('firstName').value;
-            const lastName = document.getElementById('lastName').value;
-    
-            const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+            // 1. Đăng ký tài khoản mới mà không tự động đăng nhập
+            const { error: signUpError } = await supabase.auth.signUp({
                 email: email,
                 password: password,
                 options: {
                     data: {
-                        full_name: `${firstName} ${lastName}`
-                    }
+                        full_name: `${document.getElementById('firstName').value} ${document.getElementById('lastName').value}`
+                    },
+                    emailRedirectTo: `${window.location.origin}/` // <-- Quan trọng cho email xác nhận
                 }
             });
     
@@ -93,12 +91,23 @@ document.addEventListener('DOMContentLoaded', async () => {
                 placeOrderBtn.textContent = 'Đặt hàng';
                 return;
             }
-            
-            // Sau khi đăng ký thành công, user object đã có sẵn
-            currentUser = signUpData.user;
+    
+            // 2. Đăng nhập ngay sau khi đăng ký để tạo session hợp lệ
+            const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+                email: email,
+                password: password,
+            });
+    
+            if (signInError) {
+                alert('Lỗi đăng nhập sau khi đăng ký: ' + signInError.message);
+                placeOrderBtn.disabled = false;
+                placeOrderBtn.textContent = 'Đặt hàng';
+                return;
+            }
+            currentUser = signInData.user;
         }
     
-        // Tạo đơn hàng và lấy lại ID của đơn hàng vừa tạo
+        // 3. Bây giờ session đã hợp lệ, tiến hành tạo đơn hàng
         const { data: orderData, error: orderError } = await supabase
             .from('orders')
             .insert({
@@ -106,18 +115,20 @@ document.addEventListener('DOMContentLoaded', async () => {
                 plan_id: plan.id,
                 total_price: plan.price
             })
-            .select('id') // <-- Lấy lại cột 'id'
-            .single();   // <-- Vì chúng ta chỉ tạo 1 đơn hàng
+            .select('id')
+            .single();
     
         if (orderError) {
-            alert('Lỗi khi tạo đơn hàng: ' + orderError.message);
+            // Thông báo lỗi cụ thể hơn cho người dùng
+            alert(`Lỗi khi tạo đơn hàng: ${orderError.message}`);
             placeOrderBtn.disabled = false;
             placeOrderBtn.textContent = 'Đặt hàng';
         } else {
-            // Chuyển hướng đến trang cảm ơn với ID đơn hàng
+            // Chuyển hướng đến trang cảm ơn
             window.location.href = `/thankyou/?order_id=${orderData.id}`;
         }
     });
+
 
 
     // Xử lý đăng xuất
