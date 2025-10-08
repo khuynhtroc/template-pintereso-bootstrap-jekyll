@@ -58,6 +58,6 @@ async function fetchPlans(supabase, container) {
 }
 
 function purchasePlan(planId) {
-    // Chuyển hướng đến trang checkout mà bạn đã có
-    window.location.href = `/checkout.html?plan_id=${planId}`;
+    // Chuyển hướng đến trang /checkout/ (ĐÚNG)
+    window.location.href = `/checkout/?plan_id=${planId}`;
 }
