@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const orderId = urlParams.get('order_id');
 
     if (!orderId) {
-        detailsPlaceholder.innerHTML = '<p class="text-danger">[translate:Mã đơn hàng không hợp lệ.]</p>';
+        detailsPlaceholder.innerHTML = '<p class="text-danger">Mã đơn hàng không hợp lệ.</p>';
         return;
     }
 
@@ -26,7 +26,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     if (error || !order) {
         console.error(error);
-        detailsPlaceholder.innerHTML = '<p class="text-danger">[translate:Không tìm thấy thông tin đơn hàng.]</p>';
+        detailsPlaceholder.innerHTML = '<p class="text-danger">Không tìm thấy thông tin đơn hàng.</p>';
         return;
     }
 
@@ -36,11 +36,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     detailsPlaceholder.innerHTML = `
         <div class="row text-center">
-            <div class="col"><strong>[translate:Mã đơn hàng:]</strong> #${order.id}</div>
-            <div class="col"><strong>[translate:Ngày:]</strong> ${orderDate}</div>
+            <div class="col"><strong>Mã đơn hàng:</strong> #${order.id}</div>
+            <div class="col"><strong>Ngày:</strong> ${orderDate}</div>
             <div class="col"><strong>Email:</strong> ${order.users.email}</div>
-            <div class="col"><strong>[translate:Tổng cộng:]</strong> ${orderTotal}</div>
-            <div class="col"><strong>[translate:Phương thức thanh toán:]</strong> [translate:Chuyển khoản]</div>
+            <div class="col"><strong>Tổng cộng:</strong> ${orderTotal}</div>
+            <div class="col"><strong>Phương thức thanh toán:</strong> Chuyển khoản</div>
         </div>
     `;
 
