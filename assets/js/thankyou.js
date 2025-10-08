@@ -1,18 +1,17 @@
 document.addEventListener('DOMContentLoaded', async () => {
-    const detailsPlaceholder = document.getElementById('order-details-placeholder');
-    if (!detailsPlaceholder) return;
+    const summaryContainer = document.getElementById('order-summary-container');
+    if (!summaryContainer) return;
 
     const urlParams = new URLSearchParams(window.location.search);
     const orderId = urlParams.get('order_id');
 
     if (!orderId) {
-        detailsPlaceholder.innerHTML = '<p class="text-danger">Mã đơn hàng không hợp lệ.</p>';
+        summaryContainer.innerHTML = '<p class="text-danger text-center">Mã đơn hàng không hợp lệ.</p>';
         return;
     }
 
     const supabase = window.supabaseClient;
 
-    // Lấy thông tin đơn hàng
     const { data: order, error } = await supabase
         .from('orders')
         .select(`
@@ -25,26 +24,36 @@ document.addEventListener('DOMContentLoaded', async () => {
         .single();
 
     if (error || !order) {
-        console.error(error);
-        detailsPlaceholder.innerHTML = '<p class="text-danger">Không tìm thấy thông tin đơn hàng.</p>';
+        summaryContainer.innerHTML = '<p class="text-danger text-center">Không tìm thấy thông tin đơn hàng.</p>';
         return;
     }
 
-    // Hiển thị thông tin đơn hàng
+    // Định dạng dữ liệu để hiển thị
     const orderDate = new Date(order.created_at).toLocaleDateString('vi-VN');
     const orderTotal = new Intl.NumberFormat('vi-VN').format(order.total_price) + 'đ';
 
-    detailsPlaceholder.innerHTML = `
-        <div class="row text-center">
-            <div class="col"><strong>Mã đơn hàng:</strong> #${order.id}</div>
-            <div class="col"><strong>Ngày:</strong> ${orderDate}</div>
-            <div class="col"><strong>Email:</strong> ${order.users.email}</div>
-            <div class="col"><strong>Tổng cộng:</strong> ${orderTotal}</div>
-            <div class="col"><strong>Phương thức thanh toán:</strong> Chuyển khoản</div>
-        </div>
+    // Tạo bảng HTML tóm tắt
+    const summaryTableHTML = `
+        <table class="table table-bordered mx-auto mb-3" style="max-width: 1000px;">
+            <tbody>
+                <tr>
+                    <th scope="row">Mã đơn hàng:</th>
+                    <td>#${order.id}</td>
+                    <th scope="row">Ngày:</th>
+                    <td>${orderDate}</td>
+                    <th scope="row">Email:</th>
+                    <td>${order.users.email}</td>
+                    <th scope="row">Tổng cộng:</th>
+                    <td>${orderTotal}</td>
+                    <th scope="row">Phương thức thanh toán:</th>
+                    <td>Chuyển khoản</td>
+                </tr>
+            </tbody>
+        </table>
     `;
-
-    // Cập nhật thông tin chuyển khoản
+    
+    // Cập nhật giao diện
+    summaryContainer.innerHTML = summaryTableHTML;
     document.getElementById('order-amount').textContent = orderTotal;
     document.getElementById('order-content').textContent = `CAMON${order.id}`;
 });

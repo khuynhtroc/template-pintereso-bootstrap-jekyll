@@ -9,19 +9,19 @@ permalink: /thankyou/
     Cảm ơn bạn. Đơn hàng của bạn đã được nhận.
   </div>
 
-  <!-- Vùng thông tin đơn hàng tóm tắt -->
-  <div class="order-info-summary my-4 p-3 border rounded">
-    <div id="order-details-placeholder" class="text-center">
-      <div class="spinner-border" role="status">
-        <span class="visually-hidden">Loading...</span>
+  <!-- Vùng chứa thông tin đơn hàng tóm tắt -->
+  <div id="order-summary-container" class="my-4">
+      <!-- Dữ liệu sẽ được JS chèn vào đây -->
+      <div class="text-center p-3">
+          <div class="spinner-border text-primary" role="status">
+              <span class="visually-hidden">Đang tải thông tin đơn hàng...</span>
+          </div>
       </div>
-    </div>
   </div>
 
   <h3 class="text-center mb-4">Mã QR chuyển khoản</h3>
   <p class="text-center mb-4">Quét mã dưới đây để thực hiện thanh toán nhanh qua ứng dụng ngân hàng.</p>
 
-  <!-- Thay thế src bằng đường dẫn tới file ảnh QR của bạn -->
   <div class="text-center mb-4">
     <img src="/assets/images/qr-code.png" alt="Mã QR thanh toán" style="width:200px; height:200px; border:1px solid #ddd;">
   </div>
@@ -59,6 +59,3 @@ permalink: /thankyou/
     <a href="/" class="btn btn-primary">Quay về trang chủ</a>
   </div>
 </div>
-
-
-<script src="{{ '/assets/js/thankyou.js' | relative_url }}"></script>
