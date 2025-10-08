@@ -2,7 +2,7 @@ import { sb } from '/assets/js/sb-client.js';
 
 const $  = (s)=>document.querySelector(s);
 const $$ = (s)=>Array.from(document.querySelectorAll(s));
-const money=(a,c='VND')=>new Intl.NumberFormat(c==='USD'?'en-US':'vi-VN',{style:'currency',currency:c,maximumFractionDigits:0}).format(a||0); // [web:307]
+const money=(a,c='VND')=>new Intl.NumberFormat(c==='USD'?'en-US':'vi-VN',{style:'currency',currency:c,maximumFractionDigits:0}).format(a||0);
 const toArray=(f)=>Array.isArray(f)?f:(f?(()=>{try{return typeof f==='string'?JSON.parse(f):f}catch{return []}})():[]);
 
 function card(p){
@@ -26,21 +26,21 @@ async function fetchPlans(){
     const { data, error } = await sb
       .from('membership_plans')
       .select('id, slug, name, subtitle, duration_months, price, compare_at_price, currency, daily_downloads, features, is_popular, badge_text, sort_order, is_active')
-      .eq('is_active', true).order('sort_order',{ascending:true}).order('price',{ascending:true}); // [web:293][web:311]
+      .eq('is_active', true).order('sort_order',{ascending:true}).order('price',{ascending:true});
     if (error) throw error;
     grid.innerHTML=(data||[]).map(card).join('')||'<p>Chưa có gói nào.</p>';
     $$('.plan-cta').forEach(btn=>{
       btn.addEventListener('click', async (e)=>{
         e.preventDefault(); e.stopPropagation();
         const slug=btn.dataset.slug, id=btn.dataset.id;
-        const { data:{ user } } = await sb.auth.getUser(); if (!user){ window.fvOpenAuth?.(); return; } // [web:293]
+        const { data:{ user } } = await sb.auth.getUser(); if (!user){ window.fvOpenAuth?.(); return; }
         const sel='id, slug, name, subtitle, duration_months, price, currency, compare_at_price';
         const { data:plan, error:e1 } = slug
           ? await sb.from('membership_plans').select(sel).eq('slug',slug).maybeSingle()
           : await sb.from('membership_plans').select(sel).eq('id',id).maybeSingle();
         if (e1){ alert(e1.message); return; } if (!plan){ alert('Gói không tồn tại.'); return; }
         const qs=new URLSearchParams({ plan:plan.slug||plan.id, price:String(plan.price??''), currency:plan.currency||'VND', name:plan.name||'', duration:String(plan.duration_months??'') }).toString();
-        location.assign(`${location.origin}/checkout/?${qs}`); // [web:344]
+        location.assign(`${location.origin}/checkout/?${qs}`);
       });
     });
   }catch(e){ if (grid) grid.innerHTML=''; if (err){ err.hidden=false; err.textContent=e.message||'Không thể tải dữ liệu gói.'; } }
