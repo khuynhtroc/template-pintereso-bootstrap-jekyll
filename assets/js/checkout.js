@@ -62,20 +62,21 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // Xử lý sự kiện click "Đặt hàng"
+    // Dán đè lên hàm có sẵn trong assets/js/checkout.js
     checkoutForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         placeOrderBtn.disabled = true;
         placeOrderBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Đang xử lý...';
-        
+    
         let currentUser = user;
-
+    
         if (!currentUser) {
             // Nếu chưa đăng nhập, tiến hành đăng ký tài khoản mới
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
             const firstName = document.getElementById('firstName').value;
             const lastName = document.getElementById('lastName').value;
-
+    
             const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
                 email: email,
                 password: password,
@@ -85,34 +86,39 @@ document.addEventListener('DOMContentLoaded', async () => {
                     }
                 }
             });
-
+    
             if (signUpError) {
                 alert('Lỗi đăng ký: ' + signUpError.message);
                 placeOrderBtn.disabled = false;
                 placeOrderBtn.textContent = 'Đặt hàng';
                 return;
             }
+            
+            // Sau khi đăng ký thành công, user object đã có sẵn
             currentUser = signUpData.user;
         }
-
-        // Tạo đơn hàng trong bảng 'orders'
-        const { error: orderError } = await supabase
+    
+        // Tạo đơn hàng và lấy lại ID của đơn hàng vừa tạo
+        const { data: orderData, error: orderError } = await supabase
             .from('orders')
             .insert({
                 user_id: currentUser.id,
                 plan_id: plan.id,
                 total_price: plan.price
-            });
-
+            })
+            .select('id') // <-- Lấy lại cột 'id'
+            .single();   // <-- Vì chúng ta chỉ tạo 1 đơn hàng
+    
         if (orderError) {
             alert('Lỗi khi tạo đơn hàng: ' + orderError.message);
             placeOrderBtn.disabled = false;
             placeOrderBtn.textContent = 'Đặt hàng';
         } else {
-            // Chuyển hướng đến trang cảm ơn
-            window.location.href = '/thankyou/';
+            // Chuyển hướng đến trang cảm ơn với ID đơn hàng
+            window.location.href = `/thankyou/?order_id=${orderData.id}`;
         }
     });
+
 
     // Xử lý đăng xuất
     document.getElementById('logout-button').addEventListener('click', async () => {
