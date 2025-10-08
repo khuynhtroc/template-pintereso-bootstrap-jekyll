@@ -1,20 +1,60 @@
-.pricing-wrap{max-width:1200px;margin:0 auto;padding:24px 12px;text-align:center}
-.pricing-title{font-size:42px;font-weight:800;margin:4px 0 6px}
-.pricing-sub{color:#6b7280;margin:0 0 18px}
-.plans-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px}
-@media (max-width: 1100px){.plans-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media (max-width: 640px){.plans-grid{grid-template-columns:1fr}}
-.plan{background:#0b0b23;color:#fff;border-radius:14px;padding:18px;position:relative;border:1px solid #16163b}
-.plan.popular{outline:2px solid #22c55e;outline-offset:0}
-.plan-badge{position:absolute;top:10px;right:-6px;background:#22c55e;color:#0b0b23;padding:6px 10px;border-radius:999px;font-weight:700;font-size:12px}
-.plan-title{font-size:22px;text-align:left;margin:0 0 4px}
-.plan-sub{color:#cbd5e1;text-align:left;margin:0 0 10px}
-.plan-price{font-size:36px;font-weight:800;text-align:left;margin:6px 0}
-.plan-compare{color:#94a3b8;text-decoration:line-through;text-align:left;margin-top:-6px;margin-bottom:8px}
-.plan-features{background:#0f0f2e;border:1px solid #16163b;border-radius:10px;padding:12px;text-align:left;margin:10px 0}
-.plan-features li{display:flex;gap:8px;margin:6px 0}
-.plan-cta{display:block;width:100%;padding:12px 14px;border-radius:12px;border:1px solid transparent;background:#ef4444;color:#fff;font-weight:700;cursor:pointer}
-.plan-cta:hover{background:#dc2626}
-.plan-skel{height:360px;border-radius:14px;background:linear-gradient(90deg,#0b0b23 25%,#101036 37%,#0b0b23 63%);background-size:400% 100%;animation:s 1.4s ease infinite}
-@keyframes s{0%{background-position:100% 50%}100%{background-position:0 50%}}
-.plans-error{margin-top:12px;color:#dc2626}
+.pricing-header {
+  max-width: 700px;
+}
+.card {
+  border: none;
+  border-radius: 1rem;
+  transition: all 0.2s;
+  box-shadow: 0 0.5rem 1rem 0 rgba(0, 0, 0, 0.1);
+  position: relative;
+  height: 100%; 
+}
+.card-body {
+  padding: 2rem;
+}
+.card-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+.card .price {
+  font-size: 3rem;
+  font-weight: bold;
+  color: #e54b4b;
+}
+.card .price-original {
+  font-size: 1.2rem;
+  text-decoration: line-through;
+  color: #6c757d;
+}
+.card ul li {
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+}
+.card ul li .fa-check {
+  color: #28a745;
+  margin-right: 0.5rem;
+}
+.btn-buy {
+  font-size: 1.2rem;
+  border-radius: 5rem;
+  padding: 0.8rem 2rem;
+  background-color: #e54b4b;
+  color: white;
+  font-weight: bold;
+}
+.btn-buy:hover {
+  background-color: #d43f3f;
+  color: white;
+}
+.best-value-badge {
+  position: absolute;
+  top: -10px;
+  right: 20px;
+  background-color: #28a745;
+  color: white;
+  padding: 5px 10px;
+  font-size: 0.8rem;
+  border-radius: 5px;
+  transform: rotate(15deg);
+}

@@ -1,25 +1,18 @@
 ---
 layout: default
-title: Thành viên VIP
+title: Thành Viên VIP
 permalink: /pricing/
 ---
 
-<link rel="stylesheet" href="{{ '/assets/css/pricing.css' | relative_url }}">
-
-<section class="pricing-wrap">
-  <h1 class="pricing-title">THÀNH VIÊN VIP</h1>
-  <p class="pricing-sub">Mở khóa toàn bộ tài nguyên với các gói thành viên của chúng tôi.</p>
-
-  <div id="plans" class="plans-grid">
-    <!-- Skeleton trong khi tải -->
-    <div class="plan-skel"></div>
-    <div class="plan-skel"></div>
-    <div class="plan-skel"></div>
-    <div class="plan-skel"></div>
+<div class="container py-5">
+  <div class="pricing-header p-3 pb-md-4 mx-auto text-center">
+    <h1 class="display-4 fw-normal">THÀNH VIÊN VIP</h1>
+    <p class="fs-5 text-muted">Mở khóa toàn bộ tài nguyên với các gói thành viên của chúng tôi.</p>
   </div>
 
-  <div id="plans-error" class="plans-error" hidden></div>
-</section>
+  <div class="row row-cols-1 row-cols-md-4 mb-4 text-center" id="pricing-plans">
+    <!-- Các gói giá sẽ được JavaScript chèn vào đây -->
+  </div>
+</div>
 
-<script type="module" src="/assets/js/pricing.js"></script>
-
+<script src="{{ '/assets/js/pricing.js' | relative_url }}"></script>
