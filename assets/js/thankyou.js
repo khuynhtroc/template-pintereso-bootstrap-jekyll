@@ -13,7 +13,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         return;
     }
 
-    // Đảm bảo Supabase client đã sẵn sàng
     if (!window.supabaseClient) {
         console.error('Lỗi: Supabase client chưa được khởi tạo.');
         summaryContainer.innerHTML = '<p class="text-danger text-center">Lỗi kết nối, không thể tải dữ liệu.</p>';
@@ -21,35 +20,28 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
     const supabase = window.supabaseClient;
 
-    // --- BẮT ĐẦU SỬA LỖI ---
+    // 1. Lấy thông tin người dùng đang đăng nhập
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
 
-    // 1. Lấy thông tin đơn hàng
+    if (userError || !user) {
+        console.error('Lỗi khi lấy thông tin người dùng:', userError);
+        summaryContainer.innerHTML = '<p class="text-danger text-center">Không thể xác thực người dùng. Vui lòng đăng nhập lại.</p>';
+        return;
+    }
+
+    // 2. Lấy thông tin đơn hàng và xác thực người dùng sở hữu đơn hàng này
     const { data: order, error: orderError } = await supabase
         .from('orders')
         .select('id, created_at, total_price, user_id')
         .eq('id', orderId)
+        .eq('user_id', user.id) // Thêm lớp bảo mật để chắc chắn đúng người dùng
         .single();
 
     if (orderError || !order) {
         console.error('Lỗi khi lấy thông tin đơn hàng:', orderError);
-        summaryContainer.innerHTML = '<p class="text-danger text-center">Không tìm thấy thông tin đơn hàng. Vui lòng kiểm tra lại.</p>';
+        summaryContainer.innerHTML = '<p class="text-danger text-center">Không tìm thấy thông tin đơn hàng hoặc bạn không có quyền xem đơn hàng này.</p>';
         return;
     }
-
-    // 2. Dùng user_id từ đơn hàng để lấy thông tin email từ bảng profiles
-    const { data: profile, error: profileError } = await supabase
-        .from('profiles')
-        .select('email')
-        .eq('id', order.user_id)
-        .single();
-
-    if (profileError || !profile) {
-        console.error('Lỗi khi lấy thông tin người dùng:', profileError);
-        summaryContainer.innerHTML = '<p class="text-danger text-center">Không thể tải thông tin người dùng của đơn hàng.</p>';
-        return;
-    }
-
-    // --- KẾT THÚC SỬA LỖI ---
 
     // 3. Hiển thị dữ liệu khi đã có đủ thông tin
     const orderDate = new Date(order.created_at).toLocaleDateString('vi-VN');
@@ -64,7 +56,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     <th scope="row">Ngày:</th>
                     <td>${orderDate}</td>
                     <th scope="row">Email:</th>
-                    <td>${profile.email}</td>
+                    <td>${user.email}</td>
                     <th scope="row">Tổng cộng:</th>
                     <td>${orderTotal}</td>
                     <th scope="row">Phương thức thanh toán:</th>
