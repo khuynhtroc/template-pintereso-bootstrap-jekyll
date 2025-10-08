@@ -4,66 +4,78 @@ title: Thanh toán
 permalink: /checkout/
 ---
 
-<link rel="stylesheet" href="{{ '/assets/css/checkout.css' | relative_url }}">
-
-<section class="checkout-wrap">
-  <h1 class="co-title">THANH TOÁN</h1>
-
-  <div class="co-grid">
-    <!-- Form thông tin -->
-    <form id="co-form" class="co-form card">
-      <h2>Thông tin tài khoản</h2>
-
-      <div class="grid-2">
-        <div>
-          <label>Tên</label>
-          <input id="co-first" type="text" required>
-        </div>
-        <div>
-          <label>Họ</label>
-          <input id="co-last" type="text" required>
-        </div>
-      </div>
-
-      <div>
-        <label>Số điện thoại</label>
-        <input id="co-phone" type="tel" required>
-      </div>
-
-      <div>
-        <label>Địa chỉ email</label>
-        <input id="co-email" type="email" required>
-      </div>
-
-      <div class="mt-2">
-        <label>Tôi đã đọc và đồng ý với điều khoản và điều kiện của website</label>
-        <input id="co-terms" type="checkbox" required>
-      </div>
-
-      <button type="submit" class="btn btn-primary mt-2">Đặt hàng</button>
-    </form>
-
-    <!-- Tóm tắt đơn -->
-    <aside class="co-summary card">
-      <h2>Đơn hàng của bạn</h2>
-      <div class="row">
-        <span>Sản phẩm</span>
-        <span id="co-item">—</span>
-      </div>
-      <div class="row">
-        <span>Tạm tính</span>
-        <span id="co-subtotal">—</span>
-      </div>
-      <div class="row total">
-        <span>Tổng cộng</span>
-        <span id="co-total">—</span>
-      </div>
-      <p class="muted">Chuyển khoản Ngân hàng</p>
-    </aside>
+<div class="container py-5">
+  <div class="text-center mb-5">
+    <h1 class="display-5 fw-bold">THANH TOÁN</h1>
   </div>
 
-  <div id="co-error" class="co-error" hidden></div>
-</section>
+  <div class="row g-5">
+    <!-- Cột thông tin đơn hàng và thanh toán -->
+    <div class="col-md-5 col-lg-4 order-md-last">
+      <h4 class="d-flex justify-content-between align-items-center mb-3">
+        <span class="text-primary">Đơn hàng của bạn</span>
+      </h4>
+      <div id="order-summary">
+        <!-- Thông tin gói VIP sẽ được JS chèn vào đây -->
+        <div class="d-flex justify-content-center align-items-center p-5">
+          <div class="spinner-border" role="status">
+            <span class="visually-hidden">Loading...</span>
+          </div>
+        </div>
+      </div>
+      <div class="card mt-4">
+        <div class="card-body">
+          <h5 class="card-title">Chuyển khoản Ngân hàng</h5>
+          <p class="card-text">Thực hiện thanh toán vào ngay tài khoản ngân hàng của chúng tôi. Vui lòng sử dụng ID Đơn hàng của bạn như một phần nội dung thanh toán.</p>
+          <!-- Thông tin ngân hàng của bạn ở đây -->
+        </div>
+      </div>
+    </div>
 
-<script src="{{ '/assets/js/config.supabase.js' | relative_url }}"></script>
-<script type="module" src="{{ '/assets/js/checkout.js' | relative_url }}"></script>
+    <!-- Cột thông tin khách hàng -->
+    <div class="col-md-7 col-lg-8">
+      <h4 class="mb-3">Thông tin tài khoản</h4>
+      <!-- Vùng hiển thị khi người dùng đã đăng nhập -->
+      <div id="user-logged-in" class="alert alert-success" style="display: none;">
+        Chào mừng trở lại, <strong id="user-email"></strong>! Bạn có thể tiến hành đặt hàng.
+        <a href="#" id="logout-button" class="float-end">Đăng xuất</a>
+      </div>
+
+      <!-- Vùng hiển thị khi người dùng chưa đăng nhập -->
+      <div id="user-logged-out">
+        <p>Bạn đã có tài khoản? <a href="#" id="login-link">Đăng nhập</a></p>
+        <form class="needs-validation" id="checkout-form" novalidate>
+          <p>Thông tin dưới đây sẽ được dùng để tạo tài khoản mới cho bạn.</p>
+          <div class="row g-3">
+            <div class="col-sm-6">
+              <label for="firstName" class="form-label">Tên (*)</label>
+              <input type="text" class="form-control" id="firstName" required>
+            </div>
+            <div class="col-sm-6">
+              <label for="lastName" class="form-label">Họ (*)</label>
+              <input type="text" class="form-control" id="lastName" required>
+            </div>
+            <div class="col-12">
+              <label for="email" class="form-label">Địa chỉ email (*)</label>
+              <input type="email" class="form-control" id="email" required>
+            </div>
+            <div class="col-12">
+              <label for="password" class="form-label">Mật khẩu (*)</label>
+              <input type="password" class="form-control" id="password" required>
+            </div>
+          </div>
+          <hr class="my-4">
+          <div class="form-check">
+            <input type="checkbox" class="form-check-input" id="terms" required>
+            <label class="form-check-label" for="terms">Tôi đã đọc và đồng ý với điều khoản và điều kiện của website (*)</label>
+          </div>
+          <hr class="my-4">
+          <button class="w-100 btn btn-primary btn-lg" type="submit" id="place-order-btn">Đặt hàng</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<script src="{{ '/assets/js/checkout.js' | relative_url }}"></script>

@@ -1,64 +1,129 @@
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-const supabase = createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
+document.addEventListener('DOMContentLoaded', async () => {
+    const orderSummary = document.getElementById('order-summary');
+    const userLoggedInDiv = document.getElementById('user-logged-in');
+    const userLoggedOutDiv = document.getElementById('user-logged-out');
+    const userEmailSpan = document.getElementById('user-email');
+    const checkoutForm = document.getElementById('checkout-form');
+    const placeOrderBtn = document.getElementById('place-order-btn');
 
-const $ = (s)=>document.querySelector(s);
-const fmtVND = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND', maximumFractionDigits: 0 });
+    if (!orderSummary) return; // Chỉ chạy trên trang checkout
 
-let plan = null;
+    // Lấy plan_id từ URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const planId = urlParams.get('plan_id');
 
-async function loadPlan(){
-  const params = new URLSearchParams(location.search);
-  const planId = params.get('plan_id');
-  if (!planId) { location.href = '/pricing/'; return; }
+    if (!planId) {
+        orderSummary.innerHTML = '<p class="text-danger">Gói không hợp lệ.</p>';
+        return;
+    }
 
-  const { data, error } = await supabase
-    .from('membership_plans')
-    .select('id,name,duration_months,price,is_active')
-    .eq('id', planId)
-    .maybeSingle();
-  if (error || !data || !data.is_active) {
-    $('#co-error').hidden=false; $('#co-error').textContent = error?.message || 'Gói không khả dụng.'; return;
-  }
-  plan = data;
+    const supabase = window.supabaseClient;
 
-  $('#co-item').textContent = `${plan.name} × 1`;
-  $('#co-subtotal').textContent = fmtVND.format(plan.price || 0);
-  $('#co-total').textContent = fmtVND.format(plan.price || 0);
-}
+    // Lấy thông tin gói VIP và hiển thị
+    const { data: plan, error: planError } = await supabase
+        .from('membership_plans')
+        .select('*')
+        .eq('id', planId)
+        .single();
 
-async function createOrder(e){
-  e.preventDefault();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) { window.fvOpenAuth?.(); return; }
-  if (!plan) { alert('Gói không hợp lệ'); return; }
+    if (planError || !plan) {
+        orderSummary.innerHTML = '<p class="text-danger">Không tìm thấy thông tin gói.</p>';
+        return;
+    }
 
-  const fullName = `${$('#co-first').value.trim()} ${$('#co-last').value.trim()}`.trim();
-  const email = $('#co-email').value.trim();
-  const phone = $('#co-phone').value.trim();
+    orderSummary.innerHTML = `
+        <ul class="list-group mb-3">
+            <li class="list-group-item d-flex justify-content-between lh-sm">
+                <div>
+                    <h6 class="my-0">Sản phẩm</h6>
+                    <small class="text-muted">${plan.name}</small>
+                </div>
+                <span class="text-muted">${new Intl.NumberFormat('vi-VN').format(plan.price)}đ</span>
+            </li>
+            <li class="list-group-item d-flex justify-content-between">
+                <span>Tổng cộng (VND)</span>
+                <strong>${new Intl.NumberFormat('vi-VN').format(plan.price)}đ</strong>
+            </li>
+        </ul>
+    `;
 
-  const { data, error } = await supabase
-    .from('orders')
-    .insert({
-      user_id: user.id,
-      plan_id: plan.id,
-      email,
-      full_name: fullName,
-      phone,
-      total: plan.price || 0,
-      status: 'pending',
-      payment_method: 'bank_transfer'
-    })
-    .select('id')
-    .maybeSingle();
+    // Kiểm tra trạng thái đăng nhập của người dùng
+    const { data: { user } } = await supabase.auth.getUser();
 
-  if (error || !data) { $('#co-error').hidden=false; $('#co-error').textContent = error?.message || 'Không thể tạo đơn hàng.'; return; }
+    if (user) {
+        // Nếu đã đăng nhập
+        userLoggedInDiv.style.display = 'block';
+        userLoggedOutDiv.style.display = 'none';
+        userEmailSpan.textContent = user.email;
+    } else {
+        // Nếu chưa đăng nhập
+        userLoggedInDiv.style.display = 'none';
+        userLoggedOutDiv.style.display = 'block';
+    }
 
-  const orderId = data.id;
-  // chuyển đến trang cảm ơn
-  location.href = `/cam-on/?order_id=${encodeURIComponent(orderId)}`;
-}
+    // Xử lý sự kiện click "Đặt hàng"
+    checkoutForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        placeOrderBtn.disabled = true;
+        placeOrderBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Đang xử lý...';
+        
+        let currentUser = user;
 
-document.addEventListener('DOMContentLoaded', ()=>{
-  loadPlan();
-  $('#co-form')?.addEventListener('submit', createOrder);
+        if (!currentUser) {
+            // Nếu chưa đăng nhập, tiến hành đăng ký tài khoản mới
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const firstName = document.getElementById('firstName').value;
+            const lastName = document.getElementById('lastName').value;
+
+            const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+                email: email,
+                password: password,
+                options: {
+                    data: {
+                        full_name: `${firstName} ${lastName}`
+                    }
+                }
+            });
+
+            if (signUpError) {
+                alert('Lỗi đăng ký: ' + signUpError.message);
+                placeOrderBtn.disabled = false;
+                placeOrderBtn.textContent = 'Đặt hàng';
+                return;
+            }
+            currentUser = signUpData.user;
+        }
+
+        // Tạo đơn hàng trong bảng 'orders'
+        const { error: orderError } = await supabase
+            .from('orders')
+            .insert({
+                user_id: currentUser.id,
+                plan_id: plan.id,
+                total_price: plan.price
+            });
+
+        if (orderError) {
+            alert('Lỗi khi tạo đơn hàng: ' + orderError.message);
+            placeOrderBtn.disabled = false;
+            placeOrderBtn.textContent = 'Đặt hàng';
+        } else {
+            // Chuyển hướng đến trang cảm ơn
+            window.location.href = '/thankyou/';
+        }
+    });
+
+    // Xử lý đăng xuất
+    document.getElementById('logout-button').addEventListener('click', async () => {
+        await supabase.auth.signOut();
+        window.location.reload();
+    });
+    
+    // Xử lý link đăng nhập (bạn có thể trỏ tới modal đăng nhập đã có)
+    document.getElementById('login-link').addEventListener('click', () => {
+      // Gọi modal đăng nhập của bạn ở đây
+      // Ví dụ: $('#loginModal').modal('show');
+      alert('Vui lòng tích hợp modal đăng nhập của bạn tại đây.');
+    });
 });
