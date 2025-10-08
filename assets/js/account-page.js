@@ -1,5 +1,6 @@
-import { sb } from '/assets/js/sb-client.js';
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
+const supabase = createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
 
 const $  = (s) => document.querySelector(s);
 const $$ = (s) => Array.from(document.querySelectorAll(s));
@@ -12,7 +13,7 @@ const nameInput  = $('#acc-fullname');
 const avatarUrl  = $('#acc-avatar-url');
 
 async function requireAuth(){
-  const { data: { user } } = await sb.auth.getUser();
+  const { data: { user } } = await supabase.auth.getUser();
   if (!user) {
     // Nếu chưa đăng nhập, điều hướng về trang chủ hoặc mở modal
     window.location.href = '/';
@@ -22,7 +23,7 @@ async function requireAuth(){
 }
 
 async function loadProfile(user){
-  const { data, error } = await sb
+  const { data, error } = await supabase
     .from('profiles')
     .select('email, full_name, avatar_url')
     .eq('id', user.id)
@@ -43,7 +44,7 @@ async function saveProfile(user){
     full_name: nameInput.value || null,
     avatar_url: avatarUrl.value || null
   };
-  const { error } = await sb.from('profiles').update(updates).eq('id', user.id);
+  const { error } = await supabase.from('profiles').update(updates).eq('id', user.id);
   if (error) { alert(error.message); return; }
   alert('Đã lưu');
   await loadProfile(user);
@@ -77,12 +78,12 @@ async function init(){
 
   $('#acc-signout')?.addEventListener('click', async (e)=>{
     e.preventDefault();
-    await sb.auth.signOut();
+    await supabase.auth.signOut();
     window.location.href = '/';
   });
 
   // Đồng bộ UI khi phiên thay đổi
-  sb.auth.onAuthStateChange(async (_evt, _sess)=>{ const u = await requireAuth(); if (u) loadProfile(u); });
+  supabase.auth.onAuthStateChange(async (_evt, _sess)=>{ const u = await requireAuth(); if (u) loadProfile(u); });
 }
 
 init();
