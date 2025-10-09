@@ -44,12 +44,17 @@ document.addEventListener('DOMContentLoaded', async () => {
     `;
 
     // --- STEP 3: TÍCH HỢP MODAL ĐĂNG NHẬP ---
-    // Nút "Đăng nhập" sẽ gọi đến modal đã có sẵn trên trang
+    // Gắn sự kiện click vào đúng link "Đăng nhập"
     loginLink.addEventListener('click', (e) => {
         e.preventDefault();
-        // Giả sử modal của bạn có id là 'authModal' và được khởi tạo bằng Bootstrap
-        const authModal = new bootstrap.Modal(document.getElementById('authModal'));
-        authModal.show();
+        try {
+            // Giả sử modal đăng nhập có ID là 'authModal' và đã được file auth-modal.js tạo sẵn
+            const authModalInstance = new bootstrap.Modal(document.getElementById('authModal'));
+            authModalInstance.show();
+        } catch (error) {
+            console.error("Lỗi khi mở modal đăng nhập. Bạn đã nhúng file auth-modal.js chưa?", error);
+            alert("Đã xảy ra lỗi khi mở form đăng nhập. Vui lòng thử lại.");
+        }
     });
 
     // --- STEP 4: KIỂM TRA VÀ HIỂN THỊ TRẠNG THÁI ĐĂNG NHẬP ---
