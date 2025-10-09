@@ -95,6 +95,36 @@ document.addEventListener('DOMContentLoaded', async () => {
         pane.innerHTML = '<p>Đang tải dữ liệu...</p>'; // Placeholder
 
         switch (tabId) {
+            case 'dashboard': {
+                const upgradeAlert = document.querySelector('.acc-alert');
+                if (!upgradeAlert) break;
+
+                // Tìm nút "Nâng cấp ngay" và gán link
+                const upgradeButton = upgradeAlert.querySelector('button');
+                if (upgradeButton) {
+                    upgradeButton.addEventListener('click', () => {
+                        window.location.href = '/pricing/'; // Chuyển đến trang pricing
+                    });
+                }
+
+                // Kiểm tra xem user có phải là VIP không
+                const { data: vipOrder, error } = await supabase
+                    .from('orders')
+                    .select('id')
+                    .eq('user_id', currentUser.id)
+                    .eq('status', 'completed')
+                    .limit(1) // Chỉ cần tìm 1 đơn hàng là đủ
+                    .single();
+
+                // Nếu có đơn hàng VIP đã hoàn thành, ẩn thông báo nâng cấp
+                if (vipOrder && !error) {
+                    upgradeAlert.style.display = 'none';
+                } else {
+                    upgradeAlert.style.display = 'block';
+                }
+                break;
+            }
+            
             case 'orders': {
                 const ordersPane = document.getElementById('tab-orders');
                 ordersPane.innerHTML = '<h2 class="acc-title">Đơn hàng của bạn</h2><p>Đang tải đơn hàng...</p>';
