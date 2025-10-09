@@ -100,11 +100,73 @@ document.addEventListener('DOMContentLoaded', async () => {
                 break;
             }
 
-            // --- CASE: ĐƠN HÀNG ---
             case 'orders': {
-                // Giữ nguyên logic của case 'orders' đã làm ở các bước trước
+                const ordersPane = document.getElementById('tab-orders');
+                ordersPane.innerHTML = '<h2 class="acc-title">Đơn hàng của bạn</h2><p>Đang tải đơn hàng...</p>';
+                
+                // Thêm 'status' vào danh sách các cột cần lấy
+                const { data, error } = await supabase
+                    .from('orders')
+                    .select(`
+                        id,
+                        created_at,
+                        total_price,
+                        status, 
+                        membership_plans (name)
+                    `)
+                    .eq('user_id', currentUser.id)
+                    .order('created_at', { ascending: false });
+
+                if (error || data.length === 0) {
+                    ordersPane.innerHTML = '<h2 class="acc-title">Đơn hàng của bạn</h2><p>Bạn chưa có đơn hàng nào.</p>';
+                } else {
+                    // Thêm cột 'Trạng thái' vào header của bảng
+                    let table = `
+                        <h2 class="acc-title">Đơn hàng của bạn</h2>
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Mã ĐH</th>
+                                    <th>Sản phẩm đã mua</th>
+                                    <th>Tổng tiền</th>
+                                    <th>Trạng thái</th>
+                                    <th>Ngày tạo</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                    `;
+                    
+                    data.forEach(order => {
+                        // Logic để hiển thị tag màu cho trạng thái
+                        let statusBadge;
+                        switch (order.status) {
+                            case 'completed':
+                                statusBadge = '<span class="badge bg-success">Hoàn thành</span>';
+                                break;
+                            case 'failed':
+                                statusBadge = '<span class="badge bg-danger">Thất bại</span>';
+                                break;
+                            default:
+                                statusBadge = '<span class="badge bg-warning text-dark">Chờ xử lý</span>';
+                        }
+
+                        // Thêm cột 'status' vào mỗi dòng
+                        table += `
+                            <tr>
+                                <td>#${order.id}</td>
+                                <td>${order.membership_plans.name}</td>
+                                <td>${new Intl.NumberFormat('vi-VN').format(order.total_price)}đ</td>
+                                <td>${statusBadge}</td>
+                                <td>${new Date(order.created_at).toLocaleDateString('vi-VN')}</td>
+                            </tr>
+                        `;
+                    });
+
+                    ordersPane.innerHTML = table + '</tbody></table>';
+                }
                 break;
             }
+
             
             // --- CASE: GÓI VIP CỦA TÔI ---
             case 'vip': {
@@ -146,6 +208,20 @@ document.addEventListener('DOMContentLoaded', async () => {
                 }
                 contentHTML += '<button class="btn btn-primary mt-3" onclick="window.location.href=\'/pricing/\'">Nâng cấp hoặc Gia hạn gói</button>';
                 pane.innerHTML = contentHTML;
+                break;
+            }
+
+            case 'downloads': {
+                const { data, error } = await supabase.from('downloads').select('product_name, downloaded_at').eq('user_id', currentUser.id).order('downloaded_at', { ascending: false }).limit(50);
+                if (error || data.length === 0) {
+                    pane.innerHTML = '<h2 class="acc-title">Lịch sử tải</h2><p>Bạn chưa có lượt tải nào.</p>';
+                } else {
+                    let list = '<h2 class="acc-title">Lịch sử tải</h2><ul class="list-group">';
+                    data.forEach(dl => {
+                        list += `<li class="list-group-item">${dl.product_name} - <span class="text-muted">${new Date(dl.downloaded_at).toLocaleString('vi-VN')}</span></li>`;
+                    });
+                    pane.innerHTML = list + '</ul>';
+                }
                 break;
             }
 
