@@ -96,18 +96,72 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         switch (tabId) {
             case 'orders': {
-                const { data, error } = await supabase.from('orders').select(`id, created_at, total_price, membership_plans (name)`).eq('user_id', currentUser.id).order('created_at', { ascending: false });
+                const ordersPane = document.getElementById('tab-orders');
+                ordersPane.innerHTML = '<h2 class="acc-title">Đơn hàng của bạn</h2><p>Đang tải đơn hàng...</p>';
+                
+                // Thêm 'status' vào danh sách các cột cần lấy
+                const { data, error } = await supabase
+                    .from('orders')
+                    .select(`
+                        id,
+                        created_at,
+                        total_price,
+                        status, 
+                        membership_plans (name)
+                    `)
+                    .eq('user_id', currentUser.id)
+                    .order('created_at', { ascending: false });
+
                 if (error || data.length === 0) {
-                    pane.innerHTML = '<h2 class="acc-title">Đơn hàng</h2><p>Bạn chưa có đơn hàng nào.</p>';
+                    ordersPane.innerHTML = '<h2 class="acc-title">Đơn hàng của bạn</h2><p>Bạn chưa có đơn hàng nào.</p>';
                 } else {
-                    let table = '<h2 class="acc-title">Đơn hàng</h2><table class="table"><thead><tr><th>Mã ĐH</th><th>Ngày</th><th>Sản phẩm</th><th>Tổng tiền</th></tr></thead><tbody>';
+                    // Thêm cột 'Trạng thái' vào header của bảng
+                    let table = `
+                        <h2 class="acc-title">Đơn hàng của bạn</h2>
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Mã ĐH</th>
+                                    <th>Sản phẩm đã mua</th>
+                                    <th>Tổng tiền</th>
+                                    <th>Trạng thái</th>
+                                    <th>Ngày tạo</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                    `;
+                    
                     data.forEach(order => {
-                        table += `<tr><td>#${order.id}</td><td>${new Date(order.created_at).toLocaleDateString('vi-VN')}</td><td>${order.membership_plans.name}</td><td>${new Intl.NumberFormat('vi-VN').format(order.total_price)}đ</td></tr>`;
+                        // Logic để hiển thị tag màu cho trạng thái
+                        let statusBadge;
+                        switch (order.status) {
+                            case 'completed':
+                                statusBadge = '<span class="badge bg-success">Hoàn thành</span>';
+                                break;
+                            case 'failed':
+                                statusBadge = '<span class="badge bg-danger">Thất bại</span>';
+                                break;
+                            default:
+                                statusBadge = '<span class="badge bg-warning text-dark">Chờ xử lý</span>';
+                        }
+
+                        // Thêm cột 'status' vào mỗi dòng
+                        table += `
+                            <tr>
+                                <td>#${order.id}</td>
+                                <td>${order.membership_plans.name}</td>
+                                <td>${new Intl.NumberFormat('vi-VN').format(order.total_price)}đ</td>
+                                <td>${statusBadge}</td>
+                                <td>${new Date(order.created_at).toLocaleDateString('vi-VN')}</td>
+                            </tr>
+                        `;
                     });
-                    pane.innerHTML = table + '</tbody></table>';
+
+                    ordersPane.innerHTML = table + '</tbody></table>';
                 }
                 break;
             }
+
             case 'vip': {
                 const { data, error } = await supabase.from('orders').select(`created_at, membership_plans (name, duration_months)`).eq('user_id', currentUser.id).eq('status', 'completed').order('created_at', { ascending: false }).limit(1);
                 if (error || data.length === 0) {
