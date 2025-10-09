@@ -1,9 +1,18 @@
 <!-- This goes before </head> closing tag, Google Analytics can be placed here --> 
-	<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+	<!-- 1. Thư viện Supabase (từ CDN) -->
+	<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+	
+	<!-- 2. Thư viện Bootstrap JS (cần cho Modal) -->
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+	
+	<!-- 3. File config Supabase của BẠN -->
+	<script src="{{ '/assets/js/config.supabase.js' | relative_url }}"></script>
+	
+	<!-- 4. File logic Modal của BẠN -->
+	<script src="{{ '/assets/js/auth-modal.js' | relative_url }}"></script>
+	
     <link rel="stylesheet" href="{{ '/assets/css/auth-modal.css' | relative_url }}">
-    <script src="{{ '/assets/js/config.supabase.js' | relative_url }}"></script>
-    <script type="module" src="{{ '/assets/js/auth-modal.js' | relative_url }}"></script>
-    
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <!-- Tải CSS riêng cho trang pricing -->
   	{% if page.permalink == '/pricing/' %}
