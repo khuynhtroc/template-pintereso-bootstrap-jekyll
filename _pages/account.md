@@ -95,5 +95,4 @@ permalink: /account/
   </div>
 </section>
 
-<script src="{{ '/assets/js/config.supabase.js' | relative_url }}"></script>
 <script type="module" src="{{ '/assets/js/account-page.js' | relative_url }}"></script>
