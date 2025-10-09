@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const userEmailSpan = document.getElementById('user-email');
     const checkoutForm = document.getElementById('checkout-form');
     const placeOrderBtnLoggedOut = document.getElementById('place-order-btn');
-    const loginLink = document.getElementById('checkout-login-link');
+    const loginLink = document.getElementById('checkout-login-link'); 
     const loggedInActions = document.getElementById('logged-in-checkout-action');
     const placeOrderBtnLoggedIn = document.getElementById('place-order-btn-loggedin');
 
