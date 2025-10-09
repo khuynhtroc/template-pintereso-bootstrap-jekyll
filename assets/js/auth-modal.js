@@ -45,7 +45,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     // --- STEP 3: LẤY CÁC PHẦN TỬ DOM ---
-    const authModal = new bootstrap.Modal(document.getElementById('authModal'));
+    const authModalEl = document.getElementById('authModal');
+    const authModalInstance = new bootstrap.Modal(authModalEl);
     const userProfileLink = document.getElementById('user-profile-link');
     const headerAvatar = document.getElementById('header-avatar');
     const headerAuthText = document.getElementById('header-auth-text');
@@ -53,20 +54,30 @@ document.addEventListener('DOMContentLoaded', () => {
     const loginForm = document.getElementById('login-form');
     const registerForm = document.getElementById('register-form');
 
+    // *** HÀM DỌN DẸP MODAL (PHẦN THÊM MỚI) ***
+    function forceCloseModal() {
+        // 1. Sử dụng API của Bootstrap để ẩn modal
+        authModalInstance.hide();
+        
+        // 2. Tìm và xóa tất cả các lớp phủ backdrop còn sót lại
+        const backdrops = document.querySelectorAll('.modal-backdrop');
+        backdrops.forEach(backdrop => backdrop.remove());
+
+        // 3. Xóa class 'modal-open' khỏi body để cho phép cuộn trang lại
+        document.body.classList.remove('modal-open');
+        document.body.style.overflow = '';
+        document.body.style.paddingRight = '';
+    }
+
     // --- STEP 4: GẮN CÁC SỰ KIỆN ---
 
-    // *** SỬA LỖI QUAN TRỌNG NHẤT ***
     // Gắn sự kiện click để luôn luôn kiểm tra trạng thái trước khi quyết định
     userProfileLink.addEventListener('click', async (e) => {
-        // Luôn dùng getUser() để có kết quả chính xác nhất
         const { data: { user } } = await supabase.auth.getUser(); 
-        
-        // Nếu không có user, tức là chưa đăng nhập
         if (!user) {
-            e.preventDefault(); // Ngăn thẻ <a> chuyển trang
-            authModal.show();   // Mở modal
+            e.preventDefault(); 
+            authModalInstance.show();
         }
-        // Nếu có user, không làm gì cả, để thẻ <a> tự động chuyển đến /account/
     });
 
     // Chuyển đổi giữa các form
@@ -78,24 +89,35 @@ document.addEventListener('DOMContentLoaded', () => {
         await supabase.auth.signInWithOAuth({ provider: 'google' });
     });
 
-    // Xử lý form đăng nhập email
+    // Xử lý form đăng nhập email (ĐÃ CẬP NHẬT)
     loginForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         const { error } = await supabase.auth.signInWithPassword({
             email: loginForm.querySelector('#login-email').value,
             password: loginForm.querySelector('#login-password').value,
         });
-        if (error) alert(error.message); else authModal.hide();
+        if (error) {
+            alert(error.message);
+        } else {
+            // Đăng nhập thành công, gọi hàm dọn dẹp modal
+            forceCloseModal();
+        }
     });
 
-    // Xử lý form đăng ký email
+    // Xử lý form đăng ký email (ĐÃ CẬP NHẬT)
     registerForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         const { error } = await supabase.auth.signUp({
             email: registerForm.querySelector('#register-email').value,
             password: registerForm.querySelector('#register-password').value,
         });
-        if (error) alert(error.message); else { alert('Đăng ký thành công! Vui lòng kiểm tra email để xác thực.'); authModal.hide(); }
+        if (error) {
+            alert(error.message);
+        } else { 
+            alert('Đăng ký thành công! Vui lòng kiểm tra email để xác thực.');
+            // Đăng ký thành công, gọi hàm dọn dẹp modal
+            forceCloseModal();
+        }
     });
 
     // --- STEP 5: CẬP NHẬT GIAO DIỆN DỰA TRÊN TRẠNG THÁI ĐĂNG NHẬP ---
@@ -105,11 +127,11 @@ document.addEventListener('DOMContentLoaded', () => {
         if (user) {
             const displayName = user.user_metadata?.full_name || user.user_metadata?.name || user.email.split('@')[0];
             headerAuthText.textContent = displayName;
-            if(headerAvatar) headerAvatar.src = user.user_metadata?.avatar_url || '/assets/images/sal.jpg';
+            if(headerAvatar) headerAvatar.src = user.user_metadata?.avatar_url || '/assets/images/default-avatar.png'; // Đổi lại thành default-avatar
             userProfileLink.href = '/account/';
         } else {
             headerAuthText.textContent = 'Đăng nhập';
-            if(headerAvatar) headerAvatar.src = '/assets/images/sal.jpg';
+            if(headerAvatar) headerAvatar.src = '/assets/images/default-avatar.png'; // Đổi lại thành default-avatar
             userProfileLink.href = '#';
         }
     };
