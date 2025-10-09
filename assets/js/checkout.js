@@ -6,8 +6,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     const userEmailSpan = document.getElementById('user-email');
     const checkoutForm = document.getElementById('checkout-form');
     const placeOrderBtn = document.getElementById('place-order-btn');
+    const loginLink = document.getElementById('user-profile-link'); // Đã có sẵn trong file HTML của bạn
 
-    if (!orderSummary || !checkoutForm) {
+    if (!orderSummary || !checkoutForm || !loginLink) {
         console.error('Lỗi: Thiếu các thành phần HTML cần thiết cho trang checkout.');
         return;
     }
@@ -42,58 +43,67 @@ document.addEventListener('DOMContentLoaded', async () => {
         </ul>
     `;
 
-    // --- STEP 3: KIỂM TRA VÀ HIỂN THỊ TRẠNG THÁI ĐĂNG NHẬP ---
-    const { data: { user } } = await supabase.auth.getUser();
-    if (user) {
-        userLoggedInDiv.style.display = 'block';
-        userLoggedOutDiv.style.display = 'none';
-        if (userEmailSpan) userEmailSpan.textContent = user.email;
-    } else {
-        userLoggedInDiv.style.display = 'none';
-        userLoggedOutDiv.style.display = 'block';
-    }
+    // --- STEP 3: TÍCH HỢP MODAL ĐĂNG NHẬP ---
+    // Nút "Đăng nhập" sẽ gọi đến modal đã có sẵn trên trang
+    loginLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        // Giả sử modal của bạn có id là 'authModal' và được khởi tạo bằng Bootstrap
+        const authModal = new bootstrap.Modal(document.getElementById('authModal'));
+        authModal.show();
+    });
 
-    // --- STEP 4: XỬ LÝ VIỆC ĐẶT HÀNG ---
+    // --- STEP 4: KIỂM TRA VÀ HIỂN THỊ TRẠNG THÁI ĐĂNG NHẬP ---
+    const updateUserStatus = (user) => {
+        if (user) {
+            userLoggedInDiv.style.display = 'block';
+            userLoggedOutDiv.style.display = 'none';
+            if (userEmailSpan) userEmailSpan.textContent = user.email;
+        } else {
+            userLoggedInDiv.style.display = 'none';
+            userLoggedOutDiv.style.display = 'block';
+        }
+    };
+    
+    // Lắng nghe sự kiện đăng nhập/đăng xuất thành công từ auth-modal.js
+    supabase.auth.onAuthStateChange((_event, session) => {
+        updateUserStatus(session?.user);
+        // Nếu người dùng vừa đăng nhập thành công, không cần tải lại trang
+        // Giao diện sẽ tự cập nhật
+    });
+
+    // Kiểm tra trạng thái ban đầu khi tải trang
+    const { data: { user } } = await supabase.auth.getUser();
+    updateUserStatus(user);
+
+
+    // --- STEP 5: XỬ LÝ VIỆC ĐẶT HÀNG ---
     checkoutForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         placeOrderBtn.disabled = true;
         placeOrderBtn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Đang xử lý...';
         
-        let currentUser = user;
+        // Lấy lại thông tin user lần nữa để chắc chắn là đã đăng nhập
+        const { data: { user: currentUser } } = await supabase.auth.getUser();
 
-        // Nếu người dùng chưa đăng nhập, thực hiện đăng ký nhanh
         if (!currentUser) {
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            const firstName = document.getElementById('firstName').value;
-            const lastName = document.getElementById('lastName').value;
-
-            const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
-                email: email,
-                password: password,
-                options: { data: { full_name: `${firstName} ${lastName}` } }
-            });
-
-            if (signUpError) {
-                alert('Lỗi đăng ký: ' + signUpError.message);
-                placeOrderBtn.disabled = false;
-                placeOrderBtn.textContent = 'Đặt hàng';
-                return;
-            }
-            currentUser = signUpData.user;
+             alert('Bạn cần đăng nhập hoặc tạo tài khoản để hoàn tất đơn hàng.');
+             placeOrderBtn.disabled = false;
+             placeOrderBtn.textContent = 'Đặt hàng';
+             // Mở modal đăng nhập cho người dùng
+             const authModal = new bootstrap.Modal(document.getElementById('authModal'));
+             authModal.show();
+             return;
         }
         
         // Chuẩn bị dữ liệu để chèn vào bảng `orders`
         const orderPayload = {
             user_id: currentUser.id,
             total_price: item.price,
-            status: 'pending', // Mặc định là đang chờ
-            // Reset các trường liên quan
+            status: 'pending',
             plan_id: null,
             product_id: null
         };
 
-        // Gán ID tương ứng dựa trên loại sản phẩm
         if (item.type === 'plan') {
             orderPayload.plan_id = item.id;
         } else if (item.type === 'product') {
@@ -112,29 +122,17 @@ document.addEventListener('DOMContentLoaded', async () => {
             placeOrderBtn.disabled = false;
             placeOrderBtn.textContent = 'Đặt hàng';
         } else {
-            // Xóa item khỏi sessionStorage sau khi đã tạo đơn hàng thành công
             sessionStorage.removeItem('checkoutItem');
-            // Chuyển hướng đến trang cảm ơn
             window.location.href = `/thankyou/?order_id=${orderData.id}`;
         }
     });
 
-    // --- STEP 5: XỬ LÝ CÁC NÚT PHỤ ---
+    // --- STEP 6: XỬ LÝ NÚT ĐĂNG XUẤT ---
     const logoutButton = document.getElementById('logout-button');
     if(logoutButton) {
         logoutButton.addEventListener('click', async () => {
             await supabase.auth.signOut();
-            window.location.reload();
-        });
-    }
-    
-    // Nút này nên tích hợp với modal đăng nhập chung của bạn
-    const loginLink = document.getElementById('login-link');
-    if(loginLink) {
-        loginLink.addEventListener('click', () => {
-            // Logic để mở auth-modal.js
-            // Bạn có thể gọi một hàm toàn cục hoặc dispatch một event
-            alert('Chức năng đăng nhập sẽ được kích hoạt tại đây.');
+            window.location.reload(); // Tải lại trang checkout để hiển thị form đăng ký
         });
     }
 });
