@@ -516,3 +516,13 @@ a.next {
     font-weight: bold;
     color: var(--bs-danger);
 }
+
+.vip-upsell-box {
+    margin-top: 1.5rem;
+    padding: 1rem;
+    background-color: #fff3cd;
+    border: 1px solid #ffeeba;
+    border-left: 5px solid #ffc107;
+    border-radius: 0.375rem;
+    text-align: center;
+}

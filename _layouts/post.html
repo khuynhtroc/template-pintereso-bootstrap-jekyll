@@ -4,7 +4,7 @@ layout: default
 <section class="bg-gray200 pt-5 pb-5">
     <div class="container">
         <div class="row justify-content-center">
-            <div class="col-md-10">
+            <div class="col-md-12">
                 
                 <article class="card">
                     
@@ -30,7 +30,7 @@ layout: default
                             {{ content }}
                         </div>
                         <div class="col-md-4">
-                            {% if page.download_url %}
+                            <!--{% if page.download_url %}
                                 <p><a target="_blank" href="{{page.download_url}}" class="btn btn-primary d-block font-weight-bold">
                                     <i class="fas fa-download"></i> Tải về</a>
                                 </p>
@@ -39,15 +39,10 @@ layout: default
                                 <p><a target="_blank" href="{{page.visit}}" class="btn btn-gray d-block font-weight-bold">
                                     Visit <i class="fas fa-external-link-alt"></i></a>
                                 </p>
-                            {% endif %}
+                            {% endif %}-->
 
 
-                            {% if page.sku %}
-                                <p class="text-lg mb-1">
-                                    <strong>SKU:</strong> 
-                                    <span class="text-blue-600 font-mono">{{ page.sku }}</span>
-                                </p>
-                            {% endif %}
+
                         
                             {% if page.price %}
                             <div class="buy-box text-center">
@@ -70,6 +65,13 @@ layout: default
                                 {% endif %}
                                 
                             </div>
+                            {% endif %}
+
+                            {% if page.sku %}
+                                <p class="text-lg mb-1">
+                                    <strong>SKU:</strong> 
+                                    <span class="text-blue-600 font-mono">{{ page.sku }}</span>
+                                </p>
                             {% endif %}
 
                             {% for category in page.categories %}
