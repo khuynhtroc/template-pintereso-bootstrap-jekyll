@@ -1,89 +1,141 @@
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-
-const supabase = createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
-
-const $  = (s) => document.querySelector(s);
-const $$ = (s) => Array.from(document.querySelectorAll(s));
-
-const accName    = $('#acc-name');
-const accHello   = $('#acc-hello');
-const accAvatar  = $('#acc-avatar');
-const emailInput = $('#acc-email');
-const nameInput  = $('#acc-fullname');
-const avatarUrl  = $('#acc-avatar-url');
-
-async function requireAuth(){
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) {
-    // Nếu chưa đăng nhập, điều hướng về trang chủ hoặc mở modal
-    window.location.href = '/';
-    return null;
+document.addEventListener('DOMContentLoaded', async () => {
+  const supabase = window.supabaseClient;
+  if (!supabase) {
+    console.error('Supabase client not found.');
+    return;
   }
-  return user;
-}
 
-async function loadProfile(user){
-  const { data, error } = await supabase
+  // --- Lấy thông tin người dùng và profile ---
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) {
+    // Nếu chưa đăng nhập, có thể chuyển hướng về trang chủ hoặc hiển thị modal
+    alert('Vui lòng đăng nhập để xem trang tài khoản.');
+    window.location.href = '/'; 
+    return;
+  }
+
+  const { data: profile, error: profileError } = await supabase
     .from('profiles')
-    .select('email, full_name, avatar_url')
+    .select('full_name, avatar_url')
     .eq('id', user.id)
-    .maybeSingle();
-  if (error) { alert(error.message); return; }
+    .single();
 
-  const displayName = data?.full_name || user.user_metadata?.username || (user.email?.split('@')[0] ?? 'Tài khoản');
-  accName.textContent  = displayName;
-  accHello.textContent = displayName;
-  emailInput.value     = data?.email || user.email || '';
-  nameInput.value      = data?.full_name || '';
-  avatarUrl.value      = data?.avatar_url || '';
-  if (data?.avatar_url) accAvatar.src = data.avatar_url;
-}
+  // --- Cập nhật giao diện với thông tin người dùng ---
+  const accName = document.getElementById('acc-name');
+  const accAvatar = document.getElementById('acc-avatar');
+  const accHello = document.getElementById('acc-hello');
+  
+  if (profile) {
+    accName.textContent = profile.full_name || user.email;
+    accHello.textContent = profile.full_name || user.email;
+    if (profile.avatar_url) {
+      accAvatar.src = profile.avatar_url;
+    }
+  } else {
+      accName.textContent = user.email;
+      accHello.textContent = user.email;
+  }
 
-async function saveProfile(user){
-  const updates = {
-    full_name: nameInput.value || null,
-    avatar_url: avatarUrl.value || null
-  };
-  const { error } = await supabase.from('profiles').update(updates).eq('id', user.id);
-  if (error) { alert(error.message); return; }
-  alert('Đã lưu');
-  await loadProfile(user);
-}
+  // --- Xử lý chuyển Tab ---
+  const menuLinks = document.querySelectorAll('.acc-menu a');
+  const tabPanes = document.querySelectorAll('.acc-content .tab-pane');
 
-function initTabs(){
-  $$('.acc-menu li a').forEach(a=>{
-    a.addEventListener('click', (e)=>{
+  menuLinks.forEach(link => {
+    link.addEventListener('click', (e) => {
       e.preventDefault();
-      const tab = a.dataset.tab;
-      $$('.acc-menu li').forEach(li=>li.classList.remove('active'));
-      a.parentElement.classList.add('active');
-      $$('.tab-pane').forEach(s=>s.classList.remove('is-active'));
-      $('#tab-'+tab)?.classList.add('is-active');
+      const tabId = link.getAttribute('data-tab');
+
+      // Bỏ active ở tất cả link và tab
+      menuLinks.forEach(l => l.parentElement.classList.remove('active'));
+      tabPanes.forEach(p => p.classList.remove('is-active'));
+
+      // Thêm active cho link và tab được click
+      link.parentElement.classList.add('active');
+      document.getElementById(`tab-${tabId}`).classList.add('is-active');
+
+      // Tải dữ liệu cho tab khi được chọn
+      loadTabData(tabId, user);
     });
   });
-}
 
-async function init(){
-  initTabs();
+  // --- Xử lý Form cập nhật Profile ---
+  const profileForm = document.getElementById('acc-form');
+  const accEmailInput = document.getElementById('acc-email');
+  const accFullnameInput = document.getElementById('acc-fullname');
+  const accAvatarUrlInput = document.getElementById('acc-avatar-url');
 
-  const user = await requireAuth();
-  if (!user) return;
+  accEmailInput.value = user.email;
+  if (profile) {
+      accFullnameInput.value = profile.full_name || '';
+      accAvatarUrlInput.value = profile.avatar_url || '';
+  }
 
-  await loadProfile(user);
-
-  $('#acc-form')?.addEventListener('submit', async (e)=>{
+  profileForm.addEventListener('submit', async (e) => {
     e.preventDefault();
-    await saveProfile(user);
+    const button = profileForm.querySelector('button');
+    button.textContent = 'Đang lưu...';
+    button.disabled = true;
+
+    const { error: updateError } = await supabase
+      .from('profiles')
+      .update({
+        full_name: accFullnameInput.value,
+        avatar_url: accAvatarUrlInput.value
+      })
+      .eq('id', user.id);
+
+    if (updateError) {
+      alert('Lỗi cập nhật: ' + updateError.message);
+    } else {
+      alert('Cập nhật thành công!');
+      // Cập nhật lại giao diện ngay lập tức
+      accName.textContent = accFullnameInput.value;
+      if (accAvatarUrlInput.value) {
+        accAvatar.src = accAvatarUrlInput.value;
+      }
+    }
+    button.textContent = 'Lưu';
+    button.disabled = false;
   });
 
-  $('#acc-signout')?.addEventListener('click', async (e)=>{
+  // --- Xử lý đăng xuất ---
+  document.getElementById('acc-signout').addEventListener('click', async (e) => {
     e.preventDefault();
     await supabase.auth.signOut();
     window.location.href = '/';
   });
 
-  // Đồng bộ UI khi phiên thay đổi
-  supabase.auth.onAuthStateChange(async (_evt, _sess)=>{ const u = await requireAuth(); if (u) loadProfile(u); });
-}
+  // --- Hàm tải dữ liệu cho từng tab ---
+  async function loadTabData(tabId, currentUser) {
+    if (tabId === 'orders') {
+      const ordersPane = document.getElementById('tab-orders');
+      ordersPane.innerHTML = '<p>Đang tải đơn hàng...</p>';
+      
+      const { data: orders, error } = await supabase
+        .from('orders')
+        .select(`id, created_at, total_price, membership_plans (name)`)
+        .eq('user_id', currentUser.id)
+        .order('created_at', { ascending: false });
 
-init();
+      if (error || !orders || orders.length === 0) {
+        ordersPane.innerHTML = '<p>Bạn chưa có đơn hàng nào.</p>';
+      } else {
+        let table = '<table class="table"><thead><tr><th>Mã ĐH</th><th>Ngày</th><th>Sản phẩm</th><th>Tổng tiền</th></tr></thead><tbody>';
+        orders.forEach(order => {
+          table += `
+            <tr>
+              <td>#${order.id}</td>
+              <td>${new Date(order.created_at).toLocaleDateString('vi-VN')}</td>
+              <td>${order.membership_plans.name}</td>
+              <td>${new Intl.NumberFormat('vi-VN').format(order.total_price)}đ</td>
+            </tr>
+          `;
+        });
+        table += '</tbody></table>';
+        ordersPane.innerHTML = table;
+      }
+    }
+    // Bạn có thể thêm logic tải dữ liệu cho các tab khác (vip, downloads...) ở đây
+  }
+});
