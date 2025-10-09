@@ -1,7 +1,10 @@
 document.addEventListener('DOMContentLoaded', async () => {
+    // LOG 1: Báo hiệu script đã bắt đầu chạy
+    console.log('Bắt đầu chạy script thankyou.js...'); 
+
     const summaryContainer = document.getElementById('order-summary-container');
     if (!summaryContainer) {
-        console.error('Lỗi: Không tìm thấy thẻ div "order-summary-container".');
+        console.error('LỖI NGHIÊM TRỌNG: Không tìm thấy thẻ div#order-summary-container trong HTML.');
         return;
     }
 
@@ -9,41 +12,53 @@ document.addEventListener('DOMContentLoaded', async () => {
     const orderId = urlParams.get('order_id');
 
     if (!orderId) {
+        console.error('Lỗi: Không có order_id trong địa chỉ URL.');
         summaryContainer.innerHTML = '<p class="text-danger text-center">Mã đơn hàng không hợp lệ.</p>';
         return;
     }
+    // LOG 2: In ra order_id tìm thấy
+    console.log(`Bước 1: Tìm thấy order_id = ${orderId}`); 
 
     if (!window.supabaseClient) {
-        console.error('Lỗi: Supabase client chưa được khởi tạo.');
+        console.error('LỖI NGHIÊM TRỌNG: Supabase client chưa được khởi tạo. Kiểm tra lại file config.supabase.js.');
         summaryContainer.innerHTML = '<p class="text-danger text-center">Lỗi kết nối, không thể tải dữ liệu.</p>';
         return;
     }
     const supabase = window.supabaseClient;
+    // LOG 3: Xác nhận Supabase đã sẵn sàng
+    console.log('Bước 2: Supabase client đã sẵn sàng.'); 
 
-    // 1. Lấy thông tin người dùng đang đăng nhập
+    // LOG 4: Kiểm tra phiên đăng nhập của người dùng (bước quan trọng nhất)
+    console.log('Bước 3: Đang kiểm tra phiên đăng nhập người dùng...'); 
     const { data: { user }, error: userError } = await supabase.auth.getUser();
 
     if (userError || !user) {
-        console.error('Lỗi khi lấy thông tin người dùng:', userError);
-        summaryContainer.innerHTML = '<p class="text-danger text-center">Không thể xác thực người dùng. Vui lòng đăng nhập lại.</p>';
+        console.error('LỖI QUAN TRỌNG: Không lấy được thông tin người dùng hoặc chưa có ai đăng nhập.', { userError, user });
+        summaryContainer.innerHTML = '<p class="text-danger text-center">Không thể xác thực người dùng. Vui lòng đăng nhập lại và thử lại.</p>';
         return;
     }
+    // LOG 5: In ra thông tin người dùng nếu thành công
+    console.log(`Bước 4: Xác thực người dùng thành công. Email: ${user.email}, ID: ${user.id}`);
 
-    // 2. Lấy thông tin đơn hàng và xác thực người dùng sở hữu đơn hàng này
+    // LOG 6: Bắt đầu truy vấn đơn hàng
+    console.log(`Bước 5: Đang lấy thông tin đơn hàng #${orderId} cho người dùng ${user.id}...`); 
     const { data: order, error: orderError } = await supabase
         .from('orders')
         .select('id, created_at, total_price, user_id')
         .eq('id', orderId)
-        .eq('user_id', user.id) // Thêm lớp bảo mật để chắc chắn đúng người dùng
+        .eq('user_id', user.id) // Đảm bảo chỉ lấy đơn hàng của chính người dùng này
         .single();
 
     if (orderError || !order) {
-        console.error('Lỗi khi lấy thông tin đơn hàng:', orderError);
-        summaryContainer.innerHTML = '<p class="text-danger text-center">Không tìm thấy thông tin đơn hàng hoặc bạn không có quyền xem đơn hàng này.</p>';
+        console.error('LỖI QUAN TRỌNG: Không lấy được thông tin đơn hàng.', { orderError });
+        summaryContainer.innerHTML = `<p class="text-danger text-center">Không tìm thấy thông tin đơn hàng #${orderId}. Đơn hàng có thể không tồn tại hoặc bạn không có quyền xem.</p>`;
         return;
     }
+    // LOG 7: In ra thông tin đơn hàng nếu thành công
+    console.log('Bước 6: Lấy thông tin đơn hàng thành công:', order); 
 
-    // 3. Hiển thị dữ liệu khi đã có đủ thông tin
+    // LOG 8: Bắt đầu cập nhật giao diện
+    console.log('Bước 7: Đang cập nhật giao diện...'); 
     const orderDate = new Date(order.created_at).toLocaleDateString('vi-VN');
     const orderTotal = new Intl.NumberFormat('vi-VN').format(order.total_price) + 'đ';
 
@@ -66,8 +81,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         </table>
     `;
     
-    // Cập nhật giao diện
     summaryContainer.innerHTML = summaryTableHTML;
     document.getElementById('order-amount').textContent = orderTotal;
     document.getElementById('order-content').textContent = `CAMON${order.id}`;
+
+    // LOG 9: Hoàn tất
+    console.log('Bước 8: Cập nhật giao diện hoàn tất.'); 
 });
