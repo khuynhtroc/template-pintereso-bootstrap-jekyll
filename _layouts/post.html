@@ -44,28 +44,30 @@ layout: default
 
 
                         
+                            <!-- Bắt đầu khối code thay thế -->
                             {% if page.price %}
                             <div class="buy-box text-center">
                                 <p class="text-muted">Mua lẻ để sở hữu vĩnh viễn tài nguyên này</p>
-                                <p style="color: #898989; font-weight: 600;">(Tự động kích hoạt sau 20s)</p>
+                                <p style="color: #898989; font-weight: 600;">(Tự động kích hoạt sau khi thanh toán)</p>
                                 <div class="price mb-3">
                                     <strong>Giá:</strong> 
-                                    <span class="text-red-600 font-bold">{{ page.price | append: ' VNĐ' }}</span>
+                                    <!-- Sử dụng filter của Jekyll để format số cho đẹp -->
+                                    <span class="text-red-600 font-bold">{{ page.price | money_without_currency | remove: '.00' | append: ' VNĐ' }}</span>
                                 </div>
-                                {% if page.download_url %}
-                                    <p>
-                                      <a href="{{page.download_url}}"
-                                         class="btn btn-success w-100 fw-bold fs-5"
-                                         id="downloadBtn"
-                                         data-download-url="{{page.download_url}}"
-                                         data-requires-vip="true">
-                                        <i class="fas fa-shopping-cart"></i> Mua File Này
-                                      </a>
-                                    </p>
-                                {% endif %}
                                 
+                                <!-- NÚT "MUA NGAY" ĐÃ ĐƯỢC NÂNG CẤP -->
+                                <button 
+                                    class="btn btn-success w-100 fw-bold fs-5"
+                                    id="buy-product-btn"
+                                    data-product-sku="{{ page.sku }}"
+                                    data-product-name="{{ page.title | escape }}"
+                                    data-product-price="{{ page.price }}"
+                                >
+                                    <i class="fas fa-shopping-cart me-2"></i> Mua ngay
+                                </button>
                             </div>
                             {% endif %}
+                            <!-- Kết thúc khối code thay thế -->
 
                             <div class="vip-upsell-box">
                                 <p>Hoặc</p>
@@ -108,7 +110,7 @@ layout: default
 
                 {% if sorted_related_posts.size > 0 %}
                   <div class="related-posts-section mt-5">
-                    <h3 class="h4 text-center mb-4">Các bài viết liên quan</h3>
+                    <h3 class="h4 text-center mb-4">Tài nguyên liên quan</h3>
                     <div class="row">
                         {% for post in sorted_related_posts %}
                             <div class="col-md-6 mb-4">
@@ -142,3 +144,5 @@ layout: default
         </div>
     </div>
 </section>
+
+<script src="{{ '/assets/js/product-purchase.js' | relative_url }}"></script>
