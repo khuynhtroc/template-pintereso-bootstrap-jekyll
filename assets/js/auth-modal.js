@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        <button id="google-signin-btn" class="btn btn-outline-danger w-100 mb-3"><i class="fab fa-google me-2"></i>Tiếp tục với Google</button>
+                        <button id="google-signin-btn" class="btn btn-outline-danger w-100 mb-3"><i class="fab fa-google me-2"></i> Tiếp tục với Google</button>
                         <div class="text-center my-2">hoặc</div>
                         <form id="login-form">
                             <div class="mb-3"><input type="email" id="login-email" class="form-control" placeholder="Email" required></div>
