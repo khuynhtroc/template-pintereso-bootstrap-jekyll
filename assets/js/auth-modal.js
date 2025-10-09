@@ -56,11 +56,11 @@ document.addEventListener('DOMContentLoaded', () => {
         if (user) {
             const displayName = user.user_metadata.full_name || user.user_metadata.name || user.email.split('@')[0];
             headerAuthText.textContent = displayName;
-            headerAvatar.src = user.user_metadata.avatar_url || '/assets/images/default-avatar.png';
+            headerAvatar.src = user.user_metadata.avatar_url || '/assets/images/sal.jpg';
             userProfileLink.href = '/account/';
         } else {
             headerAuthText.textContent = 'Đăng nhập';
-            headerAvatar.src = '/assets/images/default-avatar.png';
+            headerAvatar.src = '/assets/images/sal.jpg';
             userProfileLink.href = '#';
         }
     };
