@@ -1,43 +1,31 @@
 document.addEventListener('DOMContentLoaded', async () => {
-    // --- LẤY CÁC THÀNH PHẦN GIAO DIỆN ---
     const summaryContainer = document.getElementById('order-summary-container');
     const notifyBtn = document.getElementById('notify-payment-btn');
     
     if (!summaryContainer || !notifyBtn) {
-        console.error('Lỗi: Thiếu thẻ div#order-summary-container hoặc button#notify-payment-btn.');
-        if (summaryContainer) summaryContainer.innerHTML = '<p class="text-danger">Lỗi giao diện trang.</p>';
+        console.error('Lỗi: Thiếu thẻ HTML cần thiết.');
         return;
     }
 
     const urlParams = new URLSearchParams(window.location.search);
     const orderId = urlParams.get('order_id');
 
-    if (!orderId) {
-        summaryContainer.innerHTML = '<p class="text-danger text-center">Mã đơn hàng không hợp lệ.</p>';
+    if (!orderId || !window.supabaseClient) {
+        summaryContainer.innerHTML = '<p class="text-danger text-center">Lỗi trang hoặc không tìm thấy đơn hàng.</p>';
         notifyBtn.disabled = true;
         return;
     }
 
-    if (!window.supabaseClient) {
-        summaryContainer.innerHTML = '<p class="text-danger text-center">Lỗi kết nối.</p>';
-        notifyBtn.disabled = true;
-        return;
-    }
     const supabase = window.supabaseClient;
 
-    // --- HIỂN THỊ THÔNG TIN ĐƠN HÀNG ---
     try {
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) throw new Error('Không thể xác thực người dùng. Vui lòng đăng nhập lại.');
 
-        // *** ĐOẠN CODE SỬA LỖI CUỐI CÙNG ***
+        // --- BƯỚC 1: LẤY THÔNG TIN CƠ BẢN CỦA ĐƠN HÀNG ---
         const { data: order, error: orderError } = await supabase
             .from('orders')
-            .select(`
-                id, created_at, total_price, user_id,
-                product:products!orders_product_id_fkey(title),
-                plan:membership_plans!orders_plan_id_fkey(name)
-            `)
+            .select('id, created_at, total_price, user_id, product_id, plan_id')
             .eq('id', orderId)
             .eq('user_id', user.id)
             .single();
@@ -45,11 +33,29 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (orderError) throw orderError;
         if (!order) throw new Error('Không tìm thấy đơn hàng hoặc bạn không có quyền xem.');
 
+        let itemName = 'Sản phẩm không xác định';
+
+        // --- BƯỚC 2: DỰA VÀO ID, LẤY TÊN SẢN PHẨM HOẶC GÓI VIP (TRUY VẤN RIÊNG BIỆT) ---
+        if (order.product_id) {
+            const { data: product, error: productError } = await supabase
+                .from('products')
+                .select('title')
+                .eq('id', order.product_id)
+                .single();
+            if (product) itemName = product.title;
+        } else if (order.plan_id) {
+            const { data: plan, error: planError } = await supabase
+                .from('membership_plans')
+                .select('name')
+                .eq('id', order.plan_id)
+                .single();
+            if (plan) itemName = plan.name;
+        }
+
+        // --- BƯỚC 3: HIỂN THỊ GIAO DIỆN ---
         const orderDate = new Date(order.created_at).toLocaleDateString('vi-VN');
         const orderTotal = new Intl.NumberFormat('vi-VN').format(order.total_price) + 'đ';
-        const itemName = order.product?.title || order.plan?.name || 'Sản phẩm không xác định';
-
-        // Cập nhật bảng tóm tắt
+        
         summaryContainer.innerHTML = `
             <table class="table table-bordered mx-auto mb-3" style="max-width: 1000px;">
                 <tbody>
@@ -68,12 +74,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                 </tbody>
             </table>
         `;
-
-        // Cập nhật thông tin thanh toán
         document.getElementById('order-amount').textContent = orderTotal;
         document.getElementById('order-content').textContent = `CAMON${order.id}`;
 
-        // --- GẮN SỰ KIỆN CHO NÚT "TÔI ĐÃ THANH TOÁN" ---
+        // --- BƯỚC 4: GẮN SỰ KIỆN CHO NÚT BẤM ---
         notifyBtn.addEventListener('click', async () => {
             notifyBtn.disabled = true;
             notifyBtn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Đang gửi...';
@@ -84,17 +88,15 @@ document.addEventListener('DOMContentLoaded', async () => {
                     item_name_param: itemName,
                     customer_email_param: user.email
                 });
-
                 if (rpcError) throw rpcError;
 
                 notifyBtn.classList.remove('btn-primary');
                 notifyBtn.classList.add('btn-success');
                 notifyBtn.textContent = '✔ Đã thông báo thành công!';
-                alert('Chúng tôi đã nhận được thông báo của bạn và sẽ xử lý đơn hàng trong thời gian sớm nhất!');
-
+                alert('Chúng tôi đã nhận được thông báo và sẽ xử lý đơn hàng trong thời gian sớm nhất!');
             } catch (error) {
                 console.error('Lỗi khi gửi thông báo:', error);
-                alert('Đã có lỗi xảy ra khi gửi thông báo. Vui lòng thử lại sau.');
+                alert('Đã có lỗi xảy ra khi gửi thông báo.');
                 notifyBtn.disabled = false;
                 notifyBtn.innerHTML = '<i class="fas fa-paper-plane me-2"></i> Tôi đã hoàn tất thanh toán';
             }
