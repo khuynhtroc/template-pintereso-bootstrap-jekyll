@@ -32,12 +32,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) throw new Error('Không thể xác thực người dùng. Vui lòng đăng nhập lại.');
 
+        // *** ĐOẠN CODE SỬA LỖI QUAN TRỌNG NHẤT ***
+        // Chỉ định rõ ràng khóa ngoại để Supabase biết đường đi lấy dữ liệu
         const { data: order, error: orderError } = await supabase
             .from('orders')
             .select(`
                 id, created_at, total_price, user_id,
-                products (title),
-                membership_plans (name)
+                product:products!product_id(title),
+                plan:membership_plans!plan_id(name)
             `)
             .eq('id', orderId)
             .eq('user_id', user.id)
@@ -48,7 +50,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         const orderDate = new Date(order.created_at).toLocaleDateString('vi-VN');
         const orderTotal = new Intl.NumberFormat('vi-VN').format(order.total_price) + 'đ';
-        const itemName = order.products?.title || order.membership_plans?.name || 'Sản phẩm không xác định';
+        // Lấy tên sản phẩm/gói VIP từ các bí danh mới
+        const itemName = order.product?.title || order.plan?.name || 'Sản phẩm không xác định';
 
         // Cập nhật bảng tóm tắt
         summaryContainer.innerHTML = `
@@ -80,7 +83,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             notifyBtn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Đang gửi...';
 
             try {
-                // Gọi đến Database Function đã tạo ở Phần 2
+                // Gọi đến Database Function đã tạo
                 const { error: rpcError } = await supabase.rpc('notify_telegram_on_payment', {
                     order_id_param: parseInt(orderId), // Đảm bảo là kiểu integer
                     item_name_param: itemName,
