@@ -32,14 +32,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) throw new Error('Không thể xác thực người dùng. Vui lòng đăng nhập lại.');
 
-        // *** ĐOẠN CODE SỬA LỖI QUAN TRỌNG NHẤT ***
-        // Chỉ định rõ ràng khóa ngoại để Supabase biết đường đi lấy dữ liệu
+        // *** ĐOẠN CODE SỬA LỖI CUỐI CÙNG ***
+        // Chỉ định rõ ràng TÊN của khóa ngoại để Supabase biết đường đi lấy dữ liệu
         const { data: order, error: orderError } = await supabase
             .from('orders')
             .select(`
                 id, created_at, total_price, user_id,
-                product:products!product_id(title),
-                plan:membership_plans!plan_id(name)
+                product:products!orders_product_id_fkey(title),
+                plan:membership_plans!orders_plan_id_fkey(name),
+                customer:profiles!orders_user_id_fkey(email)
             `)
             .eq('id', orderId)
             .eq('user_id', user.id)
@@ -50,8 +51,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         const orderDate = new Date(order.created_at).toLocaleDateString('vi-VN');
         const orderTotal = new Intl.NumberFormat('vi-VN').format(order.total_price) + 'đ';
-        // Lấy tên sản phẩm/gói VIP từ các bí danh mới
         const itemName = order.product?.title || order.plan?.name || 'Sản phẩm không xác định';
+        const customerEmail = order.customer?.email || user.email; // Ưu tiên lấy email từ join
 
         // Cập nhật bảng tóm tắt
         summaryContainer.innerHTML = `
@@ -63,7 +64,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                         <th scope="row">Ngày:</th>
                         <td>${orderDate}</td>
                         <th scope="row">Email:</th>
-                        <td>${user.email}</td>
+                        <td>${customerEmail}</td>
                         <th scope="row">Tổng cộng:</th>
                         <td>${orderTotal}</td>
                         <th scope="row">Phương thức thanh toán:</th>
@@ -85,9 +86,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             try {
                 // Gọi đến Database Function đã tạo
                 const { error: rpcError } = await supabase.rpc('notify_telegram_on_payment', {
-                    order_id_param: parseInt(orderId), // Đảm bảo là kiểu integer
+                    order_id_param: parseInt(orderId),
                     item_name_param: itemName,
-                    customer_email_param: user.email
+                    customer_email_param: customerEmail
                 });
 
                 if (rpcError) throw rpcError;
