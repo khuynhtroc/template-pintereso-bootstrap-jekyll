@@ -1,16 +1,14 @@
 document.addEventListener('DOMContentLoaded', async () => {
     // --- LẤY CÁC THÀNH PHẦN GIAO DIỆN ---
     const summaryContainer = document.getElementById('order-summary-container');
-    const notifyBtn = document.getElementById('notify-payment-btn'); // Nút "Tôi đã thanh toán"
+    const notifyBtn = document.getElementById('notify-payment-btn');
     
-    // Kiểm tra các thành phần HTML quan trọng
     if (!summaryContainer || !notifyBtn) {
-        console.error('Lỗi: Thiếu thẻ div#order-summary-container hoặc button#notify-payment-btn trong HTML.');
-        if (summaryContainer) summaryContainer.innerHTML = '<p class="text-danger">Lỗi giao diện trang. Vui lòng liên hệ quản trị viên.</p>';
+        console.error('Lỗi: Thiếu thẻ div#order-summary-container hoặc button#notify-payment-btn.');
+        if (summaryContainer) summaryContainer.innerHTML = '<p class="text-danger">Lỗi giao diện trang.</p>';
         return;
     }
 
-    // --- LẤY DỮ LIỆU TỪ URL VÀ SUPABASE ---
     const urlParams = new URLSearchParams(window.location.search);
     const orderId = urlParams.get('order_id');
 
@@ -21,7 +19,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     if (!window.supabaseClient) {
-        summaryContainer.innerHTML = '<p class="text-danger text-center">Lỗi kết nối, không thể tải dữ liệu.</p>';
+        summaryContainer.innerHTML = '<p class="text-danger text-center">Lỗi kết nối.</p>';
         notifyBtn.disabled = true;
         return;
     }
@@ -33,14 +31,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!user) throw new Error('Không thể xác thực người dùng. Vui lòng đăng nhập lại.');
 
         // *** ĐOẠN CODE SỬA LỖI CUỐI CÙNG ***
-        // Chỉ định rõ ràng TÊN của khóa ngoại để Supabase biết đường đi lấy dữ liệu
         const { data: order, error: orderError } = await supabase
             .from('orders')
             .select(`
                 id, created_at, total_price, user_id,
                 product:products!orders_product_id_fkey(title),
-                plan:membership_plans!orders_plan_id_fkey(name),
-                customer:profiles!orders_user_id_fkey(email)
+                plan:membership_plans!orders_plan_id_fkey(name)
             `)
             .eq('id', orderId)
             .eq('user_id', user.id)
@@ -52,7 +48,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         const orderDate = new Date(order.created_at).toLocaleDateString('vi-VN');
         const orderTotal = new Intl.NumberFormat('vi-VN').format(order.total_price) + 'đ';
         const itemName = order.product?.title || order.plan?.name || 'Sản phẩm không xác định';
-        const customerEmail = order.customer?.email || user.email; // Ưu tiên lấy email từ join
 
         // Cập nhật bảng tóm tắt
         summaryContainer.innerHTML = `
@@ -64,7 +59,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                         <th scope="row">Ngày:</th>
                         <td>${orderDate}</td>
                         <th scope="row">Email:</th>
-                        <td>${customerEmail}</td>
+                        <td>${user.email}</td>
                         <th scope="row">Tổng cộng:</th>
                         <td>${orderTotal}</td>
                         <th scope="row">Phương thức thanh toán:</th>
@@ -84,16 +79,14 @@ document.addEventListener('DOMContentLoaded', async () => {
             notifyBtn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Đang gửi...';
 
             try {
-                // Gọi đến Database Function đã tạo
                 const { error: rpcError } = await supabase.rpc('notify_telegram_on_payment', {
                     order_id_param: parseInt(orderId),
                     item_name_param: itemName,
-                    customer_email_param: customerEmail
+                    customer_email_param: user.email
                 });
 
                 if (rpcError) throw rpcError;
 
-                // Nếu thành công, đổi giao diện nút
                 notifyBtn.classList.remove('btn-primary');
                 notifyBtn.classList.add('btn-success');
                 notifyBtn.textContent = '✔ Đã thông báo thành công!';
