@@ -36,25 +36,19 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // BƯỚC 2: DỰA VÀO ID, LẤY TÊN SẢN PHẨM HOẶC GÓI VIP
         if (order.product_id) {
-            const { data: product, error: productError } = await supabase
-                .from('products')
-                .select('name') // SỬA 'title' THÀNH 'name'
-                .eq('id', order.product_id)
-                .single();
-            if (product) itemName = product.name; // SỬA 'title' THÀNH 'name'
+            const { data: product } = await supabase.from('products').select('name').eq('id', order.product_id).single();
+            if (product) itemName = product.name;
         } else if (order.plan_id) {
-            const { data: plan, error: planError } = await supabase
-                .from('membership_plans')
-                .select('name')
-                .eq('id', order.plan_id)
-                .single();
+            const { data: plan } = await supabase.from('membership_plans').select('name').eq('id', order.plan_id).single();
             if (plan) itemName = plan.name;
         }
 
         // BƯỚC 3: HIỂN THỊ GIAO DIỆN
         const orderDate = new Date(order.created_at).toLocaleDateString('vi-VN');
-        const orderTotal = new Intl.NumberFormat('vi-VN').format(order.total_price) + 'đ';
-        
+        const orderTotal = new Intl.NumberFormat('vi-VN').format(order.total_price); // Lấy số tiền chưa có chữ 'đ'
+        const orderTotalFormatted = orderTotal + 'đ'; // Số tiền đã định dạng để hiển thị
+        const paymentContent = `CAMON${order.id}`; // Nội dung chuyển khoản
+
         summaryContainer.innerHTML = `
             <table class="table table-bordered mx-auto mb-3" style="max-width: 1000px;">
                 <tbody>
@@ -66,15 +60,15 @@ document.addEventListener('DOMContentLoaded', async () => {
                         <th scope="row">Email:</th>
                         <td>${user.email}</td>
                         <th scope="row">Tổng cộng:</th>
-                        <td>${orderTotal}</td>
+                        <td>${orderTotalFormatted}</td>
                         <th scope="row">Phương thức thanh toán:</th>
                         <td>Chuyển khoản</td>
                     </tr>
                 </tbody>
             </table>
         `;
-        document.getElementById('order-amount').textContent = orderTotal;
-        document.getElementById('order-content').textContent = `CAMON${order.id}`;
+        document.getElementById('order-amount').textContent = orderTotalFormatted;
+        document.getElementById('order-content').textContent = paymentContent;
 
         // BƯỚC 4: GẮN SỰ KIỆN CHO NÚT BẤM
         notifyBtn.addEventListener('click', async () => {
@@ -82,13 +76,15 @@ document.addEventListener('DOMContentLoaded', async () => {
             notifyBtn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Đang gửi...';
 
             try {
+                // === THÊM THÔNG TIN GỬI ĐI ===
                 const { error: rpcError } = await supabase.rpc('notify_telegram_on_payment', {
                     order_id_param: parseInt(orderId),
                     item_name_param: itemName,
                     customer_email_param: user.email,
-                    payment_amount_param: orderTotal, // Thêm số tiền
-                    payment_content_param: paymentContent // Thêm nội dung chuyển khoản
+                    payment_amount_param: orderTotal,      // Thêm số tiền
+                    payment_content_param: paymentContent  // Thêm nội dung chuyển khoản
                 });
+                
                 if (rpcError) throw rpcError;
 
                 notifyBtn.classList.remove('btn-primary');
