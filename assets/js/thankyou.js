@@ -86,6 +86,11 @@ document.addEventListener('DOMContentLoaded', async () => {
                 notifyBtn.classList.add('btn-success');
                 notifyBtn.textContent = '✔ Đã thông báo thành công!';
                 alert('Chúng tôi đã nhận được thông báo của bạn và sẽ xử lý đơn hàng trong thời gian sớm nhất!');
+                // === ĐOẠN CODE MỚI THÊM VÀO ===
+                // Tự động chuyển về trang chủ sau 3 giây
+                setTimeout(() => {
+                    window.location.href = '/'; // Dấu '/' đại diện cho trang chủ
+                }, 3000); // 3000 mili giây = 3 giây
             } catch (error) {
                 console.error('Lỗi khi gửi thông báo:', error);
                 alert('Đã có lỗi xảy ra khi gửi thông báo.');
