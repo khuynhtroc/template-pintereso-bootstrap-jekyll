@@ -85,7 +85,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const { error: rpcError } = await supabase.rpc('notify_telegram_on_payment', {
                     order_id_param: parseInt(orderId),
                     item_name_param: itemName,
-                    customer_email_param: user.email
+                    customer_email_param: user.email,
+                    payment_amount_param: orderTotal, // Thêm số tiền
+                    payment_content_param: paymentContent // Thêm nội dung chuyển khoản
                 });
                 if (rpcError) throw rpcError;
 
