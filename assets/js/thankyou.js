@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) throw new Error('Không thể xác thực người dùng. Vui lòng đăng nhập lại.');
 
-        // BƯỚC 1: LẤY THÔNG TIN CƠ BẢN CỦA ĐƠN HÀNG
+        // Lấy thông tin đơn hàng
         const { data: order, error: orderError } = await supabase
             .from('orders')
             .select('id, created_at, total_price, user_id, product_id, plan_id')
@@ -33,8 +33,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!order) throw new Error('Không tìm thấy đơn hàng hoặc bạn không có quyền xem.');
 
         let itemName = 'Sản phẩm không xác định';
-
-        // BƯỚC 2: DỰA VÀO ID, LẤY TÊN SẢN PHẨM HOẶC GÓI VIP
         if (order.product_id) {
             const { data: product } = await supabase.from('products').select('name').eq('id', order.product_id).single();
             if (product) itemName = product.name;
@@ -43,26 +41,22 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (plan) itemName = plan.name;
         }
 
-        // BƯỚC 3: HIỂN THỊ GIAO DIỆN
+        // Chuẩn bị các biến để hiển thị và gửi đi
         const orderDate = new Date(order.created_at).toLocaleDateString('vi-VN');
-        const orderTotal = new Intl.NumberFormat('vi-VN').format(order.total_price); // Lấy số tiền chưa có chữ 'đ'
+        const orderTotal = new Intl.NumberFormat('vi-VN').format(order.total_price); // Số tiền chưa có chữ 'đ'
         const orderTotalFormatted = orderTotal + 'đ'; // Số tiền đã định dạng để hiển thị
         const paymentContent = `CAMON${order.id}`; // Nội dung chuyển khoản
 
+        // Hiển thị giao diện
         summaryContainer.innerHTML = `
             <table class="table table-bordered mx-auto mb-3" style="max-width: 1000px;">
                 <tbody>
                     <tr>
-                        <th scope="row">Mã đơn hàng:</th>
-                        <td>#${order.id}</td>
-                        <th scope="row">Ngày:</th>
-                        <td>${orderDate}</td>
-                        <th scope="row">Email:</th>
-                        <td>${user.email}</td>
-                        <th scope="row">Tổng cộng:</th>
-                        <td>${orderTotalFormatted}</td>
-                        <th scope="row">Phương thức thanh toán:</th>
-                        <td>Chuyển khoản</td>
+                        <th scope="row">Mã đơn hàng:</th> <td>#${order.id}</td>
+                        <th scope="row">Ngày:</th> <td>${orderDate}</td>
+                        <th scope="row">Email:</th> <td>${user.email}</td>
+                        <th scope="row">Tổng cộng:</th> <td>${orderTotalFormatted}</td>
+                        <th scope="row">Phương thức thanh toán:</th> <td>Chuyển khoản</td>
                     </tr>
                 </tbody>
             </table>
@@ -70,19 +64,20 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('order-amount').textContent = orderTotalFormatted;
         document.getElementById('order-content').textContent = paymentContent;
 
-        // BƯỚC 4: GẮN SỰ KIỆN CHO NÚT BẤM
+        // Gắn sự kiện cho nút bấm
         notifyBtn.addEventListener('click', async () => {
             notifyBtn.disabled = true;
             notifyBtn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Đang gửi...';
 
             try {
-                // === THÊM THÔNG TIN GỬI ĐI ===
+                // === ĐOẠN SỬA LỖI QUAN TRỌNG ===
+                // Gửi đi ĐỦ 5 tham số như database đang yêu cầu
                 const { error: rpcError } = await supabase.rpc('notify_telegram_on_payment', {
                     order_id_param: parseInt(orderId),
                     item_name_param: itemName,
                     customer_email_param: user.email,
-                    payment_amount_param: orderTotal,      // Thêm số tiền
-                    payment_content_param: paymentContent  // Thêm nội dung chuyển khoản
+                    payment_amount_param: orderTotal,      // Tham số thứ 4
+                    payment_content_param: paymentContent  // Tham số thứ 5
                 });
                 
                 if (rpcError) throw rpcError;
