@@ -29,11 +29,11 @@ layout: default
               <div class="col-md-4">
                 {% if page.price %}
                   <div class="buy-box text-center p-3 border rounded bg-light">
-                    <p class="text-muted mb-1">[translate:Buy lẻ để sở hữu vĩnh viễn tài nguyên này]</p>
-                    <p style="color:#898989;font-weight:600" class="mb-2">([translate:Tự động kích hoạt sau khi thanh toán])</p>
+                    <p class="text-muted mb-1">Mua lẻ để sở hữu vĩnh viễn tài nguyên này</p>
+                    <p style="color:#898989;font-weight:600" class="mb-2">(Tự động kích hoạt sau khi thanh toán)</p>
                     
                     <div class="price mb-3">
-                      <strong class="fs-5">[translate:Giá]:</strong>
+                      <strong class="fs-5">Giá:</strong>
                       <span id="product-price-display" class="text-danger fw-bold fs-4">
                         {{ page.price | money_without_currency | remove: '.00' | append: ' VNĐ' }}
                       </span>
@@ -47,15 +47,15 @@ layout: default
                       data-product-price="{{ page.price }}"
                     >
                       <i class="fas fa-shopping-cart me-2"></i>
-                      <span id="buy-button-text">[translate:Mua ngay]</span>
+                      <span id="buy-button-text">Mua ngay</span>
                     </button>
                   </div>
                 {% endif %}
 
                 <div class="vip-upsell-box mt-3 text-center">
-                  <p class="mb-1">[translate:Hoặc]</p>
-                  <p class="fw-bold">[translate:Nâng cấp VIP để tải toàn bộ tài nguyên!]</p>
-                  <a href="{{ '/pricing' | relative_url }}" class="btn btn-warning btn-sm">[translate:Xem các gói VIP]</a>
+                  <p class="mb-1">Hoặc</p>
+                  <p class="fw-bold">Nâng cấp VIP để tải toàn bộ tài nguyên!</p>
+                  <a href="{{ '/pricing' | relative_url }}" class="btn btn-warning btn-sm">Xem các gói VIP</a>
                 </div>
 
                 {% if page.sku %}
@@ -93,7 +93,7 @@ layout: default
 
         {% if sorted_related_posts.size > 0 %}
           <div class="related-posts-section mt-5">
-            <h3 class="h4 text-center mb-4">[translate:Tài nguyên liên quan]</h3>
+            <h3 class="h4 text-center mb-4">Tài nguyên liên quan</h3>
             <div class="row">
               {% for post in sorted_related_posts %}
                 <div class="col-md-6 mb-4">
@@ -168,7 +168,7 @@ layout: default
         
         // Cập nhật giá trị trên nút để logic mua hàng xử lý đúng
         buyButton.dataset.productPrice = '0';
-        buyButtonText.innerText = '[translate:Tải miễn phí (VIP)]';
+        buyButtonText.innerText = 'Tải miễn phí (VIP)';
       }
     } catch (e) {
       console.error('Lỗi không xác định khi kiểm tra trạng thái VIP:', e);
