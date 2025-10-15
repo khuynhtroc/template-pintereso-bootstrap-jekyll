@@ -191,7 +191,9 @@ case 'devices': {
 
     devices.forEach(device => {
         const deviceInfo = device.device_info;
-        const deviceName = deviceInfo.browser ? `${deviceInfo.browser[0]} on ${deviceInfo.os}` : 'Thiết bị không xác định';
+        const deviceName = (deviceInfo.browser && Array.isArray(deviceInfo.browser) && deviceInfo.browser.length > 0)
+          ? `${deviceInfo.browser[0]} on ${deviceInfo.os}` 
+          : 'Thiết bị không xác định';
         const lastActive = new Date(device.last_active_at).toLocaleString('vi-VN');
         const isCurrent = device.id === currentSessionId;
 
