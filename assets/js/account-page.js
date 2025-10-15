@@ -159,12 +159,12 @@ document.addEventListener('DOMContentLoaded', async () => {
       case 'downloads': {
         const { data, error, count } = await supabase
           .from('downloads')
-          .select('product_name, created_at, download_url, product_id', { count: 'exact' })
+          .select('product_name, downloaded_at, download_url, product_id', { count: 'exact' })
           .eq('user_id', currentUser.id)
-          .order('created_at', { ascending: false });
+          .order('downloaded_at', { ascending: false });
 
         if (error || !data || data.length === 0) {
-          pane.innerHTML = '<h2 class="acc-title">[translate:Lịch sử tải] <small class="text-muted">([translate:Tổng số]: 0)</small></h2><p>[translate:Bạn chưa có lượt tải nào.]</p>';
+          pane.innerHTML = '<h2 class="acc-title">Lịch sử tải <small class="text-muted">(Tổng số: 0)</small></h2><p>Bạn chưa có lượt tải nào.</p>';
           if(error) console.error('[Downloads Error]', error.message);
           break;
         }
@@ -178,21 +178,22 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         }
 
-        let html = `<h2 class="acc-title">[translate:Lịch sử tải] <small class="text-muted">([translate:Tổng số]: ${count})</small></h2>
+        let html = `<h2 class="acc-title">Lịch sử tải <small class="text-muted">(Tổng số: ${count})</small></h2>
                     <div class="table-responsive"><table class="table">
-                    <thead><tr><th>[translate:Sản phẩm]</th><th>[translate:Thời gian]</th><th>[translate:Tải lại]</th></tr></thead><tbody>`;
+                    <thead><tr><th>Sản phẩm</th><th>Thời gian</th><th>Tải lại</th></tr></thead><tbody>`;
 
         data.forEach(dl => {
-          const name = dl.product_name || '[translate:Không rõ tên]';
-          const time = dl.created_at ? new Date(dl.created_at).toLocaleString('vi-VN') : '—';
+          const name = dl.product_name || 'Không rõ tên]';
+          const time = dl.downloaded_at ? new Date(dl.downloaded_at).toLocaleString('vi-VN') : '—';
           const link = dl.download_url || productLinkMap.get(dl.product_id);
-          const btn = link ? `<a class="btn btn-sm btn-success" href="${link}" target="_blank" rel="noopener">[translate:Tải lại]</a>` : '<span class="text-muted">[translate:Không có link]</span>';
+          const btn = link ? `<a class="btn btn-sm btn-success" href="${link}" target="_blank" rel="noopener">Tải lại</a>` : '<span class="text-muted">Không có link</span>';
           html += `<tr><td>${name}</td><td>${time}</td><td>${btn}</td></tr>`;
         });
 
         pane.innerHTML = html + '</tbody></table></div>';
         break;
       }
+
 
 
       case 'profile': {
