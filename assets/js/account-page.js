@@ -5,8 +5,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     return;
   }
 
-  // 1) Auth + profile
+  // 1. Xác thực người dùng và lấy thông tin
   const { data: { user } } = await supabase.auth.getUser();
+
   if (!user) {
     document.body.innerHTML = '<div class="container py-5 text-center"><p>Vui lòng đăng nhập để xem trang tài khoản. Đang chuyển hướng...</p></div>';
     setTimeout(() => { window.location.href = '/'; }, 2000);
@@ -15,13 +16,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).single();
 
-  // 2) UI chung
+  // 2. Cập nhật giao diện chung
   const accName = document.getElementById('acc-name');
   const accAvatar = document.getElementById('acc-avatar');
   if (accName) accName.textContent = profile?.full_name || user.email;
   if (accAvatar && profile?.avatar_url) accAvatar.src = profile.avatar_url;
 
-  // 3) Đăng xuất
+  // 3. Xử lý sự kiện (Đăng xuất, chuyển tab)
   const signOutBtn = document.getElementById('acc-signout');
   if (signOutBtn) {
     signOutBtn.addEventListener('click', async (e) => {
@@ -31,7 +32,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }
 
-  // 4) Chuyển tab
   const menuLinks = document.querySelectorAll('.acc-menu a');
   const tabPanes = document.querySelectorAll('.acc-content .tab-pane');
   menuLinks.forEach(link => {
@@ -45,10 +45,11 @@ document.addEventListener('DOMContentLoaded', async () => {
       loadTabData(tabId, user, profile);
     });
   });
+
   const initialTab = document.querySelector('.acc-menu li.active a')?.getAttribute('data-tab') || 'dashboard';
   loadTabData(initialTab, user, profile);
 
-  // 5) Hàm tải dữ liệu theo tab
+  // 4. Hàm tải dữ liệu cho từng tab
   async function loadTabData(tabId, currentUser, currentProfile) {
     const pane = document.getElementById(`tab-${tabId}`);
     if (!pane) return;
@@ -72,182 +73,78 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
 
       case 'orders': {
-        const { data, error } = await supabase
-          .from('orders')
-          .select('id, created_at, amount, status, membership_plans(name), products(name)')
-          .eq('user_id', currentUser.id)
-          .order('created_at', { ascending: false });
+        const { data, error } = await supabase.from('orders').select('*, membership_plans(name), products(name)').eq('user_id', currentUser.id).order('created_at', { ascending: false });
 
         if (error || !data || data.length === 0) {
           pane.innerHTML = '<h2 class="acc-title">Đơn hàng của bạn</h2><p>Bạn chưa có đơn hàng nào.</p>';
           break;
         }
 
-        let html = `
-          <h2 class="acc-title">Đơn hàng của bạn</h2>
-          <div class="table-responsive">
-          <table class="table">
-            <thead>
-              <tr>
-                <th>Mã ĐH</th>
-                <th>Sản phẩm</th>
-                <th>Tổng tiền</th>
-                <th>Trạng thái</th>
-                <th>Ngày tạo</th>
-              </tr>
-            </thead>
-            <tbody>
-        `;
-        data.forEach(o => {
-          const name = o.membership_plans?.name || o.products?.name || 'Sản phẩm lẻ';
-          const statusBadge =
-            o.status === 'completed'
-              ? '<span class="badge bg-success">Hoàn thành</span>'
-              : o.status === 'failed'
-                ? '<span class="badge bg-danger">Thất bại</span>'
-                : '<span class="badge bg-warning text-dark">Chờ xử lý</span>';
-          html += `
-            <tr>
-              <td>#${o.id}</td>
-              <td>${name}</td>
-              <td>${new Intl.NumberFormat('vi-VN').format(o.amount || 0)}đ</td>
-              <td>${statusBadge}</td>
-              <td>${o.created_at ? new Date(o.created_at).toLocaleDateString('vi-VN') : '—'}</td>
-            </tr>
-          `;
+        let tableHtml = `<h2 class="acc-title">Đơn hàng của bạn</h2><table class="table"><thead><tr><th>Mã ĐH</th><th>Sản phẩm</th><th>Tổng tiền</th><th>Trạng thái</th><th>Ngày tạo</th></tr></thead><tbody>`;
+        data.forEach(order => {
+          const itemName = order.membership_plans?.name || order.products?.name || 'Sản phẩm lẻ';
+          const statusBadge = order.status === 'completed' ? '<span class="badge bg-success">Hoàn thành</span>' : '<span class="badge bg-danger">Thất bại</span>';
+          tableHtml += `<tr><td>#${order.id}</td><td>${itemName}</td><td>${new Intl.NumberFormat('vi-VN').format(order.amount || 0)}đ</td><td>${statusBadge}</td><td>${new Date(order.created_at).toLocaleDateString('vi-VN')}</td></tr>`;
         });
-        pane.innerHTML = html + '</tbody></table></div>';
+        pane.innerHTML = tableHtml + '</tbody></table>';
         break;
       }
-
+      
       case 'vip': {
-        const { data: vipOrders, error } = await supabase
-          .from('orders')
-          .select('created_at, status, membership_plans(name, duration_days)')
-          .eq('user_id', currentUser.id)
-          .not('plan_id', 'is', null)
-          .order('created_at', { ascending: false });
+        const { data: vipOrders, error } = await supabase.from('orders').select('*, membership_plans(name, duration_days)').eq('user_id', currentUser.id).not('plan_id', 'is', null).order('created_at', { ascending: false });
 
-        let html = '<h2 class="acc-title">Các gói thành viên của bạn</h2>';
+        let vipHtml = '<h2 class="acc-title">Các gói thành viên của bạn</h2>';
         if (error || !vipOrders || vipOrders.length === 0) {
-          html += '<p>Bạn chưa từng đăng ký gói VIP nào.</p>';
+          vipHtml += '<p>Bạn chưa từng đăng ký gói VIP nào.</p>';
         } else {
-          html += `
-            <div class="table-responsive">
-            <table class="table">
-              <thead><tr>
-                <th>Gói thành viên</th>
-                <th>Ngày bắt đầu</th>
-                <th>Ngày hết hạn</th>
-                <th>Trạng thái</th>
-              </tr></thead>
-              <tbody>
-          `;
-          vipOrders.forEach(v => {
-            const name = v.membership_plans?.name || 'Gói không xác định';
-            const start = v.created_at ? new Date(v.created_at) : null;
-            let expiry = 'Vĩnh viễn';
-            const days = v.membership_plans?.duration_days ?? null;
-            if (start && Number.isFinite(days) && days > 0) {
-              const end = new Date(start);
-              end.setDate(end.getDate() + days);
-              expiry = end.toLocaleDateString('vi-VN');
+          vipHtml += `<table class="table"><thead><tr><th>Gói thành viên</th><th>Ngày bắt đầu</th><th>Ngày hết hạn</th><th>Trạng thái</th></tr></thead><tbody>`;
+          vipOrders.forEach(pkg => {
+            const planName = pkg.membership_plans?.name || 'Gói không xác định';
+            const startDate = new Date(pkg.created_at);
+            let expiryDate = 'Vĩnh viễn';
+            if (pkg.membership_plans?.duration_days) {
+              const expiry = new Date(startDate);
+              expiry.setDate(expiry.getDate() + pkg.membership_plans.duration_days);
+              expiryDate = expiry.toLocaleDateString('vi-VN');
             }
-            const badge = v.status === 'completed'
-              ? '<span class="badge bg-success">Hoạt động</span>'
-              : '<span class="badge bg-warning text-dark">Chờ xử lý</span>';
-            html += `<tr><td>${name}</td><td>${start ? start.toLocaleDateString('vi-VN') : '—'}</td><td>${expiry}</td><td>${badge}</td></tr>`;
+            const statusBadge = pkg.status === 'completed' ? '<span class="badge bg-success">Hoạt động</span>' : '<span class="badge bg-warning text-dark">Chờ xử lý</span>';
+            vipHtml += `<tr><td>${planName}</td><td>${startDate.toLocaleDateString('vi-VN')}</td><td>${expiryDate}</td><td>${statusBadge}</td></tr>`;
           });
-          html += '</tbody></table></div>';
+          vipHtml += '</tbody></table>';
         }
-        html += '<button class="btn btn-primary mt-3" onclick="window.location.href=\'/pricing/\'">Nâng cấp hoặc Gia hạn gói</button>';
-        pane.innerHTML = html;
+        vipHtml += '<button class="btn btn-primary mt-3" onclick="window.location.href=\'/pricing/\'">Nâng cấp hoặc Gia hạn gói</button>';
+        pane.innerHTML = vipHtml;
         break;
       }
 
       case 'downloads': {
-        // Lưu ý: cần RLS cho phép user đọc downloads của chính họ.
-        // Bổ sung thêm download_url từ bảng downloads hoặc products (tùy bạn đang lưu ở đâu).
-        // Ở đây ưu tiên: downloads(download_url) -> nếu null thì fallback products(download_url).
-        const { data, error, count } = await supabase
-          .from('downloads')
-          .select('product_name, product_sku, downloaded_at, download_url, products(download_url)', { count: 'exact' })
-          .eq('user_id', currentUser.id)
-          .order('downloaded_at', { ascending: false })
-          .limit(300);
-
-        let html = `<h2 class="acc-title">Lịch sử tải <small class="text-muted">(Tổng số: ${Number.isFinite(count) ? count : (data?.length || 0)})</small></h2>`;
+        const { data, error, count } = await supabase.from('downloads').select('product_name, downloaded_at, product_sku', { count: 'exact' }).eq('user_id', currentUser.id).order('downloaded_at', { ascending: false }).limit(200);
 
         if (error || !data || data.length === 0) {
-          html += '<p>Bạn chưa có lượt tải nào.</p>';
-          pane.innerHTML = html;
+          pane.innerHTML = '<h2 class="acc-title">Lịch sử tải</h2><p>Bạn chưa có lượt tải nào.</p>';
           break;
         }
 
-        html += `
-          <div class="table-responsive">
-          <table class="table">
-            <thead><tr>
-              <th>Sản phẩm</th>
-              <th>SKU</th>
-              <th>Thời gian</th>
-              <th>Tải lại</th>
-            </tr></thead>
-            <tbody>
-        `;
-
+        let dlHtml = `<h2 class="acc-title">Lịch sử tải <small class="text-muted">(Tổng số: ${count})</small></h2><div class="table-responsive"><table class="table"><thead><tr><th>Sản phẩm</th><th>SKU</th><th>Thời gian</th></tr></thead><tbody>`;
         data.forEach(dl => {
-          const name = dl.product_name || 'Không rõ tên';
-          const sku = dl.product_sku || '—';
-          const time = dl.downloaded_at ? new Date(dl.downloaded_at).toLocaleString('vi-VN') : '—';
-          // Ưu tiên downloads.download_url; nếu không có thì fallback sang products.download_url (nếu bạn dùng quan hệ)
-          const directUrl = dl.download_url || dl.products?.download_url || '#';
-
-          // Nút tải lại trực tiếp
-          const downloadBtn = directUrl && directUrl !== '#'
-            ? `<a class="btn btn-sm btn-success" href="${directUrl}" target="_blank" rel="noopener">Tải lại</a>`
-            : '<span class="text-muted">Không có link</span>';
-
-          html += `<tr><td>${name}</td><td>${sku}</td><td>${time}</td><td>${downloadBtn}</td></tr>`;
+          dlHtml += `<tr><td>${dl.product_name || 'Không rõ tên'}</td><td>${dl.product_sku || '—'}</td><td>${new Date(dl.downloaded_at).toLocaleString('vi-VN')}</td></tr>`;
         });
-
-        html += '</tbody></table></div>';
-        pane.innerHTML = html;
+        pane.innerHTML = dlHtml + '</tbody></table></div>';
         break;
       }
 
       case 'profile': {
-        const canEditUsername = !currentProfile?.username || currentProfile.username.trim() === '';
         pane.innerHTML = `
           <h2 class="acc-title">Chỉnh sửa hồ sơ</h2>
           <form id="profile-update-form">
-            <div class="mb-3">
-              <label for="username" class="form-label">Tên người dùng</label>
-              <input type="text" id="username" class="form-control" value="${currentProfile?.username || ''}" ${canEditUsername ? '' : 'disabled'}>
-              <div class="form-text">${canEditUsername ? 'Bạn chỉ có thể đặt username một lần.' : 'Username đã được thiết lập và không thể thay đổi.'}</div>
-            </div>
-            <div class="mb-3">
-              <label for="full_name" class="form-label">Tên hiển thị</label>
-              <input type="text" id="full_name" class="form-control" value="${currentProfile?.full_name || ''}">
-            </div>
-            <div class="mb-3">
-              <label class="form-label">Email</label>
-              <input type="email" class="form-control" value="${currentUser.email}" disabled>
-            </div>
-            <div class="mb-3">
-              <label for="phone" class="form-label">Số điện thoại</label>
-              <input type="text" id="phone" class="form-control" value="${currentProfile?.phone || ''}">
-            </div>
+            <div class="mb-3"><label class="form-label">Tên người dùng</label><input type="text" class="form-control" value="${currentProfile?.username || ''}" disabled><div class="form-text">Tên người dùng không thể thay đổi.</div></div>
+            <div class="mb-3"><label for="full_name" class="form-label">Tên hiển thị</label><input type="text" id="full_name" class="form-control" value="${currentProfile?.full_name || ''}"></div>
+            <div class="mb-3"><label class="form-label">Email</label><input type="email" class="form-control" value="${currentUser.email}" disabled></div>
+            <div class="mb-3"><label for="phone" class="form-label">Số điện thoại</label><input type="text" id="phone" class="form-control" value="${currentProfile?.phone || ''}"></div>
             <hr>
             <h4 class="mt-4">Thay đổi mật khẩu</h4>
-            <div class="mb-3">
-              <label for="new_password" class="form-label">Mật khẩu mới</label>
-              <input type="password" id="new_password" class="form-control" placeholder="Để trống nếu không đổi">
-            </div>
-            <div class="mb-3">
-              <label for="confirm_password" class="form-label">Xác nhận mật khẩu mới</label>
-              <input type="password" id="confirm_password" class="form-control">
-            </div>
+            <div class="mb-3"><label for="new_password" class="form-label">Mật khẩu mới</label><input type="password" id="new_password" class="form-control" placeholder="Để trống nếu không đổi"></div>
+            <div class="mb-3"><label for="confirm_password" class="form-label">Xác nhận mật khẩu mới</label><input type="password" id="confirm_password" class="form-control"></div>
             <button type="submit" class="btn btn-primary">Cập nhật hồ sơ</button>
           </form>
         `;
@@ -258,54 +155,29 @@ document.addEventListener('DOMContentLoaded', async () => {
           btn.disabled = true;
           btn.textContent = 'Đang xử lý...';
 
-          const username = document.getElementById('username').value.trim();
           const fullName = document.getElementById('full_name').value.trim();
           const phone = document.getElementById('phone').value.trim();
           const newPassword = document.getElementById('new_password').value;
-          const confirmPassword = document.getElementById('confirm_password').value;
-
-          // 1) Cập nhật profile: full_name, phone (+ username nếu được phép và chưa có)
-          const updatePayload = { full_name: fullName, phone };
-          if (canEditUsername && username) {
-            updatePayload.username = username;
-          }
-
-          // Nếu canEditUsername=false mà user cố đổi username, payload sẽ không có username => không đổi
-          const { error: profErr } = await supabase
-            .from('profiles')
-            .update(updatePayload)
-            .eq('id', currentUser.id);
+          
+          const { error: profErr } = await supabase.from('profiles').update({ full_name: fullName, phone }).eq('id', currentUser.id);
 
           if (profErr) {
             alert('Lỗi cập nhật profile: ' + profErr.message);
-            btn.disabled = false;
-            btn.textContent = 'Cập nhật hồ sơ';
-            return;
-          }
-
-          // 2) Đổi mật khẩu (nếu có)
-          if (newPassword) {
-            if (newPassword !== confirmPassword) {
+          } else if (newPassword) {
+            if (newPassword !== document.getElementById('confirm_password').value) {
               alert('Mật khẩu xác nhận không khớp!');
-              btn.disabled = false;
-              btn.textContent = 'Cập nhật hồ sơ';
-              return;
+            } else {
+              const { error: passErr } = await supabase.auth.updateUser({ password: newPassword });
+              if (passErr) alert('Lỗi đổi mật khẩu: ' + passErr.message);
+              else alert('Cập nhật thành công!');
             }
-            const { error: passErr } = await supabase.auth.updateUser({ password: newPassword });
-            if (passErr) {
-              alert('Lỗi đổi mật khẩu: ' + passErr.message);
-              btn.disabled = false;
-              btn.textContent = 'Cập nhật hồ sơ';
-              return;
-            }
+          } else {
+            alert('Cập nhật thành công!');
+            if (accName) accName.textContent = fullName;
           }
-
-          alert('Cập nhật thành công!');
-          if (accName && fullName) accName.textContent = fullName;
           btn.disabled = false;
           btn.textContent = 'Cập nhật hồ sơ';
         });
-
         break;
       }
 
