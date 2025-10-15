@@ -64,32 +64,68 @@ document.addEventListener('DOMContentLoaded', async () => {
         `;
         break;
 
-      case 'orders': {
-        const { data: orders, error } = await supabase.from('orders').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false });
+case 'orders': {
+  const uid = (await supabase.auth.getUser()).data.user.id;
 
-        if (error || !orders || orders.length === 0) {
-          pane.innerHTML = '<h2 class="acc-title">[translate:Đơn hàng của bạn]</h2><p>[translate:Bạn chưa có đơn hàng nào.]</p>';
-          break;
-        }
+  // 1) lấy orders tối giản
+  let q = supabase.from('orders').select('*').eq('user_id', uid);
+  // thử order theo created_at, nếu 400 thì bỏ order
+  let res = await q.order('created_at', { ascending: false });
+  if (res.error) res = await q; // fallback bỏ order
 
-        const planIds = [...new Set(orders.map(o => o.plan_id).filter(Boolean))];
-        const productIds = [...new Set(orders.map(o => o.product_id).filter(Boolean))];
+  const { data: orders, error } = res;
+  if (error || !orders || orders.length === 0) {
+    pane.innerHTML = '<h2 class="acc-title">Đơn hàng của bạn</h2><p>Bạn chưa có đơn hàng nào.</p>';
+    if (error) console.error('[orders]', error);
+    break;
+  }
 
-        const { data: plans } = planIds.length > 0 ? await supabase.from('membership_plans').select('id, name').in('id', planIds) : { data: [] };
-        const { data: products } = productIds.length > 0 ? await supabase.from('products').select('id, name').in('id', productIds) : { data: [] };
-        
-        const planMap = new Map(plans.map(p => [p.id, p.name]));
-        const productMap = new Map(products.map(p => [p.id, p.name]));
+  // 2) map tên từ bảng liên quan bằng 2 truy vấn riêng, tránh nested
+  const planIds = [...new Set(orders.map(o => o.plan_id).filter(Boolean))];
+  const productIds = [...new Set(orders.map(o => o.product_id).filter(Boolean))];
 
-        let tableHtml = `<h2 class="acc-title">[translate:Đơn hàng của bạn]</h2><table class="table"><thead><tr><th>[translate:Mã ĐH]</th><th>[translate:Sản phẩm]</th><th>[translate:Tổng tiền]</th><th>[translate:Trạng thái]</th><th>[translate:Ngày tạo]</th></tr></thead><tbody>`;
-        orders.forEach(order => {
-          const itemName = planMap.get(order.plan_id) || productMap.get(order.product_id) || '[translate:Sản phẩm lẻ]';
-          const statusBadge = order.status === 'completed' ? '<span class="badge bg-success">[translate:Hoàn thành]</span>' : '<span class="badge bg-danger">[translate:Thất bại]</span>';
-          tableHtml += `<tr><td>#${order.id}</td><td>${itemName}</td><td>${new Intl.NumberFormat('vi-VN').format(order.amount || 0)}đ</td><td>${statusBadge}</td><td>${new Date(order.created_at).toLocaleDateString('vi-VN')}</td></tr>`;
-        });
-        pane.innerHTML = tableHtml + '</tbody></table>';
-        break;
-      }
+  const planMap = new Map();
+  if (planIds.length) {
+    const { data: plans, error: pe } = await supabase.from('membership_plans').select('id,name').in('id', planIds);
+    if (pe) console.warn('[plans]', pe); else plans.forEach(p => planMap.set(p.id, p.name));
+  }
+
+  const productMap = new Map();
+  if (productIds.length) {
+    const { data: products, error: pr } = await supabase.from('products').select('id,name').in('id', productIds);
+    if (pr) console.warn('[products]', pr); else products.forEach(p => productMap.set(p.id, p.name));
+  }
+
+  // 3) render, tự động dùng amount hoặc total_price (cột nào có)
+  let html = `<h2 class="acc-title">Đơn hàng của bạn</h2>
+    <div class="table-responsive"><table class="table">
+      <thead><tr>
+        <th>Mã ĐH</th><th>Sản phẩm</th><th>Tổng tiền</th><th>Trạng thái</th><th>Ngày tạo</th>
+      </tr></thead><tbody>`;
+
+  orders.forEach(o => {
+    const itemName = planMap.get(o.plan_id) || productMap.get(o.product_id) || 'Sản phẩm lẻ';
+    const total = (o.amount ?? o.total_price ?? 0);
+    const statusBadge = o.status === 'completed'
+      ? '<span class="badge bg-success">Hoàn thành</span>'
+      : o.status === 'failed'
+        ? '<span class="badge bg-danger">Thất bại</span>'
+        : '<span class="badge bg-warning text-dark">Chờ xử lý</span>';
+    const created = o.created_at ? new Date(o.created_at).toLocaleDateString('vi-VN') : '—';
+
+    html += `<tr>
+      <td>#${o.id}</td>
+      <td>${itemName}</td>
+      <td>${new Intl.NumberFormat('vi-VN').format(total)}đ</td>
+      <td>${statusBadge}</td>
+      <td>${created}</td>
+    </tr>`;
+  });
+
+  pane.innerHTML = html + '</tbody></table></div>';
+  break;
+}
+
       
       case 'vip': {
         const { data: vipOrders, error } = await supabase.from('orders').select('*, membership_plans(name, duration_days)').eq('user_id', currentUser.id).not('plan_id', 'is', null).order('created_at', { ascending: false });
@@ -118,21 +154,51 @@ document.addEventListener('DOMContentLoaded', async () => {
         break;
       }
 
-      case 'downloads': {
-        const { data, error, count } = await supabase.from('downloads').select('product_name, downloaded_at, product_sku', { count: 'exact' }).eq('user_id', currentUser.id).order('downloaded_at', { ascending: false }).limit(200);
+case 'downloads': {
+  const uid = (await supabase.auth.getUser()).data.user.id;
 
-        if (error || !data || data.length === 0) {
-          pane.innerHTML = '<h2 class="acc-title">Lịch sử tải</h2><p>Bạn chưa có lượt tải nào.</p>';
-          break;
-        }
+  // base query + count
+  let q = supabase.from('downloads')
+    .select('product_name, product_sku, downloaded_at, product_id, download_url', { count: 'exact' })
+    .eq('user_id', uid);
 
-        let dlHtml = `<h2 class="acc-title">Lịch sử tải <small class="text-muted">(Tổng số: ${count})</small></h2><div class="table-responsive"><table class="table"><thead><tr><th>Sản phẩm</th><th>SKU</th><th>Thời gian</th></tr></thead><tbody>`;
-        data.forEach(dl => {
-          dlHtml += `<tr><td>${dl.product_name || 'Không rõ tên'}</td><td>${dl.product_sku || '—'}</td><td>${new Date(dl.downloaded_at).toLocaleString('vi-VN')}</td></tr>`;
-        });
-        pane.innerHTML = dlHtml + '</tbody></table></div>';
-        break;
-      }
+  // thử order theo downloaded_at; nếu lỗi -> thử created_at; nếu vẫn lỗi -> bỏ order
+  let resp = await q.order('downloaded_at', { ascending: false }).limit(300);
+  if (resp.error) resp = await q.order('created_at', { ascending: false }).limit(300);
+  if (resp.error) resp = await q.limit(300);
+
+  const { data, error, count } = resp;
+  if (error || !data || data.length === 0) {
+    pane.innerHTML = '<h2 class="acc-title">Lịch sử tải <small class="text-muted">(Tổng số: 0)</small></h2><p>Bạn chưa có lượt tải nào.</p>';
+    if (error) console.error('[downloads]', error);
+    break;
+  }
+
+  // fallback tên + link: nếu không có download_url trên downloads, cố lấy từ products
+  const missingLinkIds = [...new Set(data.filter(x => !x.download_url && x.product_id).map(x => x.product_id))];
+  const productLinkMap = new Map();
+  if (missingLinkIds.length) {
+    const { data: p2, error: p2e } = await supabase.from('products').select('id, download_url').in('id', missingLinkIds);
+    if (p2e) console.warn('[products for links]', p2e); else p2.forEach(p => productLinkMap.set(p.id, p.download_url));
+  }
+
+  let html = `<h2 class="acc-title">Lịch sử tải <small class="text-muted">(Tổng số: ${Number.isFinite(count) ? count : data.length})</small></h2>
+    <div class="table-responsive"><table class="table">
+      <thead><tr><th>Sản phẩm</th><th>SKU</th><th>Thời gian</th><th>Tải lại</th></tr></thead><tbody>`;
+
+  data.forEach(dl => {
+    const name = dl.product_name || 'Không rõ tên';
+    const sku = dl.product_sku || '—';
+    const time = dl.downloaded_at ? new Date(dl.downloaded_at).toLocaleString('vi-VN') : '—';
+    const link = dl.download_url || (dl.product_id ? productLinkMap.get(dl.product_id) : null);
+    const btn = link ? `<a class="btn btn-sm btn-success" href="${link}" target="_blank" rel="noopener">Tải lại</a>` : '<span class="text-muted">Không có link</span>';
+    html += `<tr><td>${name}</td><td>${sku}</td><td>${time}</td><td>${btn}</td></tr>`;
+  });
+
+  pane.innerHTML = html + '</tbody></table></div>';
+  break;
+}
+
 
       case 'profile': {
         pane.innerHTML = `
