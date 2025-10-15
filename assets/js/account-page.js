@@ -4,7 +4,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     console.error('Supabase client not found on window.');
     return;
   }
-
+ 
   // 1. Xác thực người dùng và lấy thông tin
   const { data: { user } } = await supabase.auth.getUser();
 
