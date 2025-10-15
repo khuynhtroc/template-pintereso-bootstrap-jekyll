@@ -179,7 +179,7 @@ case 'devices': {
     }
     
     if (!devices || devices.length === 0) {
-        pane.innerHTML = '<h2 class="acc-title">Quản lý thiết bị</h2><p>Không có thiết bị nào được ghi nhận.]/p>';
+        pane.innerHTML = '<h2 class="acc-title">Quản lý thiết bị</h2><p>Không có thiết bị nào được ghi nhận.</p>';
         break;
     }
 
