@@ -21,6 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
+                        <div id="auth-error-message" class="alert alert-danger" style="display:none;"></div>
                         <button id="google-signin-btn" class="btn btn-outline-danger w-100 mb-3"><i class="fab fa-google me-2"></i>Tiếp tục với Google</button>
                         <div class="text-center my-2">hoặc</div>
                         <form id="login-form">
@@ -47,8 +48,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- STEP 3: LẤY CÁC PHẦN TỬ DOM ---
     const authModalEl = document.getElementById('authModal');
     const authModalInstance = new bootstrap.Modal(authModalEl);
+    const authErrorMessage = document.getElementById('auth-error-message');
     
-    // Tìm cả 2 link đăng nhập
     const headerLoginLink = document.getElementById('user-profile-link');
     const checkoutLoginLink = document.getElementById('checkout-login-link');
     
@@ -57,7 +58,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const loginForm = document.getElementById('login-form');
     const registerForm = document.getElementById('register-form');
 
-    // *** HÀM DỌN DẸP MODAL (QUAN TRỌNG) ***
     function forceCloseModal() {
         authModalInstance.hide();
         const backdrops = document.querySelectorAll('.modal-backdrop');
@@ -67,50 +67,106 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.style.paddingRight = '';
     }
 
+    function showAuthError(message) {
+        if(authErrorMessage) {
+            authErrorMessage.textContent = message;
+            authErrorMessage.style.display = 'block';
+        } else {
+            alert(message);
+        }
+    }
+
     // --- STEP 4: GẮN CÁC SỰ KIỆN ---
 
-    // Hàm chung để mở modal
     const openLoginModal = async (e) => {
         e.preventDefault();
         const { data: { user } } = await supabase.auth.getUser(); 
         if (!user) {
+            authErrorMessage.style.display = 'none'; // Ẩn thông báo lỗi cũ
             authModalInstance.show();
         } else {
-            // Nếu đã đăng nhập, cho phép chuyển đến trang account
             window.location.href = '/account/';
         }
     };
     
-    // Gán sự kiện cho cả 2 link nếu chúng tồn tại
-    if (headerLoginLink) {
-        headerLoginLink.addEventListener('click', openLoginModal);
-    }
-    if (checkoutLoginLink) {
-        checkoutLoginLink.addEventListener('click', openLoginModal);
-    }
+    if (headerLoginLink) headerLoginLink.addEventListener('click', openLoginModal);
+    if (checkoutLoginLink) checkoutLoginLink.addEventListener('click', openLoginModal);
 
-    // Chuyển đổi giữa các form
-    document.getElementById('show-register-form').addEventListener('click', (e) => { e.preventDefault(); loginForm.style.display = 'none'; registerForm.style.display = 'block'; });
-    document.getElementById('show-login-form').addEventListener('click', (e) => { e.preventDefault(); registerForm.style.display = 'none'; loginForm.style.display = 'block'; });
+    document.getElementById('show-register-form').addEventListener('click', (e) => { e.preventDefault(); loginForm.style.display = 'none'; registerForm.style.display = 'block'; authErrorMessage.style.display = 'none'; });
+    document.getElementById('show-login-form').addEventListener('click', (e) => { e.preventDefault(); registerForm.style.display = 'none'; loginForm.style.display = 'block'; authErrorMessage.style.display = 'none'; });
 
-    // Đăng nhập Google
     document.getElementById('google-signin-btn').addEventListener('click', async () => {
         await supabase.auth.signInWithOAuth({ provider: 'google' });
     });
 
-    // Xử lý form đăng nhập email
+    // ##################################################################
+    // ### BẮT ĐẦU PHẦN SỬA ĐỔI: XỬ LÝ ĐĂNG NHẬP VÀ KIỂM TRA THIẾT BỊ ###
+    // ##################################################################
     loginForm.addEventListener('submit', async (e) => {
         e.preventDefault();
-        const { error } = await supabase.auth.signInWithPassword({
+        const loginBtn = loginForm.querySelector('button[type="submit"]');
+        loginBtn.disabled = true;
+        loginBtn.textContent = 'Đang xử lý...';
+        authErrorMessage.style.display = 'none';
+
+        // Bước 1: Đăng nhập bằng email và mật khẩu
+        const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
             email: loginForm.querySelector('#login-email').value,
             password: loginForm.querySelector('#login-password').value,
         });
-        if (error) {
-            alert(error.message);
-        } else {
-            forceCloseModal();
+
+        if (authError) {
+            showAuthError('Đăng nhập thất bại: ' + authError.message);
+            loginBtn.disabled = false;
+            loginBtn.textContent = 'Đăng nhập';
+            return;
+        }
+
+        // Bước 2: Đăng nhập thành công, đăng ký thiết bị này
+        if (authData.user) {
+            try {
+                // Lấy thông tin thiết bị
+                const deviceInfo = {
+                    browser: (navigator.userAgent.match(/(opera|chrome|safari|firefox|msie|trident(?=\/))\/?\s*(\d+)/i) || ["Unknown"])[0],
+                    os: navigator.platform
+                };
+                
+                // Gọi RPC function để kiểm tra và đăng ký thiết bị
+                const { data: deviceData, error: deviceError } = await supabase.rpc('register_new_device', {
+                    device_info: deviceInfo,
+                    ip_address: null
+                });
+
+                if (deviceError) {
+                    if (deviceError.message.includes('device_limit_reached')) {
+                        showAuthError('Bạn đã đạt giới hạn 3 thiết bị. Vui lòng xóa một thiết bị cũ trong trang tài khoản.');
+                    } else {
+                        showAuthError('Lỗi đăng ký thiết bị: ' + deviceError.message);
+                    }
+                    // Đăng xuất người dùng ra ngay lập tức
+                    await supabase.auth.signOut();
+                    loginBtn.disabled = false;
+                    loginBtn.textContent = 'Đăng nhập';
+                    return;
+                }
+
+                // Đăng ký thành công, lưu session ID và tải lại trang
+                if (deviceData && deviceData.session_id) {
+                    localStorage.setItem('device_session_id', deviceData.session_id);
+                }
+                window.location.reload();
+
+            } catch (rpcError) {
+                showAuthError('Lỗi nghiêm trọng khi gọi RPC: ' + rpcError.message);
+                await supabase.auth.signOut();
+                loginBtn.disabled = false;
+                loginBtn.textContent = 'Đăng nhập';
+            }
         }
     });
+    // ###############################################################
+    // ### KẾT THÚC PHẦN SỬA ĐỔI                                    ###
+    // ###############################################################
 
     // Xử lý form đăng ký email
     registerForm.addEventListener('submit', async (e) => {
@@ -120,10 +176,10 @@ document.addEventListener('DOMContentLoaded', () => {
             password: registerForm.querySelector('#register-password').value,
         });
         if (error) {
-            alert(error.message);
+            showAuthError('Lỗi đăng ký: ' + error.message);
         } else { 
-            alert('Đăng ký thành công! Vui lòng kiểm tra email để xác thực.');
-            forceCloseModal();
+            showAuthError('Đăng ký thành công! Vui lòng kiểm tra email để xác thực.');
+            // Giữ modal mở để người dùng đọc thông báo
         }
     });
 
@@ -143,12 +199,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    // Lắng nghe sự thay đổi trạng thái đăng nhập
     supabase.auth.onAuthStateChange((_event, session) => {
         updateUserDisplay(session?.user);
     });
 
-    // Cập nhật giao diện lần đầu tiên khi tải trang
     (async () => {
         const { data: { user } } = await supabase.auth.getUser();
         updateUserDisplay(user);
