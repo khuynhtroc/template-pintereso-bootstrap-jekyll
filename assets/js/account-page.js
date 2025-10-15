@@ -72,21 +72,63 @@ document.addEventListener('DOMContentLoaded', async () => {
         break;
       }
 
+      // Đơn hàng
       case 'orders': {
-        const { data, error } = await supabase.from('orders').select('*, membership_plans(name), products(name)').eq('user_id', currentUser.id).order('created_at', { ascending: false });
+        const { data, error } = await supabase
+          .from('orders')
+          .select(`
+            id,
+            created_at,
+            amount,
+            status,
+            membership_plans (name),
+            products (name)
+          `)
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false });
 
         if (error || !data || data.length === 0) {
           pane.innerHTML = '<h2 class="acc-title">Đơn hàng của bạn</h2><p>Bạn chưa có đơn hàng nào.</p>';
           break;
         }
 
-        let tableHtml = `<h2 class="acc-title">Đơn hàng của bạn</h2><table class="table"><thead><tr><th>Mã ĐH</th><th>Sản phẩm</th><th>Tổng tiền</th><th>Trạng thái</th><th>Ngày tạo</th></tr></thead><tbody>`;
-        data.forEach(order => {
-          const itemName = order.membership_plans?.name || order.products?.name || 'Sản phẩm lẻ';
-          const statusBadge = order.status === 'completed' ? '<span class="badge bg-success">Hoàn thành</span>' : '<span class="badge bg-danger">Thất bại</span>';
-          tableHtml += `<tr><td>#${order.id}</td><td>${itemName}</td><td>${new Intl.NumberFormat('vi-VN').format(order.amount || 0)}đ</td><td>${statusBadge}</td><td>${new Date(order.created_at).toLocaleDateString('vi-VN')}</td></tr>`;
+        let html = `
+          <h2 class="acc-title">Đơn hàng của bạn</h2>
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Mã ĐH</th>
+                <th>Sản phẩm đã mua</th>
+                <th>Tổng tiền</th>
+                <th>Trạng thái</th>
+                <th>Ngày tạo</th>
+              </tr>
+            </thead>
+            <tbody>
+        `;
+
+        data.forEach(o => {
+          const itemName = o.membership_plans?.name || o.products?.name || 'Sản phẩm lẻ';
+          const money = new Intl.NumberFormat('vi-VN').format(o.amount || 0) + 'đ';
+          const statusBadge =
+            o.status === 'completed'
+              ? '<span class="badge bg-success">Hoàn thành</span>'
+              : o.status === 'failed'
+                ? '<span class="badge bg-danger">Thất bại</span>'
+                : '<span class="badge bg-warning text-dark">Chờ xử lý</span>';
+
+          html += `
+            <tr>
+              <td>#${o.id}</td>
+              <td>${itemName}</td>
+              <td>${money}</td>
+              <td>${statusBadge}</td>
+              <td>${o.created_at ? new Date(o.created_at).toLocaleDateString('vi-VN') : '—'}</td>
+            </tr>
+          `;
         });
-        pane.innerHTML = tableHtml + '</tbody></table>';
+
+        pane.innerHTML = html + '</tbody></table>';
         break;
       }
       
