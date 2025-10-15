@@ -168,7 +168,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 case 'devices': {
     const { data: devices, error } = await supabase
         .from('device_sessions')
-        .select('id, device_info, last_active_at')
+        .select('id, device_info, last_active_at', { count: 'exact' })
         .eq('user_id', currentUser.id)
         .order('last_active_at', { ascending: false });
 
@@ -178,52 +178,88 @@ case 'devices': {
         break;
     }
     
-    if (!devices || devices.length === 0) {
-        pane.innerHTML = '<h2 class="acc-title">Quản lý thiết bị</h2><p>Không có thiết bị nào được ghi nhận.</p>';
-        break;
+    // Hàm trợ giúp để lấy icon cho hệ điều hành
+    function getOsIcon(osName = '') {
+        const lowerOs = osName.toLowerCase();
+        if (lowerOs.includes('windows')) return '<i class="fab fa-windows fa-fw me-2"></i>';
+        if (lowerOs.includes('mac') || lowerOs.includes('ios')) return '<i class="fab fa-apple fa-fw me-2"></i>';
+        if (lowerOs.includes('linux')) return '<i class="fab fa-linux fa-fw me-2"></i>';
+        if (lowerOs.includes('android')) return '<i class="fab fa-android fa-fw me-2"></i>';
+        return '<i class="fas fa-desktop fa-fw me-2"></i>';
     }
 
     const currentSessionId = localStorage.getItem('device_session_id');
+    const deviceCount = devices?.length || 0;
 
-    let html = `<h2 class="acc-title">Quản lý thiết bị</h2><p>Đây là danh sách các thiết bị đã đăng nhập vào tài khoản của bạn. Bạn có thể đăng xuất khỏi các thiết bị không còn sử dụng.</p>
-                <div class="table-responsive"><table class="table">
-                <thead><tr><th>Thiết bị</th><th>Hoạt động lần cuối</th><th>Hành động</th></tr></thead><tbody>`;
+    let html = `
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="card-title fw-bold mb-0" style="font-size: 1.1rem;">Quản lý thiết bị</h5>
+                    ${deviceCount > 0 ? `<span class="badge bg-primary rounded-pill">${deviceCount} / 3 thiết bị</span>` : ''}
+                </div>
+                <p class="card-subtitle mb-4 text-muted">Danh sách các thiết bị bạn đã dùng để đăng nhập.</p>
+                
+                <div class="list-group list-group-flush">
+    `;
 
-    devices.forEach(device => {
-        const deviceInfo = device.device_info;
-        const deviceName = (deviceInfo.browser && Array.isArray(deviceInfo.browser) && deviceInfo.browser.length > 0)
-          ? `${deviceInfo.browser[0]} on ${deviceInfo.os}` 
-          : 'Thiết bị không xác định';
-        const lastActive = new Date(device.last_active_at).toLocaleString('vi-VN');
-        const isCurrent = device.id === currentSessionId;
+    if (deviceCount === 0) {
+        html += '<p>Không có thiết bị nào được ghi nhận.</p>';
+    } else {
+        devices.forEach(device => {
+            const info = device.device_info || {};
+            const osName = info.os_name || 'Hệ điều hành lạ';
+            const browserName = (info.browser_name && info.browser_version) 
+                ? `${info.browser_name} ${info.browser_version}` 
+                : 'Trình duyệt lạ';
+            const lastActive = new Date(device.last_active_at).toLocaleString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+            const isCurrent = device.id === currentSessionId;
+            
+            html += `
+                <div class="list-group-item px-0 py-3">
+                    <div class="row align-items-center g-3">
+                        <div class="col-md-4">
+                            <small class="text-muted d-block mb-1">Hệ điều hành</small>
+                            <span class="fw-bold">${getOsIcon(osName)} ${osName}</span>
+                        </div>
+                        <div class="col-md-3">
+                            <small class="text-muted d-block mb-1">Trình duyệt</small>
+                            <span class="fw-bold">${browserName}</span>
+                        </div>
+                        <div class="col-md-3">
+                            <small class="text-muted d-block mb-1">Đăng nhập cuối</small>
+                            <span class="fw-bold">${lastActive}</span>
+                        </div>
+                        <div class="col-md-2 text-md-end">
+                            ${isCurrent 
+                                ? '<span class="badge bg-success">Thiết bị này</span>' 
+                                : `<button class="btn btn-sm btn-outline-danger btn-remove-device" title="Đăng xuất thiết bị này" data-id="${device.id}"><i class="fas fa-trash-alt"></i></button>`
+                            }
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+    }
 
-        html += `<tr>
-                    <td>${deviceName} ${isCurrent ? '<strong>(Thiết bị này)</strong>' : ''}</td>
-                    <td>${lastActive}</td>
-                    <td>
-                        ${!isCurrent ? `<button class="btn btn-sm btn-danger btn-remove-device" data-id="${device.id}">Xóa</button>` : ''}
-                    </td>
-                 </tr>`;
-    });
-    
-    html += '</tbody></table></div>';
+    html += `
+                </div>
+                <p class="mt-4 text-muted small">Nếu bạn đã đạt giới hạn 3 thiết bị, bạn cần xóa một thiết bị cũ trước khi có thể đăng nhập từ một thiết bị mới.</p>
+            </div>
+        </div>
+    `;
+
     pane.innerHTML = html;
     
-    // Thêm trình xử lý sự kiện cho các nút xóa
     pane.querySelectorAll('.btn-remove-device').forEach(button => {
         button.addEventListener('click', async (e) => {
-            const deviceId = e.target.getAttribute('data-id');
+            const deviceId = e.currentTarget.getAttribute('data-id');
             if (confirm('Bạn có chắc muốn đăng xuất khỏi thiết bị này?')) {
-                const { error: deleteError } = await supabase
-                    .from('device_sessions')
-                    .delete()
-                    .eq('id', deviceId);
-
+                const { error: deleteError } = await supabase.from('device_sessions').delete().eq('id', deviceId);
                 if (deleteError) {
                     alert('Lỗi khi xóa thiết bị: ' + deleteError.message);
                 } else {
-                    alert('Xóa thiết bị thành công.');
-                    // Tải lại tab để cập nhật danh sách
+                    alert('Đăng xuất thiết bị thành công.');
                     loadTabData('devices', currentUser, currentProfile);
                 }
             }

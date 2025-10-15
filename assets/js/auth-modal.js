@@ -82,7 +82,7 @@ document.addEventListener('DOMContentLoaded', () => {
         e.preventDefault();
         const { data: { user } } = await supabase.auth.getUser(); 
         if (!user) {
-            authErrorMessage.style.display = 'none'; // Ẩn thông báo lỗi cũ
+            authErrorMessage.style.display = 'none';
             authModalInstance.show();
         } else {
             window.location.href = '/account/';
@@ -99,9 +99,6 @@ document.addEventListener('DOMContentLoaded', () => {
         await supabase.auth.signInWithOAuth({ provider: 'google' });
     });
 
-    // ##################################################################
-    // ### BẮT ĐẦU PHẦN SỬA ĐỔI: XỬ LÝ ĐĂNG NHẬP VÀ KIỂM TRA THIẾT BỊ ###
-    // ##################################################################
     loginForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         const loginBtn = loginForm.querySelector('button[type="submit"]');
@@ -109,7 +106,6 @@ document.addEventListener('DOMContentLoaded', () => {
         loginBtn.textContent = 'Đang xử lý...';
         authErrorMessage.style.display = 'none';
 
-        // Bước 1: Đăng nhập bằng email và mật khẩu
         const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
             email: loginForm.querySelector('#login-email').value,
             password: loginForm.querySelector('#login-password').value,
@@ -122,16 +118,33 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        // Bước 2: Đăng nhập thành công, đăng ký thiết bị này
         if (authData.user) {
             try {
-                // Lấy thông tin thiết bị
-                const deviceInfo = {
-                    browser: (navigator.userAgent.match(/(opera|chrome|safari|firefox|msie|trident(?=\/))\/?\s*(\d+)/i) || ["Unknown"])[0],
-                    os: navigator.platform
-                };
+                // *** CẢI TIẾN LOGIC LẤY THÔNG TIN THIẾT BỊ ***
+                function getDeviceInfo(ua) {
+                    let os = 'Unknown OS';
+                    if (/Windows/i.test(ua)) os = 'Windows';
+                    else if (/Macintosh|Mac OS X/i.test(ua)) os = 'macOS';
+                    else if (/Linux/i.test(ua)) os = 'Linux';
+                    else if (/Android/i.test(ua)) os = 'Android';
+                    else if (/iPhone|iPad|iPod/i.test(ua)) os = 'iOS';
+                    
+                    let browser = 'Unknown Browser';
+                    let version = '';
+                    let match;
+                    if ((match = ua.match(/Edg\/([0-9\.]+)/))) {
+                        browser = 'Edge'; version = match[1];
+                    } else if ((match = ua.match(/Chrome\/([0-9\.]+)/))) {
+                        browser = 'Chrome'; version = match[1];
+                    } else if ((match = ua.match(/Firefox\/([0-9\.]+)/))) {
+                        browser = 'Firefox'; version = match[1];
+                    } else if ((match = ua.match(/Version\/([0-9\.]+).*Safari/))) {
+                        browser = 'Safari'; version = match[1];
+                    }
+                    return { os_name: os, browser_name: browser, browser_version: version.split('.')[0] };
+                }
+                const deviceInfo = getDeviceInfo(navigator.userAgent);
                 
-                // Gọi RPC function để kiểm tra và đăng ký thiết bị
                 const { data: deviceData, error: deviceError } = await supabase.rpc('register_new_device', {
                     device_info: deviceInfo,
                     ip_address: null
@@ -143,14 +156,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     } else {
                         showAuthError('Lỗi đăng ký thiết bị: ' + deviceError.message);
                     }
-                    // Đăng xuất người dùng ra ngay lập tức
                     await supabase.auth.signOut();
                     loginBtn.disabled = false;
                     loginBtn.textContent = 'Đăng nhập';
                     return;
                 }
 
-                // Đăng ký thành công, lưu session ID và tải lại trang
                 if (deviceData && deviceData.session_id) {
                     localStorage.setItem('device_session_id', deviceData.session_id);
                 }
@@ -164,11 +175,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
     });
-    // ###############################################################
-    // ### KẾT THÚC PHẦN SỬA ĐỔI                                    ###
-    // ###############################################################
 
-    // Xử lý form đăng ký email
     registerForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         const { error } = await supabase.auth.signUp({
@@ -179,11 +186,9 @@ document.addEventListener('DOMContentLoaded', () => {
             showAuthError('Lỗi đăng ký: ' + error.message);
         } else { 
             showAuthError('Đăng ký thành công! Vui lòng kiểm tra email để xác thực.');
-            // Giữ modal mở để người dùng đọc thông báo
         }
     });
 
-    // --- STEP 5: CẬP NHẬT GIAO DIỆN DỰA TRÊN TRẠNG THÁI ĐĂNG NHẬP ---
     const updateUserDisplay = (user) => {
         if (!headerAuthText || !headerLoginLink) return;
 
