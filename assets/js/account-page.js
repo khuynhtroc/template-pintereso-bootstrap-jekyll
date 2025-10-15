@@ -1,28 +1,24 @@
 document.addEventListener('DOMContentLoaded', async () => {
   const supabase = window.supabaseClient;
   if (!supabase) {
-    console.error('Supabase client not found on window.');
+    console.error('Supabase client not found.');
     return;
   }
 
-  // 1. Xác thực người dùng và lấy thông tin
   const { data: { user } } = await supabase.auth.getUser();
-
   if (!user) {
-    document.body.innerHTML = '<div class="container py-5 text-center"><p>Vui lòng đăng nhập để xem trang tài khoản. Đang chuyển hướng...</p></div>';
+    document.body.innerHTML = '<div class="container py-5 text-center"><p>[translate:Vui lòng đăng nhập để xem trang tài khoản. Đang chuyển hướng...]</p></div>';
     setTimeout(() => { window.location.href = '/'; }, 2000);
     return;
   }
 
   const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).single();
 
-  // 2. Cập nhật giao diện chung
   const accName = document.getElementById('acc-name');
-  const accAvatar = document.getElementById('acc-avatar');
   if (accName) accName.textContent = profile?.full_name || user.email;
+  const accAvatar = document.getElementById('acc-avatar');
   if (accAvatar && profile?.avatar_url) accAvatar.src = profile.avatar_url;
 
-  // 3. Xử lý sự kiện (Đăng xuất, chuyển tab)
   const signOutBtn = document.getElementById('acc-signout');
   if (signOutBtn) {
     signOutBtn.addEventListener('click', async (e) => {
@@ -33,14 +29,13 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   const menuLinks = document.querySelectorAll('.acc-menu a');
-  const tabPanes = document.querySelectorAll('.acc-content .tab-pane');
   menuLinks.forEach(link => {
     link.addEventListener('click', (e) => {
       e.preventDefault();
       const tabId = link.getAttribute('data-tab');
-      menuLinks.forEach(l => l.parentElement.classList.remove('active'));
-      tabPanes.forEach(p => p.classList.remove('is-active'));
-      document.querySelector(`.acc-menu a[data-tab="${tabId}"`)?.parentElement.classList.add('active');
+      document.querySelectorAll('.acc-menu li').forEach(li => li.classList.remove('active'));
+      document.querySelectorAll('.acc-content .tab-pane').forEach(p => p.classList.remove('is-active'));
+      link.parentElement.classList.add('active');
       document.getElementById(`tab-${tabId}`)?.classList.add('is-active');
       loadTabData(tabId, user, profile);
     });
@@ -49,86 +44,50 @@ document.addEventListener('DOMContentLoaded', async () => {
   const initialTab = document.querySelector('.acc-menu li.active a')?.getAttribute('data-tab') || 'dashboard';
   loadTabData(initialTab, user, profile);
 
-  // 4. Hàm tải dữ liệu cho từng tab
   async function loadTabData(tabId, currentUser, currentProfile) {
     const pane = document.getElementById(`tab-${tabId}`);
     if (!pane) return;
-    pane.innerHTML = '<p>Đang tải dữ liệu...</p>';
+    pane.innerHTML = '<p>[translate:Đang tải dữ liệu...]</p>';
 
     switch (tabId) {
-      case 'dashboard': {
+      case 'dashboard':
         const isVip = currentProfile?.user_tier && currentProfile.user_tier !== 'Free';
         pane.innerHTML = `
-          <h2 class="acc-title">Bảng điều khiển</h2>
+          <h2 class="acc-title">[translate:Bảng điều khiển]</h2>
           <div class="acc-alert" style="display:${isVip ? 'none' : 'block'}">
-            <h4>Nâng cấp tài khoản!</h4>
-            <p>Bạn hiện là thành viên thường. Hãy nâng cấp lên VIP để nhận được nhiều lượt tải mỗi ngày và truy cập không giới hạn vào toàn bộ tài nguyên của chúng tôi.</p>
-            <button class="btn btn-primary" id="btn-upgrade-now">Nâng cấp ngay</button>
+            <h4>[translate:Nâng cấp tài khoản!]</h4>
+            <p>[translate:Bạn hiện là thành viên thường...]</p>
+            <button class="btn btn-primary" onclick="window.location.href='/pricing/'">[translate:Nâng cấp ngay]</button>
           </div>
-          <p>Xin chào <strong>${currentProfile?.full_name || currentUser.email}</strong>.</p>
-          <p>Từ bảng điều khiển tài khoản, có thể xem các đơn hàng gần đây, quản lý các gói thành viên, và chỉnh sửa mật khẩu cũng chi tiết tài khoản.</p>
+          <p>[translate:Xin chào] <strong>${currentProfile?.full_name || currentUser.email}</strong>.</p>
+          <p>[translate:Từ bảng điều khiển tài khoản, có thể xem các đơn hàng gần đây... ]</p>
         `;
-        pane.querySelector('#btn-upgrade-now')?.addEventListener('click', () => window.location.href = '/pricing/');
         break;
-      }
 
-      // Đơn hàng
       case 'orders': {
-        const { data, error } = await supabase
-          .from('orders')
-          .select(`
-            id,
-            created_at,
-            amount,
-            status,
-            membership_plans (name),
-            products (name)
-          `)
-          .eq('user_id', user.id)
-          .order('created_at', { ascending: false });
+        const { data: orders, error } = await supabase.from('orders').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false });
 
-        if (error || !data || data.length === 0) {
-          pane.innerHTML = '<h2 class="acc-title">Đơn hàng của bạn</h2><p>Bạn chưa có đơn hàng nào.</p>';
+        if (error || !orders || orders.length === 0) {
+          pane.innerHTML = '<h2 class="acc-title">[translate:Đơn hàng của bạn]</h2><p>[translate:Bạn chưa có đơn hàng nào.]</p>';
           break;
         }
 
-        let html = `
-          <h2 class="acc-title">Đơn hàng của bạn</h2>
-          <table class="table">
-            <thead>
-              <tr>
-                <th>Mã ĐH</th>
-                <th>Sản phẩm đã mua</th>
-                <th>Tổng tiền</th>
-                <th>Trạng thái</th>
-                <th>Ngày tạo</th>
-              </tr>
-            </thead>
-            <tbody>
-        `;
+        const planIds = [...new Set(orders.map(o => o.plan_id).filter(Boolean))];
+        const productIds = [...new Set(orders.map(o => o.product_id).filter(Boolean))];
 
-        data.forEach(o => {
-          const itemName = o.membership_plans?.name || o.products?.name || 'Sản phẩm lẻ';
-          const money = new Intl.NumberFormat('vi-VN').format(o.amount || 0) + 'đ';
-          const statusBadge =
-            o.status === 'completed'
-              ? '<span class="badge bg-success">Hoàn thành</span>'
-              : o.status === 'failed'
-                ? '<span class="badge bg-danger">Thất bại</span>'
-                : '<span class="badge bg-warning text-dark">Chờ xử lý</span>';
+        const { data: plans } = planIds.length > 0 ? await supabase.from('membership_plans').select('id, name').in('id', planIds) : { data: [] };
+        const { data: products } = productIds.length > 0 ? await supabase.from('products').select('id, name').in('id', productIds) : { data: [] };
+        
+        const planMap = new Map(plans.map(p => [p.id, p.name]));
+        const productMap = new Map(products.map(p => [p.id, p.name]));
 
-          html += `
-            <tr>
-              <td>#${o.id}</td>
-              <td>${itemName}</td>
-              <td>${money}</td>
-              <td>${statusBadge}</td>
-              <td>${o.created_at ? new Date(o.created_at).toLocaleDateString('vi-VN') : '—'}</td>
-            </tr>
-          `;
+        let tableHtml = `<h2 class="acc-title">[translate:Đơn hàng của bạn]</h2><table class="table"><thead><tr><th>[translate:Mã ĐH]</th><th>[translate:Sản phẩm]</th><th>[translate:Tổng tiền]</th><th>[translate:Trạng thái]</th><th>[translate:Ngày tạo]</th></tr></thead><tbody>`;
+        orders.forEach(order => {
+          const itemName = planMap.get(order.plan_id) || productMap.get(order.product_id) || '[translate:Sản phẩm lẻ]';
+          const statusBadge = order.status === 'completed' ? '<span class="badge bg-success">[translate:Hoàn thành]</span>' : '<span class="badge bg-danger">[translate:Thất bại]</span>';
+          tableHtml += `<tr><td>#${order.id}</td><td>${itemName}</td><td>${new Intl.NumberFormat('vi-VN').format(order.amount || 0)}đ</td><td>${statusBadge}</td><td>${new Date(order.created_at).toLocaleDateString('vi-VN')}</td></tr>`;
         });
-
-        pane.innerHTML = html + '</tbody></table>';
+        pane.innerHTML = tableHtml + '</tbody></table>';
         break;
       }
       
