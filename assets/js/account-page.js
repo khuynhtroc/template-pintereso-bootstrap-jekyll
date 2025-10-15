@@ -157,46 +157,39 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
 
       case 'downloads': {
-        const uid = (await supabase.auth.getUser()).data.user.id;
-      
-        // base query + count
-        let q = supabase.from('downloads')
-          .select('product_name, product_sku, downloaded_at, product_id, download_url', { count: 'exact' })
-          .eq('user_id', uid);
-      
-        // thử order theo downloaded_at; nếu lỗi -> thử created_at; nếu vẫn lỗi -> bỏ order
-        let resp = await q.order('downloaded_at', { ascending: false }).limit(300);
-        if (resp.error) resp = await q.order('created_at', { ascending: false }).limit(300);
-        if (resp.error) resp = await q.limit(300);
-      
-        const { data, error, count } = resp;
+        const { data, error, count } = await supabase
+          .from('downloads')
+          .select('product_name, created_at, download_url, product_id', { count: 'exact' })
+          .eq('user_id', currentUser.id)
+          .order('created_at', { ascending: false });
+
         if (error || !data || data.length === 0) {
-          pane.innerHTML = '<h2 class="acc-title">Lịch sử tải <small class="text-muted">(Tổng số: 0)</small></h2><p>Bạn chưa có lượt tải nào.</p>';
-          if (error) console.error('[downloads]', error);
+          pane.innerHTML = '<h2 class="acc-title">[translate:Lịch sử tải] <small class="text-muted">([translate:Tổng số]: 0)</small></h2><p>[translate:Bạn chưa có lượt tải nào.]</p>';
+          if(error) console.error('[Downloads Error]', error.message);
           break;
         }
-      
-        // fallback tên + link: nếu không có download_url trên downloads, cố lấy từ products
-        const missingLinkIds = [...new Set(data.filter(x => !x.download_url && x.product_id).map(x => x.product_id))];
+
+        const missingLinkIds = data.filter(d => !d.download_url && d.product_id).map(d => d.product_id);
         const productLinkMap = new Map();
-        if (missingLinkIds.length) {
-          const { data: p2, error: p2e } = await supabase.from('products').select('id, download_url').in('id', missingLinkIds);
-          if (p2e) console.warn('[products for links]', p2e); else p2.forEach(p => productLinkMap.set(p.id, p.download_url));
+        if (missingLinkIds.length > 0) {
+            const { data: productsWithLinks } = await supabase.from('products').select('id, download_url').in('id', missingLinkIds);
+            if (productsWithLinks) {
+                productsWithLinks.forEach(p => productLinkMap.set(p.id, p.download_url));
+            }
         }
-      
-        let html = `<h2 class="acc-title">Lịch sử tải <small class="text-muted">(Tổng số: ${Number.isFinite(count) ? count : data.length})</small></h2>
-          <div class="table-responsive"><table class="table">
-            <thead><tr><th>Sản phẩm</th><th>SKU</th><th>Thời gian</th><th>Tải lại</th></tr></thead><tbody>`;
-      
+
+        let html = `<h2 class="acc-title">[translate:Lịch sử tải] <small class="text-muted">([translate:Tổng số]: ${count})</small></h2>
+                    <div class="table-responsive"><table class="table">
+                    <thead><tr><th>[translate:Sản phẩm]</th><th>[translate:Thời gian]</th><th>[translate:Tải lại]</th></tr></thead><tbody>`;
+
         data.forEach(dl => {
-          const name = dl.product_name || 'Không rõ tên';
-          const sku = dl.product_sku || '—';
-          const time = dl.downloaded_at ? new Date(dl.downloaded_at).toLocaleString('vi-VN') : '—';
-          const link = dl.download_url || (dl.product_id ? productLinkMap.get(dl.product_id) : null);
-          const btn = link ? `<a class="btn btn-sm btn-success" href="${link}" target="_blank" rel="noopener">Tải lại</a>` : '<span class="text-muted">Không có link</span>';
-          html += `<tr><td>${name}</td><td>${sku}</td><td>${time}</td><td>${btn}</td></tr>`;
+          const name = dl.product_name || '[translate:Không rõ tên]';
+          const time = dl.created_at ? new Date(dl.created_at).toLocaleString('vi-VN') : '—';
+          const link = dl.download_url || productLinkMap.get(dl.product_id);
+          const btn = link ? `<a class="btn btn-sm btn-success" href="${link}" target="_blank" rel="noopener">[translate:Tải lại]</a>` : '<span class="text-muted">[translate:Không có link]</span>';
+          html += `<tr><td>${name}</td><td>${time}</td><td>${btn}</td></tr>`;
         });
-      
+
         pane.innerHTML = html + '</tbody></table></div>';
         break;
       }
