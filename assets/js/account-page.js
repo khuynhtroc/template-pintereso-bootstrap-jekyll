@@ -165,6 +165,71 @@ document.addEventListener('DOMContentLoaded', async () => {
         break;
       }
 
+case 'devices': {
+    const { data: devices, error } = await supabase
+        .from('device_sessions')
+        .select('id, device_info, last_active_at')
+        .eq('user_id', currentUser.id)
+        .order('last_active_at', { ascending: false });
+
+    if (error) {
+        pane.innerHTML = '<h2 class="acc-title">Quản lý thiết bị</h2><p class="text-danger">Lỗi khi tải danh sách thiết bị.</p>';
+        console.error('[Devices Error]', error.message);
+        break;
+    }
+    
+    if (!devices || devices.length === 0) {
+        pane.innerHTML = '<h2 class="acc-title">Quản lý thiết bị</h2><p>Không có thiết bị nào được ghi nhận.]/p>';
+        break;
+    }
+
+    const currentSessionId = localStorage.getItem('device_session_id');
+
+    let html = `<h2 class="acc-title">Quản lý thiết bị</h2><p>Đây là danh sách các thiết bị đã đăng nhập vào tài khoản của bạn. Bạn có thể đăng xuất khỏi các thiết bị không còn sử dụng.</p>
+                <div class="table-responsive"><table class="table">
+                <thead><tr><th>Thiết bị</th><th>Hoạt động lần cuối</th><th>Hành động</th></tr></thead><tbody>`;
+
+    devices.forEach(device => {
+        const deviceInfo = device.device_info;
+        const deviceName = deviceInfo.browser ? `${deviceInfo.browser[0]} on ${deviceInfo.os}` : 'Thiết bị không xác định';
+        const lastActive = new Date(device.last_active_at).toLocaleString('vi-VN');
+        const isCurrent = device.id === currentSessionId;
+
+        html += `<tr>
+                    <td>${deviceName} ${isCurrent ? '<strong>(Thiết bị này)</strong>' : ''}</td>
+                    <td>${lastActive}</td>
+                    <td>
+                        ${!isCurrent ? `<button class="btn btn-sm btn-danger btn-remove-device" data-id="${device.id}">Xóa</button>` : ''}
+                    </td>
+                 </tr>`;
+    });
+    
+    html += '</tbody></table></div>';
+    pane.innerHTML = html;
+    
+    // Thêm trình xử lý sự kiện cho các nút xóa
+    pane.querySelectorAll('.btn-remove-device').forEach(button => {
+        button.addEventListener('click', async (e) => {
+            const deviceId = e.target.getAttribute('data-id');
+            if (confirm('Bạn có chắc muốn đăng xuất khỏi thiết bị này?')) {
+                const { error: deleteError } = await supabase
+                    .from('device_sessions')
+                    .delete()
+                    .eq('id', deviceId);
+
+                if (deleteError) {
+                    alert('Lỗi khi xóa thiết bị: ' + deleteError.message);
+                } else {
+                    alert('Xóa thiết bị thành công.');
+                    // Tải lại tab để cập nhật danh sách
+                    loadTabData('devices', currentUser, currentProfile);
+                }
+            }
+        });
+    });
+    break;
+}
+
       case 'profile': {
         const canEditUsername = !currentProfile?.username;
         pane.innerHTML = `
