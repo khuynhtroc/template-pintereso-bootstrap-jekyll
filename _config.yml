@@ -1,13 +1,13 @@
 # Site
-name: 'Pintereso'
-description: 'Pintereso is a free Jekyll theme for awesome people like you, Pinterest like.'
+name: 'FileVector.Store'
+description: 'Website chia sẻ tài nguyên đồ họa như thư viện cưới, thư viện sinh nhật, thư viện sketchup, thư viện video editor, tải ảnh PNG, vector, phông nền, background, tài nguyên thiết kế Corel, Ai, PSD chất lượng cao miễn phí.'
 logo: 'assets/images/logo.png'
 favicon: 'assets/images/logo.png'
 url: 'https://filevector.store'
 baseurl: ''
 avatar: 'assets/images/sal.jpg'
 disqus: 'demowebsite'
-email: 'wowthemesnet@gmail.com'
+email: 'contact@filevector.store'
 
 include:
   - "_pages"
