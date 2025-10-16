@@ -5,26 +5,718 @@ free:
   color: "#121826"
 trung-thu:
   title: "Trung Thu"
-  description: "Tải miễn phí file đồ hoạ vector Trung Thu png jpg pdf ai crd..."
+  description: "Tải miễn phí file đồ hoạ vector Trung Thu png jpg pdf ai crd esp psd cdr dwg..."
   image: "/assets/images/background-trung-thu-212.jpg"
   color: "#121826"
 y-te:
   title: "Y Tế"
-  description: "Tải miễn phí file đồ hoạ vector ngành Y Tế png jpg pdf ai crd..."
+  description: "Tải miễn phí file đồ hoạ vector ngành Y Tế png jpg pdf ai crd esp psd cdr dwg..."
   image: "/assets/images/background-nen-y-khoa-208.jpg"
   color: "#121826"
 20-10:
   title: "Ngày Phụ nữ Việt Nam 20-10"
-  description: "Tải miễn phí file đồ hoạ vector Ngày Phụ nữ Việt Nam 20-10 png jpg pdf ai crd..."
+  description: "Tải miễn phí file đồ hoạ vector Ngày Phụ nữ Việt Nam 20-10 png jpg pdf ai crd esp psd cdr dwg..."
   image: "/assets/images/background-ngay-phu-nu-viet-nam-2010-210.jpg"
   color: "#121826"
 cong-nghe:
   title: "Công Nghệ"
-  description: "Tải miễn phí file đồ hoạ vector ngành Công Nghệ png jpg pdf ai crd..."
+  description: "Tải miễn phí file đồ hoạ vector ngành Công Nghệ png jpg pdf ai crd esp psd cdr dwg..."
   image: "/assets/images/background-xanh-cong-nghe-211.jpg"
   color: "#121826"
 luyen-chu-dep:
   title: "Luyện Chữ Đẹp Cho Con"
-  description: "Tải miễn phí file đồ hoạ vector Luyện Chữ Đẹp Cho Con png jpg pdf ai crd..."
+  description: "Tải miễn phí file đồ hoạ vector Luyện Chữ Đẹp Cho Con png jpg pdf ai crd esp psd cdr dwg..."
   image: "/assets/images/74-trang-luyen-viet-chu-viet-cau-viet-tu-luyen-chu-dep-ke-o-li.jpg"
+  color: "#121826"
+# --- BỔ SUNG CÁC DANH MỤC MỚI ---
+
+kho-do-hoa-tet:
+  title: "KHO ĐỒ HỌA TẾT"
+  description: "Tải miễn phí file đồ hoạ vector KHO ĐỒ HỌA TẾT png jpg pdf ai crd esp psd cdr dwg..."
+  image: "/assets/images/affiliates.jpg"
+  color: "#121826"
+backdrop-phong-nen:
+  title: "Backdrop Phông Nền"
+  description: "Tải miễn phí file đồ hoạ vector Backdrop Phông Nền png jpg pdf ai crd esp psd cdr dwg..."
+  image: "/assets/images/affiliates.jpg"
+  color: "#121826"
+mau-li-xi:
+  title: "Mẫu Lì Xì"
+  description: "Tải miễn phí file đồ hoạ vector Mẫu Lì Xì png jpg pdf ai crd esp psd cdr dwg..."
+  image: "/assets/images/affiliates.jpg"
+  color: "#121826"
+mo-hinh-decor-khu-chup-anh-tet:
+  title: "Mô Hình Decor Khu Chụp Ảnh Tết"
+  description: "Tải miễn phí file đồ hoạ vector Mô Hình Decor Khu Chụp Ảnh Tết png jpg pdf ai crd esp psd cdr dwg..."
+  image: "/assets/images/affiliates.jpg"
+  color: "#121826"
+cong-tet:
+  title: "Cổng Tết"
+  description: "Tải miễn phí file đồ hoạ vector Cổng Tết png jpg pdf ai crd esp psd cdr dwg..."
+  image: "/assets/images/affiliates.jpg"
+  color: "#121826"
+bang-ron-co-phuon-co-dong:
+  title: "Băng Rôn, Cờ Phướn Cổ Động"
+  description: "Tải miễn phí file đồ hoạ vector Băng Rôn, Cờ Phướn Cổ Động png jpg pdf ai crd esp psd cdr dwg..."
+  image: "/assets/images/affiliates.jpg"
+  color: "#121826"
+bang-ron-mung-dang-mung-xuan:
+  title: "Băng Rôn Mừng Đảng Mừng Xuân"
+  description: "Tải miễn phí file đồ hoạ vector Băng Rôn Mừng Đảng Mừng Xuân png jpg pdf ai crd esp psd cdr dwg..."
+  image: "/assets/images/affiliates.jpg"
+  color: "#121826"
+bo-so:
+  title: "Bộ Số"
+  description: "Tải miễn phí file đồ hoạ vector Bộ Số png jpg pdf ai crd esp psd cdr dwg..."
+  image: "/assets/images/affiliates.jpg"
+  color: "#121826"
+lich-treo-tuong:
+  title: "Lịch Treo Tường"
+  description: "Tải miễn phí file đồ hoạ vector Lịch Treo Tường png jpg pdf ai crd esp psd cdr dwg..."
+  image: "/assets/images/affiliates.jpg"
+  color: "#121826"
+lich-de-ban:
+  title: "Lịch Để Bàn"
+  description: "Tải miễn phí file đồ hoạ vector Lịch Để Bàn png jpg pdf ai crd esp psd cdr dwg..."
+  image: "/assets/images/affiliates.jpg"
+  color: "#121826"
+bo-so-lich-am-duong:
+  title: "Bộ Số Lịch Âm Dương"
+  description: "Tải miễn phí file đồ hoạ vector Bộ Số Lịch Âm Dương png jpg pdf ai crd esp psd cdr dwg..."
+  image: "/assets/images/affiliates.jpg"
+  color: "#121826"
+linh-vat-rong:
+  title: "Linh Vật Rồng"
+  description: "Tải miễn phí file đồ hoạ vector Linh Vật Rồng png jpg pdf ai crd esp psd cdr dwg..."
+  image: "/assets/images/affiliates.jpg"
+  color: "#121826"
+decal-dan-cua-kinh:
+  title: "Decal Dán Cửa Kính"
+  description: "Tải miễn phí file đồ hoạ vector Decal Dán Cửa Kính png jpg pdf ai crd esp psd cdr dwg..."
+  image: "/assets/images/affiliates.jpg"
+  color: "#121826"
+phong-bi-tet:
+  title: "Phong Bì Tết"
+  description: "Tải miễn phí file đồ hoạ vector Phong Bì Tết png jpg pdf ai crd esp psd cdr dwg..."
+  image: "/assets/images/affiliates.jpg"
+  color: "#121826"
+thiep-chuc-mung-tet:
+  title: "Thiệp Chúc Mừng Tết"
+  description: "Tải miễn phí file đồ hoạ vector Thiệp Chúc Mừng Tết png jpg pdf ai crd esp psd cdr dwg..."
+  image: "/assets/images/affiliates.jpg"
+  color: "#121826"
+mung-tho:
+  title: "Mừng Thọ"
+  description: "Tải miễn phí file đồ hoạ vector Mừng Thọ png jpg pdf ai crd esp psd cdr dwg..."
+  image: "/assets/images/affiliates.jpg"
+  color: "#121826"
+hoa-tiet-tet-dan-gian:
+  title: "Họa Tiết Tết Dân Gian"
+  description: "Tải miễn phí file đồ hoạ vector Họa Tiết Tết Dân Gian png jpg pdf ai crd esp psd cdr dwg..."
+  image: "/assets/images/affiliates.jpg"
+  color: "#121826"
+tre-em-kim-dong-ngoc-nu:
+  title: "Trẻ Em Kim Đồng Ngọc Nữ"
+  description: "Tải miễn phí file đồ hoạ vector Trẻ Em Kim Đồng Ngọc Nữ png jpg pdf ai crd esp psd cdr dwg..."
+  image: "/assets/images/affiliates.jpg"
+  color: "#121826"
+hoa-dao:
+  title: "Hoa Đào"
+  description: "Tải miễn phí file đồ hoạ vector Hoa Đào png jpg pdf ai crd esp psd cdr dwg..."
+  image: "/assets/images/affiliates.jpg"
+  color: "#121826"
+hoa-mai:
+  title: "Hoa Mai"
+  description: "Tải miễn phí file đồ hoạ vector Hoa Mai png jpg pdf ai crd esp psd cdr dwg..."
+  image: "/assets/images/affiliates.jpg"
+  color: "#121826"
+khac-dua-hau-laze:
+  title: "Khắc Dưa Hấu - Laze"
+  description: "Tải miễn phí file đồ hoạ vector Khắc Dưa Hấu - Laze png jpg pdf ai crd esp psd cdr dwg..."
+  image: "/assets/images/affiliates.jpg"
+  color: "#121826"
+phao-hoa:
+  title: "Pháo Hoa"
+  description: "Tải miễn phí file đồ hoạ vector Pháo Hoa png jpg pdf ai crd esp psd cdr dwg..."
+  image: "/assets/images/affiliates.jpg"
+  color: "#121826"
+hoa-tiet-hoa-van-co:
+  title: "Họa Tiết Hoa Văn Cổ"
+  description: "Tải miễn phí file đồ hoạ vector Họa Tiết Hoa Văn Cổ png jpg pdf ai crd esp psd cdr dwg..."
+  image: "/assets/images/affiliates.jpg"
+  color: "#121826"
+hoa-tiet-bac-tien-vang:
+  title: "Họa Tiết - Bạc Tiền Vàng"
+  description: "Tải miễn phí file đồ hoạ vector Họa Tiết - Bạc Tiền Vàng png jpg pdf ai crd esp psd cdr dwg..."
+  image: "/assets/images/affiliates.jpg"
+  color: "#121826"
+cau-doi-tet:
+  title: "Câu Đối Tết"
+  description: "Tải miễn phí file đồ hoạ vector Câu Đối Tết png jpg pdf ai crd esp psd cdr dwg..."
+  image: "/assets/images/affiliates.jpg"
+  color: "#121826"
+tet-cong-giao:
+  title: "Tết Công Giáo"
+  description: "Tải miễn phí file đồ hoạ vector Tết Công Giáo png jpg pdf ai crd esp psd cdr dwg..."
+  image: "/assets/images/affiliates.jpg"
+  color: "#121826"
+giay-khen:
+  title: "Giấy Khen"
+  description: "Tải miễn phí file đồ hoạ vector Giấy Khen png jpg pdf ai crd esp psd cdr dwg..."
+  image: "/assets/images/affiliates.jpg"
+  color: "#121826"
+bo-chu-chuc-mung-nam-moi:
+  title: "Bộ Chữ Chúc Mừng Năm Mới"
+  description: "Tải miễn phí file đồ hoạ vector Bộ Chữ Chúc Mừng Năm Mới png jpg pdf ai crd esp psd cdr dwg..."
+  image: "/assets/images/affiliates.jpg"
+  color: "#121826"
+background-tet-tong-hop:
+  title: "Background Tết Tổng Hợp"
+  description: "Tải miễn phí file đồ hoạ vector Background Tết Tổng Hợp png jpg pdf ai crd esp psd cdr dwg..."
+  image: "/assets/images/affiliates.jpg"
+  color: "#121826"
+tieu-canh-tet:
+  title: "Tiểu Cảnh Tết"
+  description: "Tải miễn phí file đồ hoạ vector Tiểu Cảnh Tết png jpg pdf ai crd esp psd cdr dwg..."
+  image: "/assets/images/affiliates.jpg"
+  color: "#121826"
+kho-su-kien-ngay-le-trong-nam:
+  title: "KHO SỰ KIỆN NGÀY LỄ TRONG NĂM"
+  description: "Tải miễn phí file đồ hoạ vector KHO SỰ KIỆN NGÀY LỄ TRONG NĂM png jpg pdf ai crd esp psd cdr dwg..."
+  image: "/assets/images/affiliates.jpg"
+  color: "#121826"
+ngay-le-dang-nha-nuoc:
+  title: "NGÀY LỄ ĐẢNG - NHÀ NƯỚC"
+  description: "Tải miễn phí file đồ hoạ vector NGÀY LỄ ĐẢNG - NHÀ NƯỚC png jpg pdf ai crd esp psd cdr dwg..."
+  image: "/assets/images/affiliates.jpg"
+  color: "#121826"
+thanh-nien-26-3:
+  title: "Thanh Niên 26-3"
+  description: "Tải miễn phí file đồ hoạ vector Thanh Niên 26-3 png jpg pdf ai crd esp psd cdr dwg..."
+  image: "/assets/images/affiliates.jpg"
+  color: "#121826"
+giai-phong-mien-nam-30-04:
+  title: "Giải Phóng Miền Nam 30-04"
+  description: "Tải miễn phí file đồ hoạ vector Giải Phóng Miền Nam 30-04 png jpg pdf ai crd esp psd cdr dwg..."
+  image: "/assets/images/affiliates.jpg"
+  color: "#121826"
+gio-to-hung-vuong:
+  title: "Giổ Tổ Hùng Vương"
+  description: "Tải miễn phí file đồ hoạ vector Giổ Tổ Hùng Vương png jpg pdf ai crd esp psd cdr dwg..."
+  image: "/assets/images/affiliates.jpg"
+  color: "#121826"
+quoc-te-lao-dong-1-5:
+  title: "Quốc Tế Lao Động 1-5"
+  description: "Tải miễn phí file đồ hoạ vector Quốc Tế Lao Động 1-5 png jpg pdf ai crd esp psd cdr dwg..."
+  image: "/assets/images/affiliates.jpg"
+  color: "#121826"
+sinh-nhat-bac-ho-19-5:
+  title: "Sinh Nhật Bác Hồ 19-5"
+  description: "Tải miễn phí file đồ hoạ vector Sinh Nhật Bác Hồ 19-5 png jpg pdf ai crd esp psd cdr dwg..."
+  image: "/assets/images/affiliates.jpg"
+  color: "#121826"
+dai-doan-ket-18-11:
+  title: "Đại Đoàn Kết 18-11"
+  description: "Tải miễn phí file đồ hoạ vector Đại Đoàn Kết 18-11 png jpg pdf ai crd esp psd cdr dwg..."
+  image: "/assets/images/affiliates.jpg"
+  color: "#121826"
+cong-doan:
+  title: "Công Đoàn"
+  description: "Tải miễn phí file đồ hoạ vector Công Đoàn png jpg pdf ai crd esp psd cdr dwg..."
+  image: "/assets/images/affiliates.jpg"
+  color: "#121826"
+dai-hoi-dang:
+  title: "Đại Hội Đảng"
+  description: "Tải miễn phí file đồ hoạ vector Đại Hội Đảng png jpg pdf ai crd esp psd cdr dwg..."
+  image: "/assets/images/affiliates.jpg"
+  color: "#121826"
+bau-cu:
+  title: "Bầu Cử"
+  description: "Tải miễn phí file đồ hoạ vector Bầu Cử png jpg pdf ai crd esp psd cdr dwg..."
+  image: "/assets/images/affiliates.jpg"
+  color: "#121826"
+quoc-khanh-2-9-va-cach-mang-thang-8:
+  title: "Quốc Khánh 2-9 Và Cách Mạng Tháng 8"
+  description: "Tải miễn phí file đồ hoạ vector Quốc Khánh 2-9 Và Cách Mạng Tháng 8 png jpg pdf ai crd esp psd cdr dwg..."
+  image: "/assets/images/affiliates.jpg"
+  color: "#121826"
+nong-thon-moi:
+  title: "Nông Thôn Mới"
+  description: "Tải miễn phí file đồ hoạ vector Nông Thôn Mới png jpg pdf ai crd esp psd cdr dwg..."
+  image: "/assets/images/affiliates.jpg"
+  color: "#121826"
+co-dong-bien-dao:
+  title: "Cổ Động Biển Đảo"
+  description: "Tải miễn phí file đồ hoạ vector Cổ Động Biển Đảo png jpg pdf ai crd esp psd cdr dwg..."
+  image: "/assets/images/affiliates.jpg"
+  color: "#121826"
+quan-doi-22-12:
+  title: "Quân Đội 22-12"
+  description: "Tải miễn phí file đồ hoạ vector Quân Đội 22-12 png jpg pdf ai crd esp psd cdr dwg..."
+  image: "/assets/images/affiliates.jpg"
+  color: "#121826"
+thuong-binh-liet-si-27-7:
+  title: "Thương Binh Liệt Sĩ 27-7"
+  description: "Tải miễn phí file đồ hoạ vector Thương Binh Liệt Sĩ 27-7 png jpg pdf ai crd esp psd cdr dwg..."
+  image: "/assets/images/affiliates.jpg"
+  color: "#121826"
+thanh-lap-dang-3-2:
+  title: "Thành Lập Đảng 3-2"
+  description: "Tải miễn phí file đồ hoạ vector Thành Lập Đảng 3-2 png jpg pdf ai crd esp psd cdr dwg..."
+  image: "/assets/images/affiliates.jpg"
+  color: "#121826"
+ngay-truyen-thong-nganh-thong-tin-28-8:
+  title: "Ngày Truyền Thống Ngành Thông Tin 28-8"
+  description: "Tải miễn phí file đồ hoạ vector Ngày Truyền Thống Ngành Thông Tin 28-8 png jpg pdf ai crd esp psd cdr dwg..."
+  image: "/assets/images/affiliates.jpg"
+  color: "#121826"
+gia-dinh-xa-hoi:
+  title: "GIA ĐÌNH XÃ HỘI"
+  description: "Tải miễn phí file đồ hoạ vector GIA ĐÌNH XÃ HỘI png jpg pdf ai crd esp psd cdr dwg..."
+  image: "/assets/images/affiliates.jpg"
+  color: "#121826"
+tet-nam-moi:
+  title: "Tết Năm Mới"
+  description: "Tải miễn phí file đồ hoạ vector Tết Năm Mới png jpg pdf ai crd esp psd cdr dwg..."
+  image: "/assets/images/affiliates.jpg"
+  color: "#121826"
+valentine-14-2:
+  title: "Valentine 14-2"
+  description: "Tải miễn phí file đồ hoạ vector Valentine 14-2 png jpg pdf ai crd esp psd cdr dwg..."
+  image: "/assets/images/affiliates.jpg"
+  color: "#121826"
+ngay-gia-dinh-viet-nam-28-6:
+  title: "Ngày Gia Đình Việt Nam 28-6"
+  description: "Tải miễn phí file đồ hoạ vector Ngày Gia Đình Việt Nam 28-6 png jpg pdf ai crd esp psd cdr dwg..."
+  image: "/assets/images/affiliates.jpg"
+  color: "#121826"
+ngay-cua-me-12-5:
+  title: "Ngày Của Mẹ 12-5"
+  description: "Tải miễn phí file đồ hoạ vector Ngày Của Mẹ 12-5 png jpg pdf ai crd esp psd cdr dwg..."
+  image: "/assets/images/affiliates.jpg"
+  color: "#121826"
+vu-lan-bao-hieu-15-07-am-lich:
+  title: "Vu Lan Báo Hiếu 15-07 ( Âm Lịch )"
+  description: "Tải miễn phí file đồ hoạ vector Vu Lan Báo Hiếu 15-07 ( Âm Lịch ) png jpg pdf ai crd esp psd cdr dwg..."
+  image: "/assets/images/affiliates.jpg"
+  color: "#121826"
+phu-nu-8-3-va-20-10:
+  title: "Phụ Nữ 8-3 Và 20-10"
+  description: "Tải miễn phí file đồ hoạ vector Phụ Nữ 8-3 Và 20-10 png jpg pdf ai crd esp psd cdr dwg..."
+  image: "/assets/images/affiliates.jpg"
+  color: "#121826"
+quoc-te-dan-ong-19-11:
+  title: "Quốc Tế Đàn Ông 19-11"
+  description: "Tải miễn phí file đồ hoạ vector Quốc Tế Đàn Ông 19-11 png jpg pdf ai crd esp psd cdr dwg..."
+  image: "/assets/images/affiliates.jpg"
+  color: "#121826"
+quoc-te-thieu-nhi-01-06:
+  title: "Quốc Tế Thiếu Nhi 01-06"
+  description: "Tải miễn phí file đồ hoạ vector Quốc Tế Thiếu Nhi 01-06 png jpg pdf ai crd esp psd cdr dwg..."
+  image: "/assets/images/affiliates.jpg"
+  color: "#121826"
+trung-thu-15-08-am-lich:
+  title: "Trung Thu 15-08 ( Âm Lịch )"
+  description: "Tải miễn phí file đồ hoạ vector Trung Thu 15-08 ( Âm Lịch ) png jpg pdf ai crd esp psd cdr dwg..."
+  image: "/assets/images/affiliates.jpg"
+  color: "#121826"
+ngay-thay-thuoc-27-2:
+  title: "Ngày Thầy Thuốc 27-2"
+  description: "Tải miễn phí file đồ hoạ vector Ngày Thầy Thuốc 27-2 png jpg pdf ai crd esp psd cdr dwg..."
+  image: "/assets/images/affiliates.jpg"
+  color: "#121826"
+sinh-nhat-thoi-noi:
+  title: "Sinh Nhật Thôi Nôi"
+  description: "Tải miễn phí file đồ hoạ vector Sinh Nhật Thôi Nôi png jpg pdf ai crd esp psd cdr dwg..."
+  image: "/assets/images/affiliates.jpg"
+  color: "#121826"
+the-duc-the-thao:
+  title: "Thể Dục Thể Thao"
+  description: "Tải miễn phí file đồ hoạ vector Thể Dục Thể Thao png jpg pdf ai crd esp psd cdr dwg..."
+  image: "/assets/images/affiliates.jpg"
+  color: "#121826"
+ngay-phong-chong-thuoc-la-31-05:
+  title: "Ngày Phòng Chống Thuốc Lá 31-05"
+  description: "Tải miễn phí file đồ hoạ vector Ngày Phòng Chống Thuốc Lá 31-05 png jpg pdf ai crd esp psd cdr dwg..."
+  image: "/assets/images/affiliates.jpg"
+  color: "#121826"
+ngay-phong-chong-ma-tuy-26-06:
+  title: "Ngày Phòng Chống Ma Túy 26-06"
+  description: "Tải miễn phí file đồ hoạ vector Ngày Phòng Chống Ma Túy 26-06 png jpg pdf ai crd esp psd cdr dwg..."
+  image: "/assets/images/affiliates.jpg"
+  color: "#121826"
+ngay-bao-chi-21-06:
+  title: "Ngày Báo Chí 21-06"
+  description: "Tải miễn phí file đồ hoạ vector Ngày Báo Chí 21-06 png jpg pdf ai crd esp psd cdr dwg..."
+  image: "/assets/images/affiliates.jpg"
+  color: "#121826"
+giai-tri-ca-nhac:
+  title: "Giải Trí Ca Nhạc"
+  description: "Tải miễn phí file đồ hoạ vector Giải Trí Ca Nhạc png jpg pdf ai crd esp psd cdr dwg..."
+  image: "/assets/images/affiliates.jpg"
+  color: "#121826"
+hoi-trai:
+  title: "Hội Trại"
+  description: "Tải miễn phí file đồ hoạ vector Hội Trại png jpg pdf ai crd esp psd cdr dwg..."
+  image: "/assets/images/affiliates.jpg"
+  color: "#121826"
+hoi-thi-hoi-dien-van-nghe:
+  title: "Hội Thi - Hội Diễn Văn Nghệ"
+  description: "Tải miễn phí file đồ hoạ vector Hội Thi - Hội Diễn Văn Nghệ png jpg pdf ai crd esp psd cdr dwg..."
+  image: "/assets/images/affiliates.jpg"
+  color: "#121826"
+dam-cuoi:
+  title: "Đám Cưới"
+  description: "Tải miễn phí file đồ hoạ vector Đám Cưới png jpg pdf ai crd esp psd cdr dwg..."
+  image: "/assets/images/affiliates.jpg"
+  color: "#121826"
+tan-gia-khanh-thanh-nha:
+  title: "Tân Gia Khánh Thành Nhà"
+  description: "Tải miễn phí file đồ hoạ vector Tân Gia Khánh Thành Nhà png jpg pdf ai crd esp psd cdr dwg..."
+  image: "/assets/images/affiliates.jpg"
+  color: "#121826"
+halloween-31-10:
+  title: "Halloween 31-10"
+  description: "Tải miễn phí file đồ hoạ vector Halloween 31-10 png jpg pdf ai crd esp psd cdr dwg..."
+  image: "/assets/images/affiliates.jpg"
+  color: "#121826"
+le-phat-dan-15-04-am-lich:
+  title: "Lễ Phật Đản 15-04 ( Âm Lịch )"
+  description: "Tải miễn phí file đồ hoạ vector Lễ Phật Đản 15-04 ( Âm Lịch ) png jpg pdf ai crd esp psd cdr dwg..."
+  image: "/assets/images/affiliates.jpg"
+  color: "#121826"
+noel-25-12:
+  title: "Noel 25-12"
+  description: "Tải miễn phí file đồ hoạ vector Noel 25-12 png jpg pdf ai crd esp psd cdr dwg..."
+  image: "/assets/images/affiliates.jpg"
+  color: "#121826"
+truong-hoc:
+  title: "TRƯỜNG HỌC"
+  description: "Tải miễn phí file đồ hoạ vector TRƯỜNG HỌC png jpg pdf ai crd esp psd cdr dwg..."
+  image: "/assets/images/affiliates.jpg"
+  color: "#121826"
+tong-hop-truong-hoc:
+  title: "Tổng Hợp trường Học"
+  description: "Tải miễn phí file đồ hoạ vector Tổng Hợp trường Học png jpg pdf ai crd esp psd cdr dwg..."
+  image: "/assets/images/affiliates.jpg"
+  color: "#121826"
+hop-lop-hoi-khoa:
+  title: "Họp Lớp Hội Khóa"
+  description: "Tải miễn phí file đồ hoạ vector Họp Lớp Hội Khóa png jpg pdf ai crd esp psd cdr dwg..."
+  image: "/assets/images/affiliates.jpg"
+  color: "#121826"
+khai-giang-nam-hoc:
+  title: "Khai Giảng Năm Học"
+  description: "Tải miễn phí file đồ hoạ vector Khai Giảng Năm Học png jpg pdf ai crd esp psd cdr dwg..."
+  image: "/assets/images/affiliates.jpg"
+  color: "#121826"
+tong-ket-nam-hoc:
+  title: "Tổng Kết Năm Học"
+  description: "Tải miễn phí file đồ hoạ vector Tổng Kết Năm Học png jpg pdf ai crd esp psd cdr dwg..."
+  image: "/assets/images/affiliates.jpg"
+  color: "#121826"
+ngay-nha-giao-viet-nam-20-11:
+  title: "Ngày Nhà Giáo Việt Nam 20-11"
+  description: "Tải miễn phí file đồ hoạ vector Ngày Nhà Giáo Việt Nam 20-11 png jpg pdf ai crd esp psd cdr dwg..."
+  image: "/assets/images/affiliates.jpg"
+  color: "#121826"
+cong-ty-doanh-nghiep:
+  title: "CÔNG TY - DOANH NGHIỆP"
+  description: "Tải miễn phí file đồ hoạ vector CÔNG TY - DOANH NGHIỆP png jpg pdf ai crd esp psd cdr dwg..."
+  image: "/assets/images/affiliates.jpg"
+  color: "#121826"
+gala-dinner-teambulding:
+  title: "Gala Dinner Teambulding"
+  description: "Tải miễn phí file đồ hoạ vector Gala Dinner Teambulding png jpg pdf ai crd esp psd cdr dwg..."
+  image: "/assets/images/affiliates.jpg"
+  color: "#121826"
+khai-truong-thanh-lap-cong-ty:
+  title: "Khai Trương Thành Lập Công Ty"
+  description: "Tải miễn phí file đồ hoạ vector Khai Trương Thành Lập Công Ty png jpg pdf ai crd esp psd cdr dwg..."
+  image: "/assets/images/affiliates.jpg"
+  color: "#121826"
+hoi-nghi-tri-an-khach-hang:
+  title: "Hội Nghị Tri Ân Khách Hàng"
+  description: "Tải miễn phí file đồ hoạ vector Hội Nghị Tri Ân Khách Hàng png jpg pdf ai crd esp psd cdr dwg..."
+  image: "/assets/images/affiliates.jpg"
+  color: "#121826"
+an-toan-lao-dong:
+  title: "An Toàn Lao Động"
+  description: "Tải miễn phí file đồ hoạ vector An Toàn Lao Động png jpg pdf ai crd esp psd cdr dwg..."
+  image: "/assets/images/affiliates.jpg"
+  color: "#121826"
+phong-chay-chua-chay:
+  title: "Phòng Cháy Chữa Cháy"
+  description: "Tải miễn phí file đồ hoạ vector Phòng Cháy Chữa Cháy png jpg pdf ai crd esp psd cdr dwg..."
+  image: "/assets/images/affiliates.jpg"
+  color: "#121826"
+black-friday:
+  title: "Black Friday"
+  description: "Tải miễn phí file đồ hoạ vector Black Friday png jpg pdf ai crd esp psd cdr dwg..."
+  image: "/assets/images/affiliates.jpg"
+  color: "#121826"
+hoa-qua-tang:
+  title: "Hoa Quà Tặng"
+  description: "Tải miễn phí file đồ hoạ vector Hoa Quà Tặng png jpg pdf ai crd esp psd cdr dwg..."
+  image: "/assets/images/affiliates.jpg"
+  color: "#121826"
+bo-so-ky-niem:
+  title: "Bộ Số Kỷ Niệm"
+  description: "Tải miễn phí file đồ hoạ vector Bộ Số Kỷ Niệm png jpg pdf ai crd esp psd cdr dwg..."
+  image: "/assets/images/affiliates.jpg"
+  color: "#121826"
+background-tong-hop:
+  title: "Background Tổng Hợp"
+  description: "Tải miễn phí file đồ hoạ vector Background Tổng Hợp png jpg pdf ai crd esp psd cdr dwg..."
+  image: "/assets/images/affiliates.jpg"
+  color: "#121826"
+kho-bien-bang-quang-cao:
+  title: "KHO BIỂN BẢNG QUẢNG CÁO"
+  description: "Tải miễn phí file đồ hoạ vector KHO BIỂN BẢNG QUẢNG CÁO png jpg pdf ai crd esp psd cdr dwg..."
+  image: "/assets/images/affiliates.jpg"
+  color: "#121826"
+bien-bang-thoi-trang:
+  title: "Biển Bảng Thời Trang"
+  description: "Tải miễn phí file đồ hoạ vector Biển Bảng Thời Trang png jpg pdf ai crd esp psd cdr dwg..."
+  image: "/assets/images/affiliates.jpg"
+  color: "#121826"
+bien-bang-studio-cuoi-hoi:
+  title: "Biển Bảng Studio - Cưới Hỏi"
+  description: "Tải miễn phí file đồ hoạ vector Biển Bảng Studio - Cưới Hỏi png jpg pdf ai crd esp psd cdr dwg..."
+  image: "/assets/images/affiliates.jpg"
+  color: "#121826"
+bien-bang-spa-tham-my-nail:
+  title: "Biển Bảng Spa - Thẩm Mỹ - Nail"
+  description: "Tải miễn phí file đồ hoạ vector Biển Bảng Spa - Thẩm Mỹ - Nail png jpg pdf ai crd esp psd cdr dwg..."
+  image: "/assets/images/affiliates.jpg"
+  color: "#121826"
+bien-bang-dich-vu-rua-xe:
+  title: "Biển Bảng Dịch Vụ Rửa Xe"
+  description: "Tải miễn phí file đồ hoạ vector Biển Bảng Dịch Vụ Rửa Xe png jpg pdf ai crd esp psd cdr dwg..."
+  image: "/assets/images/affiliates.jpg"
+  color: "#121826"
+bien-bang-nha-khoa-mat-nha-thuoc:
+  title: "Biển Bảng Nha Khoa - Mắt - Nhà Thuốc"
+  description: "Tải miễn phí file đồ hoạ vector Biển Bảng Nha Khoa - Mắt - Nhà Thuốc png jpg pdf ai crd esp psd cdr dwg..."
+  image: "/assets/images/affiliates.jpg"
+  color: "#121826"
+bien-bang-nha-hang-quan-an-quan-nhau:
+  title: "Biển Bảng Nhà Hàng - Quán Ăn - Quán Nhậu"
+  description: "Tải miễn phí file đồ hoạ vector Biển Bảng Nhà Hàng - Quán Ăn - Quán Nhậu png jpg pdf ai crd esp psd cdr dwg..."
+  image: "/assets/images/affiliates.jpg"
+  color: "#121826"
+bien-bang-do-uong-giai-khat:
+  title: "Biển Bảng Đồ Uống Giải Khát"
+  description: "Tải miễn phí file đồ hoạ vector Biển Bảng Đồ Uống Giải Khát png jpg pdf ai crd esp psd cdr dwg..."
+  image: "/assets/images/affiliates.jpg"
+  color: "#121826"
+bien-bang-dien-may-tap-hoa-cua-hang:
+  title: "Biển Bảng Điện Máy - Tạp Hóa - Cửa Hàng"
+  description: "Tải miễn phí file đồ hoạ vector Biển Bảng Điện Máy - Tạp Hóa - Cửa Hàng png jpg pdf ai crd esp psd cdr dwg..."
+  image: "/assets/images/affiliates.jpg"
+  color: "#121826"
+bien-bang-dich-vu-sua-chua:
+  title: "Biển Bảng Dịch Vụ Sửa Chữa"
+  description: "Tải miễn phí file đồ hoạ vector Biển Bảng Dịch Vụ Sửa Chữa png jpg pdf ai crd esp psd cdr dwg..."
+  image: "/assets/images/affiliates.jpg"
+  color: "#121826"
+bien-bang-cat-toc:
+  title: "Biển Bảng Cắt Tóc"
+  description: "Tải miễn phí file đồ hoạ vector Biển Bảng Cắt Tóc png jpg pdf ai crd esp psd cdr dwg..."
+  image: "/assets/images/affiliates.jpg"
+  color: "#121826"
+bien-bang-cam-do-thue-xe:
+  title: "Biển Bảng - Cầm Đồ - Thuê Xe"
+  description: "Tải miễn phí file đồ hoạ vector Biển Bảng - Cầm Đồ - Thuê Xe png jpg pdf ai crd esp psd cdr dwg..."
+  image: "/assets/images/affiliates.jpg"
+  color: "#121826"
+bien-bang-linh-vuc-khac:
+  title: "Biển Bảng Lĩnh Vực Khác"
+  description: "Tải miễn phí file đồ hoạ vector Biển Bảng Lĩnh Vực Khác png jpg pdf ai crd esp psd cdr dwg..."
+  image: "/assets/images/affiliates.jpg"
+  color: "#121826"
+kho-tranh-tuong:
+  title: "KHO TRANH TƯỜNG"
+  description: "Tải miễn phí file đồ hoạ vector KHO TRANH TƯỜNG png jpg pdf ai crd esp psd cdr dwg..."
+  image: "/assets/images/affiliates.jpg"
+  color: "#121826"
+tong-hop-tranh-tuong:
+  title: "Tổng Hợp Tranh Tường"
+  description: "Tải miễn phí file đồ hoạ vector Tổng Hợp Tranh Tường png jpg pdf ai crd esp psd cdr dwg..."
+  image: "/assets/images/affiliates.jpg"
+  color: "#121826"
+tranh-thac-nuoc:
+  title: "Tranh Thác Nước"
+  description: "Tải miễn phí file đồ hoạ vector Tranh Thác Nước png jpg pdf ai crd esp psd cdr dwg..."
+  image: "/assets/images/affiliates.jpg"
+  color: "#121826"
+tranh-quan-ca-phe:
+  title: "Tranh Quán Cà phê"
+  description: "Tải miễn phí file đồ hoạ vector Tranh Quán Cà phê png jpg pdf ai crd esp psd cdr dwg..."
+  image: "/assets/images/affiliates.jpg"
+  color: "#121826"
+tranh-phong-canh:
+  title: "Tranh Phong Cảnh"
+  description: "Tải miễn phí file đồ hoạ vector Tranh Phong Cảnh png jpg pdf ai crd esp psd cdr dwg..."
+  image: "/assets/images/affiliates.jpg"
+  color: "#121826"
+tranh-phat-giao:
+  title: "Tranh Phật Giáo"
+  description: "Tải miễn phí file đồ hoạ vector Tranh Phật Giáo png jpg pdf ai crd esp psd cdr dwg..."
+  image: "/assets/images/affiliates.jpg"
+  color: "#121826"
+tranh-nha-hang:
+  title: "Tranh Nhà Hàng"
+  description: "Tải miễn phí file đồ hoạ vector Tranh Nhà Hàng png jpg pdf ai crd esp psd cdr dwg..."
+  image: "/assets/images/affiliates.jpg"
+  color: "#121826"
+tranh-hoa-3d:
+  title: "Tranh Hoa 3D"
+  description: "Tải miễn phí file đồ hoạ vector Tranh Hoa 3D png jpg pdf ai crd esp psd cdr dwg..."
+  image: "/assets/images/affiliates.jpg"
+  color: "#121826"
+tranh-dong-vat:
+  title: "Tranh Động Vật"
+  description: "Tải miễn phí file đồ hoạ vector Tranh Động Vật png jpg pdf ai crd esp psd cdr dwg..."
+  image: "/assets/images/affiliates.jpg"
+  color: "#121826"
+tranh-dong-que:
+  title: "Tranh Đồng Quê"
+  description: "Tải miễn phí file đồ hoạ vector Tranh Đồng Quê png jpg pdf ai crd esp psd cdr dwg..."
+  image: "/assets/images/affiliates.jpg"
+  color: "#121826"
+tranh-dong-luc:
+  title: "Tranh Động Lực"
+  description: "Tải miễn phí file đồ hoạ vector Tranh Động Lực png jpg pdf ai crd esp psd cdr dwg..."
+  image: "/assets/images/affiliates.jpg"
+  color: "#121826"
+tranh-cong-giao:
+  title: "Tranh Công Giáo"
+  description: "Tải miễn phí file đồ hoạ vector Tranh Công Giáo png jpg pdf ai crd esp psd cdr dwg..."
+  image: "/assets/images/affiliates.jpg"
+  color: "#121826"
+tranh-3d-tong-hop:
+  title: "Tranh 3D Tổng Hợp"
+  description: "Tải miễn phí file đồ hoạ vector Tranh 3D Tổng Hợp png jpg pdf ai crd esp psd cdr dwg..."
+  image: "/assets/images/affiliates.jpg"
+  color: "#121826"
+tranh-3d-gia-ngoc:
+  title: "Tranh 3D Giả Ngọc"
+  description: "Tải miễn phí file đồ hoạ vector Tranh 3D Giả Ngọc png jpg pdf ai crd esp psd cdr dwg..."
+  image: "/assets/images/affiliates.jpg"
+  color: "#121826"
+tranh-tra-chanh-tra-sua:
+  title: "Tranh Trà Chanh - Trà Sữa"
+  description: "Tải miễn phí file đồ hoạ vector Tranh Trà Chanh - Trà Sữa png jpg pdf ai crd esp psd cdr dwg..."
+  image: "/assets/images/affiliates.jpg"
+  color: "#121826"
+tranh-phong-ngu-tre-em:
+  title: "Tranh Phòng Ngủ Trẻ Em"
+  description: "Tải miễn phí file đồ hoạ vector Tranh Phòng Ngủ Trẻ Em png jpg pdf ai crd esp psd cdr dwg..."
+  image: "/assets/images/affiliates.jpg"
+  color: "#121826"
+tranh-phong-khach-nha-bep:
+  title: "Tranh Phòng Khách - Nhà Bếp"
+  description: "Tải miễn phí file đồ hoạ vector Tranh Phòng Khách - Nhà Bếp png jpg pdf ai crd esp psd cdr dwg..."
+  image: "/assets/images/affiliates.jpg"
+  color: "#121826"
+tranh-gia-cam:
+  title: "Tranh Gia Cầm"
+  description: "Tải miễn phí file đồ hoạ vector Tranh Gia Cầm png jpg pdf ai crd esp psd cdr dwg..."
+  image: "/assets/images/affiliates.jpg"
+  color: "#121826"
+nganh-nghe-linh-vuc-khac:
+  title: "NGÀNH NGHỀ - LĨNH VỰC KHÁC"
+  description: "Tải miễn phí file đồ hoạ vector NGÀNH NGHỀ - LĨNH VỰC KHÁC png jpg pdf ai crd esp psd cdr dwg..."
+  image: "/assets/images/affiliates.jpg"
+  color: "#121826"
+mam-non:
+  title: "Mầm Non"
+  description: "Tải miễn phí file đồ hoạ vector Mầm Non png jpg pdf ai crd esp psd cdr dwg..."
+  image: "/assets/images/affiliates.jpg"
+  color: "#121826"
+tong-hop:
+  title: "Tổng Hợp"
+  description: "Tải miễn phí file đồ hoạ vector Tổng Hợp png jpg pdf ai crd esp psd cdr dwg..."
+  image: "/assets/images/affiliates.jpg"
+  color: "#121826"
+the-thao-giai-tri:
+  title: "Thể Thao - Giải Trí"
+  description: "Tải miễn phí file đồ hoạ vector Thể Thao - Giải Trí png jpg pdf ai crd esp psd cdr dwg..."
+  image: "/assets/images/affiliates.jpg"
+  color: "#121826"
+spa-lam-dep-thoi-trang:
+  title: "Spa - Làm Đẹp - Thời Trang"
+  description: "Tải miễn phí file đồ hoạ vector Spa - Làm Đẹp - Thời Trang png jpg pdf ai crd esp psd cdr dwg..."
+  image: "/assets/images/affiliates.jpg"
+  color: "#121826"
+nha-hang:
+  title: "Nhà Hàng"
+  description: "Tải miễn phí file đồ hoạ vector Nhà Hàng png jpg pdf ai crd esp psd cdr dwg..."
+  image: "/assets/images/affiliates.jpg"
+  color: "#121826"
+nganh-in:
+  title: "Ngành In"
+  description: "Tải miễn phí file đồ hoạ vector Ngành In png jpg pdf ai crd esp psd cdr dwg..."
+  image: "/assets/images/affiliates.jpg"
+  color: "#121826"
+du-lich:
+  title: "Du Lịch"
+  description: "Tải miễn phí file đồ hoạ vector Du Lịch png jpg pdf ai crd esp psd cdr dwg..."
+  image: "/assets/images/affiliates.jpg"
+  color: "#121826"
+catalog-brochure:
+  title: "Catalog - Brochure"
+  description: "Tải miễn phí file đồ hoạ vector Catalog - Brochure png jpg pdf ai crd esp psd cdr dwg..."
+  image: "/assets/images/affiliates.jpg"
+  color: "#121826"
+bida:
+  title: "BiDa"
+  description: "Tải miễn phí file đồ hoạ vector BiDa png jpg pdf ai crd esp psd cdr dwg..."
+  image: "/assets/images/affiliates.jpg"
+  color: "#121826"
+bat-dong-san-xay-dung-kien-truc-noi-that:
+  title: "Bất Động Sản - Xây Dựng - Kiến Trúc - Nội Thất"
+  description: "Tải miễn phí file đồ hoạ vector Bất Động Sản - Xây Dựng - Kiến Trúc - Nội Thất png jpg pdf ai crd esp psd cdr dwg..."
+  image: "/assets/images/affiliates.jpg"
+  color: "#121826"
+hastag-cam-tay:
+  title: "Hastag Cầm Tay"
+  description: "Tải miễn phí file đồ hoạ vector Hastag Cầm Tay png jpg pdf ai crd esp psd cdr dwg..."
+  image: "/assets/images/affiliates.jpg"
+  color: "#121826"
+giay-moi:
+  title: "Giấy Mời"
+  description: "Tải miễn phí file đồ hoạ vector Giấy Mời png jpg pdf ai crd esp psd cdr dwg..."
+  image: "/assets/images/affiliates.jpg"
+  color: "#121826"
+menu-do-uong:
+  title: "Menu Đồ Uống"
+  description: "Tải miễn phí file đồ hoạ vector Menu Đồ Uống png jpg pdf ai crd esp psd cdr dwg..."
+  image: "/assets/images/affiliates.jpg"
+  color: "#121826"
+menu-do-an:
+  title: "Menu Đồ Ăn"
+  description: "Tải miễn phí file đồ hoạ vector Menu Đồ Ăn png jpg pdf ai crd esp psd cdr dwg..."
+  image: "/assets/images/affiliates.jpg"
+  color: "#121826"
+mockup:
+  title: "MocKup"
+  description: "Tải miễn phí file đồ hoạ vector MocKup png jpg pdf ai crd esp psd cdr dwg..."
+  image: "/assets/images/affiliates.jpg"
+  color: "#121826"
+tem-nhan-phong-bi:
+  title: "Tem Nhãn - Phong Bì"
+  description: "Tải miễn phí file đồ hoạ vector Tem Nhãn - Phong Bì png jpg pdf ai crd esp psd cdr dwg..."
+  image: "/assets/images/affiliates.jpg"
+  color: "#121826"
+hoa-van-cat-cnc:
+  title: "Hoa Văn Cắt CNC"
+  description: "Tải miễn phí file đồ hoạ vector Hoa Văn Cắt CNC png jpg pdf ai crd esp psd cdr dwg..."
+  image: "/assets/images/affiliates.jpg"
+  color: "#121826"
+hieu-ung-chu-brush:
+  title: "Hiệu ứng chữ - Brush"
+  description: "Tải miễn phí file đồ hoạ vector Hiệu ứng chữ - Brush png jpg pdf ai crd esp psd cdr dwg..."
+  image: "/assets/images/affiliates.jpg"
   color: "#121826"
