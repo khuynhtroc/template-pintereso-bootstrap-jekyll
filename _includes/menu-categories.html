@@ -9,14 +9,25 @@
     {% assign categories_list = site.categories %}
       {% if categories_list.first[0] == null %}
         {% for category in categories_list %}
-          <li class="nav-item"><a class="nav-link" href="{{site.baseurl}}/category/{{ category | downcase }}">{{ category }} ({{ site.tags[category].size }})</a></li>
+          {% assign cat_data = site.data.categories | where: "slug", category | first %}
+          <li class="nav-item">
+            <a class="nav-link" href="{{site.baseurl}}/category/{{ category | downcase }}">
+              {{ cat_data.name | default: category }} ({{ site.tags[category].size }})
+            </a>
+          </li>
         {% endfor %}
       {% else %}
         {% for category in categories_list %}
-          <li class="nav-item"><a class="nav-link" href="{{site.baseurl}}/category/{{ category[0] | downcase }}">{{ category[0] }} ({{ category[1].size }})</a></li>
+          {% assign cat_slug = category[0] %}
+          {% assign cat_data = site.data.categories | where: "slug", cat_slug | first %}
+          <li class="nav-item">
+            <a class="nav-link" href="{{site.baseurl}}/category/{{ cat_slug | downcase }}">
+              {{ cat_data.name | default: cat_slug }} ({{ category[1].size }})
+            </a>
+          </li>
         {% endfor %}
       {% endif %}
     {% assign categories_list = nil %}
-    </ul>    
+    </ul>   
     </div>
 </nav>
