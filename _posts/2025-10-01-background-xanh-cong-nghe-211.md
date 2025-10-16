@@ -7,7 +7,7 @@ visit: "#"
 date: 2025-10-01 00:00:00 +0700
 download_url: "https://terabox.com/s/1eHgvZcJQDoDDrUci0yNhUw"
 sku: "TR 211"
-price: "39000"
+price: "0"
 redirect_from: "/redirects/background-xanh-cong-nghe-211"
 ---
 Background Xanh Công Nghệ
