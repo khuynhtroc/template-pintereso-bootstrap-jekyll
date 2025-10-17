@@ -1,192 +1,191 @@
 document.addEventListener('DOMContentLoaded', async () => {
-    // --- LẤY CÁC PHẦN TỬ DOM ---
-    const orderSummaryContainer = document.getElementById('order-summary-container');
+    // --- GIỮ NGUYÊN PHẦN LẤY DOM CỦA BẠN VÀ BỔ SUNG THÊM ---
+    const orderSummary = document.getElementById('order-summary');
     const userLoggedInDiv = document.getElementById('user-logged-in');
     const userLoggedOutDiv = document.getElementById('user-logged-out');
-    const userEmailDisplay = document.getElementById('user-email-display');
+    const userEmailSpan = document.getElementById('user-email');
     const checkoutForm = document.getElementById('checkout-form');
-    const placeOrderBtn = document.getElementById('place-order-btn');
-    const loginLink = document.getElementById('checkout-login-link');
-    const logoutButton = document.getElementById('logout-button');
-    const voucherInput = document.getElementById('voucher-code');
+    const placeOrderBtnLoggedOut = document.getElementById('place-order-btn');
+    const loginLink = document.getElementById('checkout-login-link'); 
+    const loggedInActions = document.getElementById('logged-in-checkout-action');
+    const placeOrderBtnLoggedIn = document.getElementById('place-order-btn-loggedin');
+
+    // --- CÁC BIẾN MỚI ---
+    const voucherInput = document.getElementById('voucher-code-input');
     const applyVoucherBtn = document.getElementById('apply-voucher-btn');
     const voucherMessage = document.getElementById('voucher-message');
-    const paymentMethodsContainer = document.getElementById('payment-methods-container');
-    const paymentDetails = document.getElementById('payment-details');
-
+    const paymentMethodsWrapper = document.getElementById('payment-methods-wrapper');
+    const paymentRadioButtons = document.querySelectorAll('input[name="paymentMethod"]');
     const supabase = window.supabaseClient;
 
-    // --- STATE QUẢN LÝ TRẠNG THÁI THANH TOÁN ---
-    let checkoutItem = null;
+    // --- BIẾN STATE ĐỂ QUẢN LÝ ĐƠN HÀNG ---
     let originalPrice = 0;
     let finalPrice = 0;
     let discountAmount = 0;
-    let appliedVoucher = null;
+    let appliedVoucherCode = null;
+    let item = null;
 
-    // --- HÀM CẬP NHẬT GIAO DIỆN ---
-    const updateUI = () => {
-        if (!checkoutItem) {
-            orderSummaryContainer.innerHTML = '<p class="text-danger">Không có sản phẩm nào trong giỏ.</p>';
-            placeOrderBtn.disabled = true;
-            return;
-        }
+    // --- HÀM CẬP NHẬT GIAO DIỆN (MỚI) ---
+    const updateDisplay = () => {
+        if (!item) return;
 
         // Cập nhật tóm tắt đơn hàng
-        orderSummaryContainer.innerHTML = `
+        orderSummary.innerHTML = `
             <ul class="list-group mb-3">
                 <li class="list-group-item d-flex justify-content-between lh-sm">
-                    <div>
-                        <h6 class="my-0">Sản phẩm</h6>
-                        <small class="text-muted">${checkoutItem.name}</small>
-                    </div>
+                    <div><h6 class="my-0">Sản phẩm</h6><small class="text-muted">${item.name}</small></div>
                     <span class="text-muted">${originalPrice.toLocaleString('vi-VN')}đ</span>
                 </li>
                 ${discountAmount > 0 ? `
                 <li class="list-group-item d-flex justify-content-between bg-light">
-                    <div class="text-success">
-                        <h6 class="my-0">Mã giảm giá</h6>
-                        <small>${appliedVoucher.toUpperCase()}</small>
-                    </div>
+                    <div class="text-success"><h6 class="my-0">Mã giảm giá</h6><small>${appliedVoucherCode.toUpperCase()}</small></div>
                     <span class="text-success">-${discountAmount.toLocaleString('vi-VN')}đ</span>
                 </li>` : ''}
-                <li class="list-group-item d-flex justify-content-between fs-5">
-                    <span>Tổng cộng (VND)</span>
-                    <strong>${finalPrice.toLocaleString('vi-VN')}đ</strong>
+                <li class="list-group-item d-flex justify-content-between">
+                    <span>Tổng cộng (VND)</span><strong>${finalPrice.toLocaleString('vi-VN')}đ</strong>
                 </li>
-            </ul>
-        `;
+            </ul>`;
 
-        // Xử lý phần phương thức thanh toán
+        // Xử lý đơn hàng 0đ
         if (finalPrice === 0) {
-            paymentMethodsContainer.style.opacity = '0.5';
-            paymentMethodsContainer.querySelectorAll('input').forEach(input => input.disabled = true);
-            paymentDetails.innerHTML = 'Đơn hàng miễn phí, không cần thanh toán.';
-            placeOrderBtn.textContent = "Nhận sản phẩm";
+            paymentMethodsWrapper.style.opacity = '0.5';
+            paymentMethodsWrapper.style.pointerEvents = 'none';
         } else {
-            paymentMethodsContainer.style.opacity = '1';
-            paymentMethodsContainer.querySelectorAll('input').forEach(input => input.disabled = false);
-            placeOrderBtn.textContent = "Đặt hàng";
+            paymentMethodsWrapper.style.opacity = '1';
+            paymentMethodsWrapper.style.pointerEvents = 'auto';
         }
     };
     
-    // --- HÀM XỬ LÝ VOUCHER ---
+    // --- HÀM ÁP DỤNG VOUCHER (MỚI) ---
     applyVoucherBtn.addEventListener('click', async () => {
         const code = voucherInput.value.trim().toUpperCase();
         if (!code) return;
 
         applyVoucherBtn.disabled = true;
-        const { data: voucher, error } = await supabase
-            .from('vouchers')
-            .select('code, discount_percent')
-            .eq('code', code)
-            .eq('is_active', true)
-            .single();
+        const { data: voucher, error } = await supabase.from('vouchers').select('code, discount_percent').eq('code', code).eq('is_active', true).single();
 
         if (error || !voucher) {
             voucherMessage.textContent = 'Mã không hợp lệ hoặc đã hết hạn.';
             voucherMessage.className = 'mt-2 small text-danger';
             discountAmount = 0;
-            appliedVoucher = null;
+            appliedVoucherCode = null;
         } else {
             discountAmount = Math.round((voucher.discount_percent / 100) * originalPrice);
-            voucherMessage.textContent = `Áp dụng thành công! Bạn được giảm ${discountAmount.toLocaleString('vi-VN')}đ.`;
+            appliedVoucherCode = voucher.code;
+            voucherMessage.textContent = `Áp dụng thành công! Giảm ${discountAmount.toLocaleString('vi-VN')}đ.`;
             voucherMessage.className = 'mt-2 small text-success';
-            appliedVoucher = voucher.code;
         }
         
-        finalPrice = originalPrice - discountAmount;
-        if (finalPrice < 0) finalPrice = 0;
-
-        updateUI();
+        finalPrice = Math.max(0, originalPrice - discountAmount);
+        updateDisplay();
         applyVoucherBtn.disabled = false;
     });
 
-    // --- HÀM XỬ LÝ ĐẶT HÀNG ---
-    placeOrderBtn.addEventListener('click', async () => {
-        placeOrderBtn.disabled = true;
-        placeOrderBtn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Đang xử lý...';
+    // --- CẬP NHẬT HÀM ĐẶT HÀNG CỦA BẠN ---
+    const handlePlaceOrder = async (button) => {
+        button.disabled = true;
+        button.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Đang xử lý...';
 
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) {
+            // Logic cũ của bạn đã xử lý tốt
             alert('Bạn cần đăng nhập để đặt hàng.');
             new bootstrap.Modal(document.getElementById('authModal')).show();
-            placeOrderBtn.disabled = false;
-            placeOrderBtn.innerHTML = 'Đặt hàng';
+            button.disabled = false;
+            button.innerHTML = 'Đặt hàng';
             return;
         }
 
         const selectedPaymentMethod = document.querySelector('input[name="paymentMethod"]:checked')?.value;
         if (finalPrice > 0 && !selectedPaymentMethod) {
             alert('Vui lòng chọn một phương thức thanh toán.');
-            placeOrderBtn.disabled = false;
-            placeOrderBtn.innerHTML = 'Đặt hàng';
+            button.disabled = false;
+            button.innerHTML = 'Đặt hàng';
             return;
         }
 
+        // Tạo payload mới với đầy đủ thông tin
         const orderPayload = {
             user_id: user.id,
             total_price: finalPrice,
             original_price: originalPrice,
             discount_amount: discountAmount,
-            voucher_code: appliedVoucher,
+            voucher_code: appliedVoucherCode,
             status: finalPrice === 0 ? 'completed' : 'pending',
             payment_method: finalPrice > 0 ? selectedPaymentMethod : 'free',
-            plan_id: checkoutItem.type === 'plan' ? checkoutItem.id : null,
-            product_id: checkoutItem.type === 'product' ? checkoutItem.id : null,
+            plan_id: item.type === 'plan' ? item.id : null,
+            product_id: item.type === 'product' ? item.id : null,
         };
 
         const { data: orderData, error: orderError } = await supabase.from('orders').insert(orderPayload).select('id').single();
         
         if (orderError) {
             alert('Lỗi khi tạo đơn hàng: ' + orderError.message);
-            placeOrderBtn.disabled = false;
-            placeOrderBtn.innerHTML = 'Đặt hàng';
+            button.disabled = false;
+            button.innerHTML = 'Đặt hàng';
         } else {
             sessionStorage.removeItem('checkoutItem');
             window.location.href = `/thankyou/?order_id=${orderData.id}`;
         }
-    });
-
-    // --- HÀM KHỞI TẠO TRANG ---
-    const initializePage = async () => {
-        // Lấy sản phẩm từ sessionStorage
-        const itemString = sessionStorage.getItem('checkoutItem');
-        if (!itemString) {
-            updateUI();
-            return;
-        }
-        checkoutItem = JSON.parse(itemString);
-        originalPrice = parseInt(checkoutItem.price, 10);
-        finalPrice = originalPrice;
-
-        // Kiểm tra trạng thái đăng nhập
-        const { data: { user } } = await supabase.auth.getUser();
-        if (user) {
-            userLoggedInDiv.style.display = 'block';
-            userLoggedOutDiv.style.display = 'none';
-            userEmailDisplay.textContent = user.email;
-        } else {
-            userLoggedInDiv.style.display = 'none';
-            userLoggedOutDiv.style.display = 'block';
-        }
-        
-        updateUI();
     };
+    
+    // --- KHỞI TẠO DỮ LIỆU BAN ĐẦU ---
+    const checkoutItemString = sessionStorage.getItem('checkoutItem');
+    if (!checkoutItemString) {
+        orderSummary.innerHTML = '<p class="text-danger">Không có sản phẩm/gói nào được chọn.</p>';
+        placeOrderBtnLoggedOut.disabled = true;
+        placeOrderBtnLoggedIn.disabled = true;
+    } else {
+        item = JSON.parse(checkoutItemString);
+        originalPrice = parseInt(item.price, 10);
+        finalPrice = originalPrice;
+        updateDisplay(); // Gọi lần đầu để hiển thị giá
+    }
 
-    // --- GẮN CÁC SỰ KIỆN KHÁC ---
+    // --- GIỮ NGUYÊN CÁC EVENT LISTENER CŨ CỦA BẠN ---
     loginLink.addEventListener('click', (e) => {
         e.preventDefault();
-        new bootstrap.Modal(document.getElementById('authModal')).show();
-    });
-    logoutButton.addEventListener('click', async (e) => {
-        e.preventDefault();
-        await supabase.auth.signOut();
-    });
-    supabase.auth.onAuthStateChange(() => {
-        // Tải lại trang để cập nhật đúng trạng thái
-        window.location.reload();
+        try { new bootstrap.Modal(document.getElementById('authModal')).show(); } 
+        catch (error) { console.error("Lỗi khi mở modal đăng nhập.", error); }
     });
 
-    // --- CHẠY HÀM KHỞI TẠO ---
-    initializePage();
+    checkoutForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        handlePlaceOrder(placeOrderBtnLoggedOut);
+    });
+    placeOrderBtnLoggedIn.addEventListener('click', () => handlePlaceOrder(placeOrderBtnLoggedIn));
+
+    const updateUserStatus = (user) => {
+        // Code cũ của bạn đã đúng
+        if (user) {
+            userLoggedInDiv.style.display = 'block';
+            loggedInActions.style.display = 'block';
+            userLoggedOutDiv.style.display = 'none';
+            if (userEmailSpan) userEmailSpan.textContent = user.email;
+        } else {
+            userLoggedInDiv.style.display = 'none';
+            loggedInActions.style.display = 'none';
+            userLoggedOutDiv.style.display = 'block';
+        }
+    };
+
+    supabase.auth.onAuthStateChange((_event, session) => {
+        updateUserStatus(session?.user);
+    });
+
+    const { data: { user } } = await supabase.auth.getUser();
+    updateUserStatus(user);
+
+    document.getElementById('logout-button').addEventListener('click', async () => {
+        await supabase.auth.signOut();
+    });
+
+    // Hiển thị chi tiết cho từng phương thức thanh toán
+    paymentRadioButtons.forEach(radio => {
+        radio.addEventListener('change', () => {
+            document.querySelectorAll('.payment-details-content').forEach(el => el.style.display = 'none');
+            const detailEl = document.getElementById(`${radio.id}_details`);
+            if(detailEl) detailEl.style.display = 'block';
+        });
+    });
 });

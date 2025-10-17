@@ -15,73 +15,86 @@ permalink: /checkout/
       <h4 class="d-flex justify-content-between align-items-center mb-3">
         <span class="text-primary">Đơn hàng của bạn</span>
       </h4>
-      <div id="order-summary-container">
-        <!-- JS sẽ chèn nội dung tóm tắt đơn hàng vào đây -->
+      <!-- Vùng tóm tắt đơn hàng (JS sẽ điền vào) -->
+      <div id="order-summary">
+        <div class="d-flex justify-content-center align-items-center p-5">
+          <div class="spinner-border" role="status">
+            <span class="visually-hidden">Loading...</span>
+          </div>
+        </div>
       </div>
-      
-      <!-- PHẦN MÃ GIẢM GIÁ -->
+
+      <!-- Vùng mã giảm giá (MỚI) -->
       <div class="card my-4">
         <div class="card-body">
             <div class="input-group">
-                <input type="text" class="form-control" placeholder="Mã giảm giá" id="voucher-code">
+                <input type="text" class="form-control" placeholder="Mã giảm giá" id="voucher-code-input">
                 <button class="btn btn-secondary" type="button" id="apply-voucher-btn">Áp dụng</button>
             </div>
             <div id="voucher-message" class="mt-2 small"></div>
         </div>
       </div>
       
-      <!-- PHẦN CHỌN PHƯƠNG THỨC THANH TOÁN -->
-      <div id="payment-methods-container">
+      <!-- Vùng chọn phương thức thanh toán (MỚI) -->
+      <div id="payment-methods-wrapper">
         <h4 class="mb-3">Phương thức thanh toán</h4>
-        <div class="my-3">
-          <div class="form-check">
-            <input id="bank_transfer" name="paymentMethod" type="radio" class="form-check-input" required value="bank_transfer" checked>
-            <label class="form-check-label" for="bank_transfer">Chuyển khoản Ngân hàng</label>
-          </div>
-          <div class="form-check">
-            <input id="paypal" name="paymentMethod" type="radio" class="form-check-input" required value="paypal">
-            <label class="form-check-label" for="paypal">PayPal</label>
-          </div>
-          <div class="form-check">
-            <input id="stripe" name="paymentMethod" type="radio" class="form-check-input" required value="stripe">
-            <label class="form-check-label" for="stripe">Stripe (Thẻ tín dụng/ghi nợ)</label>
-          </div>
-        </div>
-        <div id="payment-details" class="text-muted small p-3 bg-light rounded">
-          <!-- JS sẽ chèn nội dung chi tiết cho từng phương thức vào đây -->
+        <div class="my-3 card">
+            <div class="card-body">
+                <div class="form-check">
+                    <input id="bank_transfer" name="paymentMethod" type="radio" class="form-check-input" required value="bank_transfer" checked>
+                    <label class="form-check-label" for="bank_transfer">Chuyển khoản Ngân hàng</label>
+                </div>
+                <div id="bank_transfer_details" class="payment-details-content text-muted small mt-2">
+                    Thực hiện thanh toán vào ngay tài khoản ngân hàng của chúng tôi. Vui lòng sử dụng ID Đơn hàng của bạn làm nội dung thanh toán.
+                </div>
+                <hr>
+                <div class="form-check">
+                    <input id="paypal" name="paymentMethod" type="radio" class="form-check-input" required value="paypal">
+                    <label class="form-check-label" for="paypal">PayPal</label>
+                </div>
+                <div id="paypal_details" class="payment-details-content text-muted small mt-2" style="display: none;">
+                    Bạn sẽ được chuyển hướng đến PayPal để hoàn tất thanh toán.
+                </div>
+                <hr>
+                <div class="form-check">
+                    <input id="stripe" name="paymentMethod" type="radio" class="form-check-input" required value="stripe">
+                    <label class="form-check-label" for="stripe">Stripe (Thẻ tín dụng/ghi nợ)</label>
+                </div>
+                 <div id="stripe_details" class="payment-details-content text-muted small mt-2" style="display: none;">
+                    Thanh toán an toàn bằng thẻ tín dụng hoặc thẻ ghi nợ qua Stripe.
+                </div>
+            </div>
         </div>
       </div>
 
     </div>
 
-    <!-- Cột thông tin khách hàng và nút đặt hàng -->
+    <!-- Cột thông tin khách hàng (Giữ nguyên cấu trúc của bạn) -->
     <div class="col-md-7 col-lg-8">
       <h4 class="mb-3">Thông tin tài khoản</h4>
-      
-      <!-- Hiển thị khi đã đăng nhập -->
       <div id="user-logged-in" class="alert alert-success" style="display: none;">
-        Chào mừng trở lại, <strong id="user-email-display"></strong>! Bạn có thể tiến hành đặt hàng.
+        Chào mừng trở lại, <strong id="user-email"></strong>! Bạn có thể tiến hành đặt hàng.
         <a href="#" id="logout-button" class="float-end">Đăng xuất</a>
       </div>
-
-      <!-- Hiển thị khi chưa đăng nhập -->
-      <div id="user-logged-out" style="display: none;">
-        <p>Bạn đã có tài khoản? <a href="#" id="checkout-login-link">Đăng nhập</a> để thanh toán nhanh hơn.</p>
+      <div id="user-logged-out">
+        <p>Bạn đã có tài khoản? <a href="#" id="checkout-login-link">Đăng nhập</a></p>
         <form class="needs-validation" id="checkout-form" novalidate>
           <p>Thông tin dưới đây sẽ được dùng để tạo tài khoản mới cho bạn.</p>
           <div class="row g-3">
+            <div class="col-sm-6"><label for="firstName" class="form-label">Tên (*)</label><input type="text" class="form-control" id="firstName" required></div>
+            <div class="col-sm-6"><label for="lastName" class="form-label">Họ (*)</label><input type="text" class="form-control" id="lastName" required></div>
             <div class="col-12"><label for="email" class="form-label">Địa chỉ email (*)</label><input type="email" class="form-control" id="email" required></div>
             <div class="col-12"><label for="password" class="form-label">Mật khẩu (*)</label><input type="password" class="form-control" id="password" required></div>
           </div>
+          <hr class="my-4">
+          <div class="form-check"><input type="checkbox" class="form-check-input" id="terms" required><label class="form-check-label" for="terms">Tôi đã đọc và đồng ý với điều khoản và điều kiện của website (*)</label></div>
+          <hr class="my-4">
+          <button class="w-100 btn btn-primary btn-lg" type="submit" id="place-order-btn">Đặt hàng</button>
         </form>
       </div>
-
-      <hr class="my-4">
-      
-      <div id="checkout-action-container">
-        <div class="d-grid">
-           <button class="btn btn-primary btn-lg" id="place-order-btn" type="button">Đặt hàng</button>
-        </div>
+      <div id="logged-in-checkout-action" style="display: none;">
+        <hr class="my-4">
+        <button class="w-100 btn btn-primary btn-lg" id="place-order-btn-loggedin" type="button">Đặt hàng</button>
       </div>
     </div>
   </div>
