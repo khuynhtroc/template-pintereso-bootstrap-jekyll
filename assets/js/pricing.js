@@ -45,7 +45,7 @@ async function fetchPlans(supabase, container) {
                         <div class="my-3">
                             ${priceHTML}
                         </div>
-                        <ul class="list-unstyled mt-3 mb-4 text-start">
+                        <ul class="list-unstyled mt-3 mb-4 text-start" style="text-align: left;">
                             ${featuresHTML}
                         </ul>
                         <button type="button" class="w-100 btn btn-lg btn-buy mt-auto" onclick="purchasePlan(${plan.id})">MUA GÓI NÀY</button>
