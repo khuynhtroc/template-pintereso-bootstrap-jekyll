@@ -7,7 +7,7 @@ visit: "#"
 date: 2025-10-17 00:00:00 +0700
 download_url: "https://terabox.com/s/1NiAtJ14cvdgTzZOOp7bpAA"
 sku: "MS TR 259"
-price: "139000"
+price: "0"
 redirect_from: "/redirects/poster---vector---convert-qua-pdf"
 ---
 Background - Poster - Vector
